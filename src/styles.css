@@ -1,0 +1,152 @@
+html,body {
+	margin: 0;
+	padding: 0;
+}
+body {
+	font: normal 10px Arial, Helvetica, sans-serif;
+	background: black;
+	color: white;
+}
+h1 {
+	text-align: center;
+	font: normal normal bold 14px/normal Arial, Helvetica, sans-serif;
+	margin-bottom: 1em;
+}
+a, a:active, a:visited {
+	color: #999;
+	cursor: pointer;
+}
+#wrapper {
+	position: absolute;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+	background-color: #0d0e0f;
+}
+#leftPanel {
+	float: left;
+	width: 265px;
+	background-color: #333;
+}
+#mainPanel {
+	margin: 0 0 0 270px;
+	width: 100%;
+}
+#wrapper * {
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+fieldset {
+	width: 238px;
+	margin: 0 auto 10px auto;
+	padding: 5px;
+	color: #555;
+	cursor: default;
+}
+legend {
+	padding: 0 .5em;
+	margin: 0 0 1em 0;
+	color: #999;
+	cursor: default;
+}
+.ui-button-text {
+	font: normal 10px/normal Arial, Helvetica, sans-serif;
+	padding: .2em;
+}
+#tools,#drawing-set {
+	padding: 5px;
+	width: auto;
+	white-space: nowrap;
+	margin: 1px auto;
+}
+#colors {
+	width: 192px;
+	white-space: nowrap;
+	margin: 2px auto;
+}
+.center {
+    text-align: center;
+}
+.small {
+    font-size: 10px;
+}
+.gap {
+    margin: 0 auto 10px auto;
+}
+.color {
+	width: 22px;
+	height: 22px;
+}
+.color span {
+	width: 13px;
+	height: 13px;
+	border: 1px solid black;
+	margin: 3px;
+	padding: 0!important;
+}
+.color0 span {
+	background: transparent url(images/ui-icons_ffffff_256x240.png) no-repeat 0 -32px;
+}
+.color1 span {
+	background: red;
+}
+.color2 span {
+	background: blue;
+}
+.color3 span {
+	background: fuchsia;
+}
+.color4 span {
+	background: green;
+}
+.color5 span {
+	background: yellow;
+}
+.color6 span {
+	background: cyan;
+}
+.color7 span {
+	background: white;
+}
+#loadsave {
+	margin: 0 auto;
+	width: auto;
+	height: 24px;
+	white-space: nowrap;
+}
+#upload-form {
+	float: left;
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+#save-form {
+	margin: 0 6px;
+}
+#upload-file, #save-data {
+	display: none;
+    width: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+}
+#upload-button {
+    margin: 0;
+	width: 100px;
+	height: 24px;
+	cursor: default;
+}
+#save-button {
+	margin: 0;
+	width: 100px;
+	height: 24px;
+	cursor: default;
+}
+#clear-button {
+    margin: 0;
+    width: 26px;
+    height: 24px;
+    cursor: default;
+}

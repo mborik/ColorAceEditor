@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<link href="styles.css" media="all" rel="stylesheet" type="text/css" />
+	<script src="init.js?dev" type="text/javascript"></script>
+	<title>PMD 85 ColorAce picture editor</title>
+</head>
+
+<body>
+<div id="wrapper">
+	<div id="leftPanel">
+		<h1 class="center">PMD 85 ColorAce<br />picture editor</h1>
+		<fieldset class="ui-widget ui-widget-content ui-corner-all">
+			<legend class="ui-widget-header ui-corner-all">tool:</legend>
+			<div id="tools" class="ui-widget-content">
+				<input type="radio" id="tool0" name="tool" value="0" /><label for="tool0">Selection</label>
+				<input type="radio" id="tool1" name="tool" value="1" /><label for="tool1">Grid selection</label>
+				<input type="radio" id="tool2" name="tool" value="2" checked="checked" /><label for="tool2">Pencil</label>
+				<input type="radio" id="tool3" name="tool" value="3" /><label for="tool3">Brush</label>
+				<input type="radio" id="tool4" name="tool" value="4" /><label for="tool4">Fill</label>
+				<input type="radio" id="tool5" name="tool" value="5" /><label for="tool5">Lines</label>
+				<input type="radio" id="tool6" name="tool" value="6" /><label for="tool6">Ellipse</label>
+				<input type="radio" id="tool7" name="tool" value="7" /><label for="tool7">Rectangle</label>
+			</div>
+			<div id="drawing-set" class="ui-widget-content">
+				<div id="drawing-mode">
+					<input type="radio" id="mode0" name="pencil-mode" value="0" /><label for="mode0">RES</label>
+					<input type="radio" id="mode1" name="pencil-mode" value="1" /><label for="mode1">SET</label>
+					<input type="radio" id="mode2" name="pencil-mode" value="2" checked="checked" /><label for="mode2">OVR</label>
+					<input type="radio" id="mode3" name="pencil-mode" value="3" /><label for="mode3">COL</label>
+				</div>
+			</div>
+		</fieldset>
+		<fieldset class="ui-widget ui-widget-content ui-corner-all">
+			<legend class="ui-widget-header ui-corner-all">palette:</legend>
+			<div id="colors">
+				<input type="radio" id="color0" name="color" value="0" checked="checked" /><label for="color0" class="color color0"></label>
+				<input type="radio" id="color1" name="color" value="1" /><label for="color1" class="color color1"></label>
+				<input type="radio" id="color2" name="color" value="2" /><label for="color2" class="color color2"></label>
+				<input type="radio" id="color3" name="color" value="3" /><label for="color3" class="color color3"></label>
+				<input type="radio" id="color4" name="color" value="4" /><label for="color4" class="color color4"></label>
+				<input type="radio" id="color5" name="color" value="5" /><label for="color5" class="color color5"></label>
+				<input type="radio" id="color6" name="color" value="6" /><label for="color6" class="color color6"></label>
+				<input type="radio" id="color7" name="color" value="7" /><label for="color7" class="color color7"></label>
+			</div>
+		</fieldset>
+		<fieldset class="ui-widget ui-widget-content ui-corner-all">
+			<legend class="ui-widget-header ui-corner-all">file:</legend>
+			<div id="loadsave">
+				<form id="upload-form" enctype="multipart/form-data">
+					<input id="upload-file" name="upload-file" type="file" />
+                    <a hidden="" id="save-data" download="screen.bin"></a>
+                    <button id="upload-button">LOAD</button>
+                    <button id="save-button">SAVE</button>
+                    <button id="clear-button">NEW</button>
+                </form>
+			</div>
+		</fieldset>
+		<div class="center small gap">left: draw<br />right/mid: pan<br />wheel: zoom</div>
+	</div>
+	<div id="mainPanel"><canvas id="myCanvas"></canvas></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "ColorAceEditor",
+  "version": "0.2.1",
+  "authors": [
+    "Martin Bórik"
+  ],
+  "description": "online editor of color images for PMD 85 microcomputer",
+  "main": "src/init.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.0.3",
+    "jqueryui": "~1.10.3",
+    "jquery-mousewheel": "~3.1.9",
+    "scroller": "~1.2.2"
+  }
+}

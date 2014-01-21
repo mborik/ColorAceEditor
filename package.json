@@ -1,0 +1,20 @@
+{
+  "name": "ColorAceEditor",
+  "version": "0.2.1",
+  "author": {
+    "name": "Martin Bórik",
+    "url": "http://martin.borik.net/"
+  },
+  "description": "online editor of color images for PMD 85 microcomputer",
+  "license": "BSD",
+  "private": true,
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "bower": "~1.2.8",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-cssmin": "~0.7.0",
+    "grunt-contrib-copy": "~0.5.0"
+  }
+}
