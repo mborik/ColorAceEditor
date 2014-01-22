@@ -101,30 +101,34 @@ $(document).ready(function() {
 	$('#clear-button').button({
 		icons: { primary: "ui-icon-new" },
 		text: false
+	}).click(function() {
+		$(this).blur();
+		return false;
 	});
 
 	$('#upload-button').button({
 		icons: { primary: "ui-icon-load" }
 	}).click(function() {
 		$('#upload-file:file').click();
+		$(this).blur();
 		return false;
 	});
 
 	$('#upload-file:file').change(function() {
 		var file = this.files[0],
-			fr = window.FileReader;
+			fr = new window.FileReader;
 
-			if (fr) try {
-				fr.onload = function() {
-					var b = this.result,
-						a = new Uint8Array(b);
-					editor.pixel.readPMD85vram(a);
-				};
+		if (fr && file) try {
+			fr.onload = function() {
+				var b = new Uint8Array(this.result);
+				editor.pixel.readPMD85vram(b);
+				editor.scroller.zoomTo(editor.zoomFactor);
+			};
 
-				fr.readAsArrayBuffer(file);
-			}
-			catch(e) { console.error(e); }
-		});
+			fr.readAsArrayBuffer(file);
+		}
+		catch(e) { console.error(e); }
+	});
 
 	$('#save-button').button({
 		icons: { primary: "ui-icon-save" }
@@ -134,7 +138,9 @@ $(document).ready(function() {
 
 		link.href = url;
 		link.click();
-		return true;
+
+		$(this).blur();
+		return false;
 	});
 
 	$('#tools').buttonset();

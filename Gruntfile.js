@@ -43,14 +43,6 @@ module.exports = function(grunt) {
 						dest: 'build/scroller.dev.js'
 					},
 					{
-						src: 'bower_components/jqueryui/ui/jquery-ui.js',
-						dest: 'build/jqueryui.dev.js'
-					},
-					{
-						src: 'bower_components/jqueryui/ui/minified/jquery-ui.min.js',
-						dest: 'build/jqueryui.js'
-					},
-					{
 						expand: true,
 						cwd: 'jqueryui_theme/images/',
 						src: '**',
@@ -65,7 +57,7 @@ module.exports = function(grunt) {
 			options: {
 				separator: '\n'
 			},
-			app: {
+			"app": {
 				src: [
 					'src/editor.js',
 					'src/editor.pixel.js',
@@ -74,20 +66,39 @@ module.exports = function(grunt) {
 				],
 				dest: 'build/app.dev.js'
 			},
-			jquery: {
+			"jquery": {
 				src: [
 					'bower_components/jquery/jquery.js',
 					'bower_components/jquery-mousewheel/jquery.mousewheel.js'
 				],
 				dest: 'build/jquery.dev.js'
 			},
-			jqueryui: {
+			"jqueryuijs": {
 				options: {
 					separator: '\n',
 					stripBanners: true
 				},
 				src: [
-					'bower_components/jqueryui/themes/base/jquery-ui.css',
+					'bower_components/jqueryui/ui/jquery.ui.core.js',
+					'bower_components/jqueryui/ui/jquery.ui.widget.js',
+					'bower_components/jqueryui/ui/jquery.ui.mouse.js',
+					'bower_components/jqueryui/ui/jquery.ui.button.js',
+					'bower_components/jqueryui/ui/jquery.ui.position.js',
+					'bower_components/jqueryui/ui/jquery.ui.dialog.js',
+					'bower_components/jqueryui/ui/jquery.ui.slider.js'
+				],
+				dest: 'build/jqueryui.dev.js'
+			},
+			"jqueryuicss": {
+				options: {
+					separator: '\n',
+					stripBanners: true
+				},
+				src: [
+					'bower_components/jqueryui/themes/base/jquery.ui.core.css',
+					'bower_components/jqueryui/themes/base/jquery.ui.button.css',
+					'bower_components/jqueryui/themes/base/jquery.ui.dialog.css',
+					'bower_components/jqueryui/themes/base/jquery.ui.slider.css',
 					'jqueryui_theme/jquery-ui.theme.css'
 				],
 				dest: 'jqueryui_theme/jquery-ui.css'
@@ -108,6 +119,10 @@ module.exports = function(grunt) {
 						dest: 'build/jquery.js'
 					},
 					{
+						src: 'build/jqueryui.dev.js',
+						dest: 'build/jqueryui.js'
+					},
+					{
 						src: 'build/init.dev.js',
 						dest: 'build/init.js'
 					},
@@ -119,7 +134,7 @@ module.exports = function(grunt) {
 			}
 		},
 		cssmin: {
-			main: {
+			'styles': {
 				options: {
 					banner: '<%= banner %>\n' +
 						'@import url("jqueryui.css");'
@@ -130,7 +145,7 @@ module.exports = function(grunt) {
 					]
 				}
 			},
-			jqueryui: {
+			'jqueryui': {
 				files: {
 					'build/jqueryui.css': [
 						'jqueryui_theme/jquery-ui.css'
@@ -149,4 +164,5 @@ module.exports = function(grunt) {
 
 	// Task definitions
 	grunt.registerTask('default', [ 'copy', 'concat', 'uglify', 'cssmin' ]);
+	grunt.registerTask('test', [ 'jshint' ]);
 };

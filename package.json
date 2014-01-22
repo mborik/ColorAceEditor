@@ -8,6 +8,11 @@
   "description": "online editor of color images for PMD 85 microcomputer",
   "license": "BSD",
   "private": true,
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "grunt test"
+  },
   "devDependencies": {
     "grunt": "~0.4.2",
     "bower": "~1.2.8",
