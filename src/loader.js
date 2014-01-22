@@ -111,8 +111,20 @@ $(document).ready(function() {
 	});
 
 	$('#upload-file:file').change(function() {
-		;
-	});
+		var file = this.files[0],
+			fr = window.FileReader;
+
+			if (fr) try {
+				fr.onload = function() {
+					var b = this.result,
+						a = new Uint8Array(b);
+					editor.pixel.readPMD85vram(a);
+				};
+
+				fr.readAsArrayBuffer(file);
+			}
+			catch(e) { console.error(e); }
+		});
 
 	$('#save-button').button({
 		icons: { primary: "ui-icon-save" }

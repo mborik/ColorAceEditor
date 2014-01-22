@@ -118,12 +118,13 @@ ColorAceEditor.Pixelator = function(e) {
 	};
 
 	/**
-	 * BASE64 encoding of PMD 85 VRAM dump.
+	 * save PMD 85 VRAM dump to Blob URL or BASE64 data URL.
 	 */
 	self.savePMD85vram = function() {
 		var baseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
 			data = [], bin = e.ctx.createImageData(16, 256).data,
-			i, j, k = 0, m, src = 0, base64 = '';
+			i, j, k = 0, m, src = 0, base64 = '', blob, url,
+			mime = 'application/octet-stream';
 
 		for (i = 0; i < 16384; i++) {
 			m = i % 3;
@@ -150,15 +151,38 @@ ColorAceEditor.Pixelator = function(e) {
 			}
 		}
 
+		// simplification for 16384 bytes ;)
 		j = (data[0] << 16);
-		base64 +=
-			baseChars.charAt(j >> 18) +
-				baseChars.charAt((j >> 12) & 0x3f) + "==";
+		base64 += baseChars.charAt(j >> 18) + baseChars.charAt((j >> 12) & 0x3f) + "==";
 
-		return {
-			BASE64: base64,
-			binary: bin
-		};
+		try {
+			blob = new Blob([ bin ], { type: mime });
+		}
+		catch(e) {
+			console.error(e);
+
+			try {
+				blob = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder);
+				blob.append(bin);
+				blob = blob.getBlob(mime);
+			}
+			catch(e) {
+				console.error(e);
+				blob = null;
+			}
+		}
+
+		if (blob) {
+			try {
+				url = (window.URL || window.webkitURL).createObjectURL(blob) + '';
+			}
+			catch(e) {
+				console.error(e);
+				url = null;
+			}
+		}
+
+		return url || 'data:application/octet-stream;base64,' + data.BASE64;
 	};
 
 	/**
@@ -505,52 +529,30 @@ $(document).ready(function() {
 	});
 
 	$('#upload-file:file').change(function() {
-		;
-	});
+		var file = this.files[0],
+			fr = window.FileReader;
+
+			if (fr) try {
+				fr.onload = function() {
+					var b = this.result,
+						a = new Uint8Array(b);
+					editor.pixel.readPMD85vram(a);
+				};
+
+				fr.readAsArrayBuffer(file);
+			}
+			catch(e) { console.error(e); }
+		});
 
 	$('#save-button').button({
 		icons: { primary: "ui-icon-save" }
 	}).click(function() {
-		var data = editor.pixel.savePMD85vram(),
-			link = $('#save-data')[0], blob = null, url;
-
-		try {
-			blob = new Blob(
-				[ data.binary ],
-				{ type: 'application/octet-stream' }
-			);
-		}
-		catch(e) {
-			console.error(e);
-			blob = null;
-		}
-
-		if (!blob) try {
-			blob = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder);
-			blob.append(data.binary);
-			blob = blob.getBlob('application/octet-stream');
-		}
-		catch(e) {
-			console.error(e);
-			blob = null;
-		}
-
-		if (!blob)
-			url = 'data:application/octet-stream;base64,' + data.BASE64;
-
-		else try {
-			url = (window.URL || window.webkitURL).createObjectURL(blob);
-			if (url !== (url + ''))
-				throw('createObjectURL output ' + url);
-		}
-		catch(e) {
-			console.error(e);
-			url = '#';
-		}
+		var url = editor.pixel.savePMD85vram(),
+			link = $('#save-data')[0];
 
 		link.href = url;
 		link.click();
-		return false;
+		return true;
 	});
 
 	$('#tools').buttonset();
