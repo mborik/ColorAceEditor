@@ -71,9 +71,15 @@ legend {
 }
 .small {
     font-size: 10px;
+    margin: 2em auto 0 auto;
 }
-.gap {
-    margin: 0 auto 10px auto;
+.status {
+	position: absolute;
+	width: 265px;
+	bottom: 1em;
+    font-size: 12px;
+    font-family: monospace;
+    font-weight: bold;
 }
 .color {
 	width: 22px;

@@ -29,7 +29,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * Initialization of palette color table.
 	 */
 	self.preparePixels = function() {
-		var i, j, r, g, b, y, a = (255 << 24);
+		var i, r, g, b, y, a = (255 << 24);
 		for (i = 0; i < 8; i++) {
 			r = self.pal[i][4];
 			g = self.pal[i][5];
@@ -38,15 +38,15 @@ ColorAceEditor.Pixelator = function(e) {
 
 			self.pal[i][0] = a | (b << 16) | (g << 8) | r;
 
-			r /= 1.333;
-			g /= 1.333;
-			b /= 1.333;
+			r = (r / 1.6) + 32;
+			g = (g / 1.6) + 32;
+			b = (b / 1.6) + 32;
 
 			self.pal[i][1] = a | (b << 16) | (g << 8) | r;
 
-			r /= 2;
-			g /= 2;
-			b /= 2;
+			r = (r / 2.4) + 16;
+			g = (g / 2.4) + 16;
+			b = (b / 2.4) + 16;
 
 			self.pal[i][2] = a | (b << 16) | (g << 8) | r;
 			self.pal[i][3] = a | (y << 16) | (y << 8) | y;
@@ -121,29 +121,26 @@ ColorAceEditor.Pixelator = function(e) {
 		j = (data[0] << 16);
 		base64 += baseChars.charAt(j >> 18) + baseChars.charAt((j >> 12) & 0x3f) + "==";
 
-		try {
-			blob = new Blob([ bin ], { type: mime });
-		}
-		catch(e) {
-			console.error(e);
+		try { blob = new Blob([ bin ], { type: mime }); }
+		catch(ex) {
+			console.error(ex);
 
 			try {
-				blob = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder);
-				blob.append(bin);
-				blob = blob.getBlob(mime);
+				var bb = (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder);
+				bb = new bb();
+				bb.append(bin);
+				blob = bb.getBlob(mime);
 			}
-			catch(e) {
-				console.error(e);
+			catch(ex2) {
+				console.error(ex2);
 				blob = null;
 			}
 		}
 
 		if (blob) {
-			try {
-				url = (window.URL || window.webkitURL).createObjectURL(blob) + '';
-			}
-			catch(e) {
-				console.error(e);
+			try { url = (window.URL || window.webkitURL).createObjectURL(blob) + ''; }
+			catch(ex) {
+				console.error(ex);
 				url = null;
 			}
 		}
@@ -155,7 +152,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * Returns nonzero if we need to show grid for exact X coordinate.
 	 * @param {number} x coordinate in surface (0-287)
 	 */
-	self.isGrid = function(x) { return (e.showGrid && ((x % 6) == 5)) ? 3 : 0; }
+	self.isGrid = function(x) { return (e.showGrid && ((x % 6) == 5)) ? 3 : 0; };
 
 	/**
 	 * Main render callback of Scroller.
@@ -164,7 +161,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {number} zoom Scroller internal zoom factor
 	 */
 	self.render = function(left, top, zoom) {
-		var i, j, k, x = 0, y = 0, z = 0,
+		var i, j, k, x = 0, y = 0, z = 0, w,
 			l = Math.max(Math.floor(left / zoom), 0),
 			t = Math.max(Math.floor(top / zoom), 0);
 
@@ -182,13 +179,13 @@ ColorAceEditor.Pixelator = function(e) {
 			bmpDWORD = new Uint32Array(bmpBuffer);
 		}
 
-		for (i = t; i < 256; i++) {
+		for (i = t, w = bmpW - zoom; i < 256; i++) {
 			x = 0;
 			for (j = l, k = ((i * 288) + j); j < 288; j++, k++) {
 				self.scalers[zoom](z + x, self.pal[self.surface[k]], self.isGrid(j));
 
 				x += zoom;
-				if (x >= bmpW)
+				if (x >= w)
 					break;
 			}
 
@@ -211,9 +208,10 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {boolean} [refreshAttributes] Refresh color from attributes.
 	 */
 	self.redrawRect = function(x, y, w, h, refreshAttributes) {
-		var i, j, k, c, d, sx, sy, z, bx, by;
+		var i, j, k, c, d, sx, sy, sz, sw, bx, by;
 
-		z = (sy = (y * currentZoom) - scrollerY) * bmpW;
+		sw = bmpW - currentZoom;
+		sz = (sy = (y * currentZoom) - scrollerY) * bmpW;
 		for (i = y; i < (y + h); i++) {
 			sx = (x * currentZoom) - scrollerX;
 			for (j = x, k = ((i * 288) + j); j < (x + w); j++, k++) {
@@ -229,19 +227,21 @@ ColorAceEditor.Pixelator = function(e) {
 				}
 
 				if (sx >= 0 && sy >= 0) {
-					self.scalers[currentZoom](z + sx, self.pal[c], self.isGrid(j));
+					self.scalers[currentZoom](sz + sx, self.pal[c], self.isGrid(j));
 
-					if (bx === undefined)
-						bx = sx, by = sy;
+					if (bx === undefined) {
+						bx = sx;
+						by = sy;
+					}
 				}
 
 				sx += currentZoom;
-				if (sx >= bmpW)
+				if (sx >= sw)
 					break;
 			}
 
 			sy += currentZoom;
-			z += currentZoom * bmpW;
+			sz += currentZoom * bmpW;
 			if (sy >= bmpH)
 				break;
 		}
@@ -262,7 +262,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {number} color 0 = no color change, 1 - 7 change to palette color
 	 */
 	self.putPixel = function(x, y, mode, color) {
-		var i, j, x, y, column, c, d, a1, a2;
+		var column, c, d, a1, a2;
 
 		if (x < 0 || x >= 288 || y < 0 || y >= 256 ||
 			mode < 0 || mode >= 4 || color < 0 || color >= 8)
@@ -363,7 +363,7 @@ ColorAceEditor.Pixelator = function(e) {
 		},
 	// 3x3
 		function (p, c, g) {
-			var a = c[0], b = c[1], o = bmpW - 2;
+			var a = c[0], o = bmpW - 2;
 
 			bmpDWORD[p++] = a;
 			bmpDWORD[p++] = a;
@@ -371,73 +371,41 @@ ColorAceEditor.Pixelator = function(e) {
 			p += o;
 			bmpDWORD[p++] = a;
 			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
+			bmpDWORD[p] = a;
 			p += o;
 			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = b;
-			bmpDWORD[p] = c[g | 1];
+			bmpDWORD[p++] = a;
+			bmpDWORD[p] = c[g];
 		},
 	// 4x4
 		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], o = bmpW - 3;
+			var a = c[0], b = c[g | 1], o = bmpW - 3;
 
 			bmpDWORD[p++] = a;
 			bmpDWORD[p++] = a;
 			bmpDWORD[p++] = a;
+			bmpDWORD[p] = a;
+			p += o;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p] = a;
+			p += o;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p] = a;
+			p += o;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
 			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = c[g | 1];
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p] = c[g | 2];
 		},
-	// 5x5
-		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], o = bmpW - 4;
-
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = c[g | 1];
-			p += o;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p] = c[g | 2];
-		},
+	// 5x5 disabled
+		null,
 	// 6x6
 		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, o = bmpW - 5;
+			var a = c[0], b = c[1], d = c[g | 1], i, o = bmpW - 5;
 
 			for (i = 0; i < 5; i++) {
 				bmpDWORD[p++] = a;
@@ -445,40 +413,19 @@ ColorAceEditor.Pixelator = function(e) {
 				bmpDWORD[p++] = a;
 				bmpDWORD[p++] = a;
 				bmpDWORD[p++] = a;
-				bmpDWORD[p] = (i & 1) ? e : b;
+				bmpDWORD[p] = (i & 1) ? d : ((i % 2) ? b : a);
 				p += o;
 			}
 
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p] = c[g | 2];
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = b;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = b;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p] = d;
 		},
-	// 7x7
-		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, o = bmpW - 6;
-
-			for (i = 0, e; i < 6; i++) {
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p] = (i == 3) ? e : b;
-				p += o;
-			}
-
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p] = c[g | 2];
-		},
+	// 7x7 disabled
+		null,
 	// 8x8
 		function (p, c, g) {
 			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, j, o = bmpW - 7;
@@ -494,22 +441,75 @@ ColorAceEditor.Pixelator = function(e) {
 				bmpDWORD[p++] = d;
 			bmpDWORD[p] = c[g | 2];
 		},
-	// 9x9
+	// 9x9 disabled
+		null,
+	// 10x10
 		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, j, o = bmpW - 8;
+			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, j, o = bmpW - 9;
 
-			for (i = 0; i < 8; i++) {
-				for (j = 0; j < 8; j++)
+			for (i = 0; i < 9; i++) {
+				for (j = 0; j < 9; j++)
 					bmpDWORD[p++] = a;
-				bmpDWORD[p] = (j == 2 || j == 5) ? e : b;
+				bmpDWORD[p] = (i & 1) ? e : b;
 				p += o;
 			}
 
-			for (j = 0; j < 8; j++)
+			for (j = 0; j < 9; j++)
 				bmpDWORD[p++] = d;
 			bmpDWORD[p] = c[g | 2];
 		},
-	]
+	// 11x11 disabled
+		null,
+	// 12x12
+		function (p, c, g) {
+			var a = c[0], b = c[1], d = c[g | 1], i, j, o = bmpW - 11;
+
+			for (i = 0; i < 11; i++) {
+				for (j = 0; j < 11; j++)
+					bmpDWORD[p++] = a;
+				bmpDWORD[p] = (i & 1) ? d : b;
+				p += o;
+			}
+
+			for (j = 0; j < 11; j++)
+				bmpDWORD[p++] = 11;
+			bmpDWORD[p] = c[g | 2];
+		},
+	// 13x13 disabled
+		null,
+	// 14x14
+		function (p, c, g) {
+			var a = c[0], b = c[1], d = c[g | 1], i, j, o = bmpW - 13;
+
+			for (i = 0; i < 13; i++) {
+				for (j = 0; j < 13; j++)
+					bmpDWORD[p++] = a;
+				bmpDWORD[p] = (i & 1) ? d : b;
+				p += o;
+			}
+
+			for (j = 0; j < 13; j++)
+				bmpDWORD[p++] = 13;
+			bmpDWORD[p] = c[g | 2];
+		},
+	// 15x15 disabled
+		null,
+	// 16x16
+		function (p, c, g) {
+			var a = c[0], b = c[1], d = c[g | 1], i, j, o = bmpW - 15;
+
+			for (i = 0; i < 15; i++) {
+				for (j = 0; j < 15; j++)
+					bmpDWORD[p++] = a;
+				bmpDWORD[p] = (i & 1) ? d : b;
+				p += o;
+			}
+
+			for (j = 0; j < 15; j++)
+				bmpDWORD[p++] = 15;
+			bmpDWORD[p] = c[g | 2];
+		}
+	];
 
 	return self;
 };

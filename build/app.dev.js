@@ -10,14 +10,15 @@ function ColorAceEditor(opt) {
 	if (!(opt.canvas && $(opt.canvas).is("canvas")))
 		throw "ColorAceEditor: Canvas element not defined!";
 
-	this.canvas  = opt.canvas;
+	this.canvas = opt.canvas;
 	this.ctx = this.canvas.getContext("2d");
 
+	this.statusBar  = opt.status;
 	this.zoomFactor = opt.zoom || 1;
 	this.showGrid   = opt.grid || true;
 	this.undoLevels = opt.undo || 10;
 	this.editColor  = 0;
-	this.editTool   = 0;
+	this.editTool   = 2;
 	this.editMode   = 2;
 
 	this.contentWidth  = 0;
@@ -46,7 +47,7 @@ function ColorAceEditor(opt) {
 		this.contentWidth  = w;
 		this.contentHeight = h;
 		this.scroller.setDimensions(w - 276, h, 288, 256);
-	}
+	};
 
 	/**
 	 * Translation of "real world" coordinates on page to our pixel space.
@@ -63,8 +64,23 @@ function ColorAceEditor(opt) {
 		r.column = Math.floor(r.x / 6);
 
 		return r;
-	}
-};
+	};
+
+	this.redrawStatusBar = function(sx, sy) {
+		var coords = this.translateCoords(sx, sy),
+			x = Math.max(0, Math.min(coords.x, 287)),
+			y = Math.max(0, Math.min(coords.y, 255)),
+			c = Math.max(0, Math.min(coords.column, 47)),
+			a = (0xC000 + (y * 64) + c).toString(16).toUpperCase() + 'h',
+			z = this.zoomFactor * 100,
+			pad = function(num, len) {
+				num = '    ' + num;
+				return num.substr(num.length - len);
+			};
+
+		this.statusBar.text(pad(z, 4) + '%   X:' + pad(x, 3) + ' Y:' + pad(y, 3) + '  C:' + pad(c, 2) + '   ' + a);
+	};
+}
 
 /*
  * PMD 85 ColorAce picture editor
@@ -97,7 +113,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * Initialization of palette color table.
 	 */
 	self.preparePixels = function() {
-		var i, j, r, g, b, y, a = (255 << 24);
+		var i, r, g, b, y, a = (255 << 24);
 		for (i = 0; i < 8; i++) {
 			r = self.pal[i][4];
 			g = self.pal[i][5];
@@ -106,15 +122,15 @@ ColorAceEditor.Pixelator = function(e) {
 
 			self.pal[i][0] = a | (b << 16) | (g << 8) | r;
 
-			r /= 1.333;
-			g /= 1.333;
-			b /= 1.333;
+			r = (r / 1.6) + 32;
+			g = (g / 1.6) + 32;
+			b = (b / 1.6) + 32;
 
 			self.pal[i][1] = a | (b << 16) | (g << 8) | r;
 
-			r /= 2;
-			g /= 2;
-			b /= 2;
+			r = (r / 2.4) + 16;
+			g = (g / 2.4) + 16;
+			b = (b / 2.4) + 16;
 
 			self.pal[i][2] = a | (b << 16) | (g << 8) | r;
 			self.pal[i][3] = a | (y << 16) | (y << 8) | y;
@@ -189,29 +205,26 @@ ColorAceEditor.Pixelator = function(e) {
 		j = (data[0] << 16);
 		base64 += baseChars.charAt(j >> 18) + baseChars.charAt((j >> 12) & 0x3f) + "==";
 
-		try {
-			blob = new Blob([ bin ], { type: mime });
-		}
-		catch(e) {
-			console.error(e);
+		try { blob = new Blob([ bin ], { type: mime }); }
+		catch(ex) {
+			console.error(ex);
 
 			try {
-				blob = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder);
-				blob.append(bin);
-				blob = blob.getBlob(mime);
+				var bb = (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder);
+				bb = new bb();
+				bb.append(bin);
+				blob = bb.getBlob(mime);
 			}
-			catch(e) {
-				console.error(e);
+			catch(ex2) {
+				console.error(ex2);
 				blob = null;
 			}
 		}
 
 		if (blob) {
-			try {
-				url = (window.URL || window.webkitURL).createObjectURL(blob) + '';
-			}
-			catch(e) {
-				console.error(e);
+			try { url = (window.URL || window.webkitURL).createObjectURL(blob) + ''; }
+			catch(ex) {
+				console.error(ex);
 				url = null;
 			}
 		}
@@ -223,7 +236,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * Returns nonzero if we need to show grid for exact X coordinate.
 	 * @param {number} x coordinate in surface (0-287)
 	 */
-	self.isGrid = function(x) { return (e.showGrid && ((x % 6) == 5)) ? 3 : 0; }
+	self.isGrid = function(x) { return (e.showGrid && ((x % 6) == 5)) ? 3 : 0; };
 
 	/**
 	 * Main render callback of Scroller.
@@ -232,7 +245,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {number} zoom Scroller internal zoom factor
 	 */
 	self.render = function(left, top, zoom) {
-		var i, j, k, x = 0, y = 0, z = 0,
+		var i, j, k, x = 0, y = 0, z = 0, w,
 			l = Math.max(Math.floor(left / zoom), 0),
 			t = Math.max(Math.floor(top / zoom), 0);
 
@@ -250,13 +263,13 @@ ColorAceEditor.Pixelator = function(e) {
 			bmpDWORD = new Uint32Array(bmpBuffer);
 		}
 
-		for (i = t; i < 256; i++) {
+		for (i = t, w = bmpW - zoom; i < 256; i++) {
 			x = 0;
 			for (j = l, k = ((i * 288) + j); j < 288; j++, k++) {
 				self.scalers[zoom](z + x, self.pal[self.surface[k]], self.isGrid(j));
 
 				x += zoom;
-				if (x >= bmpW)
+				if (x >= w)
 					break;
 			}
 
@@ -279,9 +292,10 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {boolean} [refreshAttributes] Refresh color from attributes.
 	 */
 	self.redrawRect = function(x, y, w, h, refreshAttributes) {
-		var i, j, k, c, d, sx, sy, z, bx, by;
+		var i, j, k, c, d, sx, sy, sz, sw, bx, by;
 
-		z = (sy = (y * currentZoom) - scrollerY) * bmpW;
+		sw = bmpW - currentZoom;
+		sz = (sy = (y * currentZoom) - scrollerY) * bmpW;
 		for (i = y; i < (y + h); i++) {
 			sx = (x * currentZoom) - scrollerX;
 			for (j = x, k = ((i * 288) + j); j < (x + w); j++, k++) {
@@ -297,19 +311,21 @@ ColorAceEditor.Pixelator = function(e) {
 				}
 
 				if (sx >= 0 && sy >= 0) {
-					self.scalers[currentZoom](z + sx, self.pal[c], self.isGrid(j));
+					self.scalers[currentZoom](sz + sx, self.pal[c], self.isGrid(j));
 
-					if (bx === undefined)
-						bx = sx, by = sy;
+					if (bx === undefined) {
+						bx = sx;
+						by = sy;
+					}
 				}
 
 				sx += currentZoom;
-				if (sx >= bmpW)
+				if (sx >= sw)
 					break;
 			}
 
 			sy += currentZoom;
-			z += currentZoom * bmpW;
+			sz += currentZoom * bmpW;
 			if (sy >= bmpH)
 				break;
 		}
@@ -330,7 +346,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {number} color 0 = no color change, 1 - 7 change to palette color
 	 */
 	self.putPixel = function(x, y, mode, color) {
-		var i, j, x, y, column, c, d, a1, a2;
+		var column, c, d, a1, a2;
 
 		if (x < 0 || x >= 288 || y < 0 || y >= 256 ||
 			mode < 0 || mode >= 4 || color < 0 || color >= 8)
@@ -431,7 +447,7 @@ ColorAceEditor.Pixelator = function(e) {
 		},
 	// 3x3
 		function (p, c, g) {
-			var a = c[0], b = c[1], o = bmpW - 2;
+			var a = c[0], o = bmpW - 2;
 
 			bmpDWORD[p++] = a;
 			bmpDWORD[p++] = a;
@@ -439,73 +455,41 @@ ColorAceEditor.Pixelator = function(e) {
 			p += o;
 			bmpDWORD[p++] = a;
 			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
+			bmpDWORD[p] = a;
 			p += o;
 			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = b;
-			bmpDWORD[p] = c[g | 1];
+			bmpDWORD[p++] = a;
+			bmpDWORD[p] = c[g];
 		},
 	// 4x4
 		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], o = bmpW - 3;
+			var a = c[0], b = c[g | 1], o = bmpW - 3;
 
 			bmpDWORD[p++] = a;
 			bmpDWORD[p++] = a;
 			bmpDWORD[p++] = a;
+			bmpDWORD[p] = a;
+			p += o;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p] = a;
+			p += o;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p] = a;
+			p += o;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = a;
 			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = c[g | 1];
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p] = c[g | 2];
 		},
-	// 5x5
-		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], o = bmpW - 4;
-
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = b;
-			p += o;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p++] = a;
-			bmpDWORD[p] = c[g | 1];
-			p += o;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p] = c[g | 2];
-		},
+	// 5x5 disabled
+		null,
 	// 6x6
 		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, o = bmpW - 5;
+			var a = c[0], b = c[1], d = c[g | 1], i, o = bmpW - 5;
 
 			for (i = 0; i < 5; i++) {
 				bmpDWORD[p++] = a;
@@ -513,40 +497,19 @@ ColorAceEditor.Pixelator = function(e) {
 				bmpDWORD[p++] = a;
 				bmpDWORD[p++] = a;
 				bmpDWORD[p++] = a;
-				bmpDWORD[p] = (i & 1) ? e : b;
+				bmpDWORD[p] = (i & 1) ? d : ((i % 2) ? b : a);
 				p += o;
 			}
 
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p] = c[g | 2];
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = b;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p++] = b;
+			bmpDWORD[p++] = a;
+			bmpDWORD[p] = d;
 		},
-	// 7x7
-		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, o = bmpW - 6;
-
-			for (i = 0, e; i < 6; i++) {
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p++] = a;
-				bmpDWORD[p] = (i == 3) ? e : b;
-				p += o;
-			}
-
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p++] = d;
-			bmpDWORD[p] = c[g | 2];
-		},
+	// 7x7 disabled
+		null,
 	// 8x8
 		function (p, c, g) {
 			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, j, o = bmpW - 7;
@@ -562,22 +525,75 @@ ColorAceEditor.Pixelator = function(e) {
 				bmpDWORD[p++] = d;
 			bmpDWORD[p] = c[g | 2];
 		},
-	// 9x9
+	// 9x9 disabled
+		null,
+	// 10x10
 		function (p, c, g) {
-			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, j, o = bmpW - 8;
+			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i, j, o = bmpW - 9;
 
-			for (i = 0; i < 8; i++) {
-				for (j = 0; j < 8; j++)
+			for (i = 0; i < 9; i++) {
+				for (j = 0; j < 9; j++)
 					bmpDWORD[p++] = a;
-				bmpDWORD[p] = (j == 2 || j == 5) ? e : b;
+				bmpDWORD[p] = (i & 1) ? e : b;
 				p += o;
 			}
 
-			for (j = 0; j < 8; j++)
+			for (j = 0; j < 9; j++)
 				bmpDWORD[p++] = d;
 			bmpDWORD[p] = c[g | 2];
 		},
-	]
+	// 11x11 disabled
+		null,
+	// 12x12
+		function (p, c, g) {
+			var a = c[0], b = c[1], d = c[g | 1], i, j, o = bmpW - 11;
+
+			for (i = 0; i < 11; i++) {
+				for (j = 0; j < 11; j++)
+					bmpDWORD[p++] = a;
+				bmpDWORD[p] = (i & 1) ? d : b;
+				p += o;
+			}
+
+			for (j = 0; j < 11; j++)
+				bmpDWORD[p++] = 11;
+			bmpDWORD[p] = c[g | 2];
+		},
+	// 13x13 disabled
+		null,
+	// 14x14
+		function (p, c, g) {
+			var a = c[0], b = c[1], d = c[g | 1], i, j, o = bmpW - 13;
+
+			for (i = 0; i < 13; i++) {
+				for (j = 0; j < 13; j++)
+					bmpDWORD[p++] = a;
+				bmpDWORD[p] = (i & 1) ? d : b;
+				p += o;
+			}
+
+			for (j = 0; j < 13; j++)
+				bmpDWORD[p++] = 13;
+			bmpDWORD[p] = c[g | 2];
+		},
+	// 15x15 disabled
+		null,
+	// 16x16
+		function (p, c, g) {
+			var a = c[0], b = c[1], d = c[g | 1], i, j, o = bmpW - 15;
+
+			for (i = 0; i < 15; i++) {
+				for (j = 0; j < 15; j++)
+					bmpDWORD[p++] = a;
+				bmpDWORD[p] = (i & 1) ? d : b;
+				p += o;
+			}
+
+			for (j = 0; j < 15; j++)
+				bmpDWORD[p++] = 15;
+			bmpDWORD[p] = c[g | 2];
+		}
+	];
 
 	return self;
 };
@@ -593,7 +609,7 @@ ColorAceEditor.Drawing = function(e) {
 	var self = {};
 
 	/**
-	 * Only putPixel wrapper.
+	 * putPixel wrapper only.
 	 * @param {number} x coordinate in surface (0-287)
 	 * @param {number} y coordinate in surface (0-255)
 	 */
@@ -647,17 +663,21 @@ ColorAceEditor.Drawing = function(e) {
 ColorAceEditor.Handler = function(e) {
 	var self = {}, draw = e.draw;
 
+	self.mouseDown = function(o) {
+		draw.dot(o.x, o.y);
+	};
+
 	self.mouseMove = function(o) {
 		if (o.lx != o.x || o.ly != o.y)
 			draw.line(o.lx, o.ly, o.x, o.y, o.mov);
-	}
+	};
 
 	self.mouseUp = function(o) {
 		if (o.mov)
 			draw.dot(o.x, o.y);
 		else if (o.lx != o.x || o.ly != o.y)
 			draw.line(o.lx, o.ly, o.x, o.y, true);
-	}
+	};
 
 	return self;
 };
@@ -685,6 +705,7 @@ var resizeWrapper = function() {
 $(document).ready(function() {
 	editor = new ColorAceEditor({
 		canvas : $("#myCanvas")[0],
+		status : $("#statusBar"),
 		grid   : true,
 		undo   : 20
 	});
@@ -693,21 +714,24 @@ $(document).ready(function() {
 	$(window).resize(resizeWrapper);
 	$(document).bind("contextmenu", function(e) {
 		e.preventDefault();
-		return false
+		return false;
 	});
 
 	$("#mainPanel").mousewheel(function(e, delta) {
 		var scrl = editor.scroller,
 			zoom = editor.zoomFactor + (delta = (delta < 0 ? -1 : 1));
 
-		if (zoom == 0 || zoom >= editor.pixel.scalers.length)
+		if (zoom < 1 || zoom > 16)
 			return;
+		else if (editor.pixel.scalers[zoom] === null)
+			delta *= 2;
 
 		scrl.zoomTo(scrl.__zoomLevel + delta, false, e.pageX - scrl.__clientLeft, e.pageY - scrl.__clientTop);
+		editor.redrawStatusBar(e.pageX, e.pageY);
 	});
 
 	$("#mainPanel").mousedown(function(e) {
-		if (!e) var e = window.event;
+		if (!e) e = window.event;
 		if ((e.which && e.which > 1) || (e.button && e.button > 0)) {
 			editor.scroller.doTouchStart([{
 				pageX: e.pageX,
@@ -717,6 +741,12 @@ $(document).ready(function() {
 		}
 		else {
 			var coords = editor.translateCoords(e.pageX, e.pageY);
+			editor.handler.mouseDown($.extend(coords, {
+				lx: lastPixelX,
+				ly: lastPixelY,
+				mov: true
+			}));
+
 			lastPixelX = coords.x;
 			lastPixelY = coords.y;
 			mousedown = 1;
@@ -726,7 +756,9 @@ $(document).ready(function() {
 	});
 
 	$(document).mousemove(function(e) {
-		if (mousedown == 0)
+		editor.redrawStatusBar(e.pageX, e.pageY);
+
+		if (mousedown === 0)
 			return;
 		else if (mousedown == 2) {
 			editor.scroller.doTouchMove([{
@@ -736,7 +768,6 @@ $(document).ready(function() {
 		}
 		else {
 			var coords = editor.translateCoords(e.pageX, e.pageY);
-
 			editor.handler.mouseMove($.extend(coords, {
 				lx: lastPixelX,
 				ly: lastPixelY,
@@ -754,11 +785,16 @@ $(document).ready(function() {
 		if (!mousedown)
 			return;
 
-		if (!e) var e = window.event;
+		if (!e) e = window.event;
 		if ((e.which && e.which > 1) || (e.button && e.button > 0))
 			editor.scroller.doTouchEnd(e.timeStamp);
 		else {
 			var coords = editor.translateCoords(e.pageX, e.pageY);
+			editor.handler.mouseUp($.extend(coords, {
+				lx: lastPixelX,
+				ly: lastPixelY,
+				mov: notmoved
+			}));
 		}
 
 		lastPixelX = -1; lastPixelY = -1;
@@ -784,7 +820,7 @@ $(document).ready(function() {
 
 	$('#upload-file:file').change(function() {
 		var file = this.files[0],
-			fr = new window.FileReader;
+			fr = new window.FileReader();
 
 		if (fr && file) try {
 			fr.onload = function() {
@@ -848,11 +884,15 @@ $(document).ready(function() {
 	$('#colors').buttonset();
 	$('#drawing-mode').buttonset();
 
-	$("#colors > input:radio").click(function() {
+	$("#colors>input:radio").click(function() {
 		editor.editColor = parseInt(this.value);
 		return false;
 	});
-	$("#drawing-mode > input:radio").click(function() {
+	$("#tools>input:radio").click(function() {
+		editor.editTool = parseInt(this.value);
+		return false;
+	});
+	$("#drawing-mode>input:radio").click(function() {
 		editor.editMode = parseInt(this.value);
 		return false;
 	});

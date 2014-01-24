@@ -21,6 +21,7 @@ var resizeWrapper = function() {
 $(document).ready(function() {
 	editor = new ColorAceEditor({
 		canvas : $("#myCanvas")[0],
+		status : $("#statusBar"),
 		grid   : true,
 		undo   : 20
 	});
@@ -29,21 +30,24 @@ $(document).ready(function() {
 	$(window).resize(resizeWrapper);
 	$(document).bind("contextmenu", function(e) {
 		e.preventDefault();
-		return false
+		return false;
 	});
 
 	$("#mainPanel").mousewheel(function(e, delta) {
 		var scrl = editor.scroller,
 			zoom = editor.zoomFactor + (delta = (delta < 0 ? -1 : 1));
 
-		if (zoom == 0 || zoom >= editor.pixel.scalers.length)
+		if (zoom < 1 || zoom > 16)
 			return;
+		else if (editor.pixel.scalers[zoom] === null)
+			delta *= 2;
 
 		scrl.zoomTo(scrl.__zoomLevel + delta, false, e.pageX - scrl.__clientLeft, e.pageY - scrl.__clientTop);
+		editor.redrawStatusBar(e.pageX, e.pageY);
 	});
 
 	$("#mainPanel").mousedown(function(e) {
-		if (!e) var e = window.event;
+		if (!e) e = window.event;
 		if ((e.which && e.which > 1) || (e.button && e.button > 0)) {
 			editor.scroller.doTouchStart([{
 				pageX: e.pageX,
@@ -53,6 +57,12 @@ $(document).ready(function() {
 		}
 		else {
 			var coords = editor.translateCoords(e.pageX, e.pageY);
+			editor.handler.mouseDown($.extend(coords, {
+				lx: lastPixelX,
+				ly: lastPixelY,
+				mov: true
+			}));
+
 			lastPixelX = coords.x;
 			lastPixelY = coords.y;
 			mousedown = 1;
@@ -62,7 +72,9 @@ $(document).ready(function() {
 	});
 
 	$(document).mousemove(function(e) {
-		if (mousedown == 0)
+		editor.redrawStatusBar(e.pageX, e.pageY);
+
+		if (mousedown === 0)
 			return;
 		else if (mousedown == 2) {
 			editor.scroller.doTouchMove([{
@@ -72,7 +84,6 @@ $(document).ready(function() {
 		}
 		else {
 			var coords = editor.translateCoords(e.pageX, e.pageY);
-
 			editor.handler.mouseMove($.extend(coords, {
 				lx: lastPixelX,
 				ly: lastPixelY,
@@ -90,11 +101,16 @@ $(document).ready(function() {
 		if (!mousedown)
 			return;
 
-		if (!e) var e = window.event;
+		if (!e) e = window.event;
 		if ((e.which && e.which > 1) || (e.button && e.button > 0))
 			editor.scroller.doTouchEnd(e.timeStamp);
 		else {
 			var coords = editor.translateCoords(e.pageX, e.pageY);
+			editor.handler.mouseUp($.extend(coords, {
+				lx: lastPixelX,
+				ly: lastPixelY,
+				mov: notmoved
+			}));
 		}
 
 		lastPixelX = -1; lastPixelY = -1;
@@ -120,7 +136,7 @@ $(document).ready(function() {
 
 	$('#upload-file:file').change(function() {
 		var file = this.files[0],
-			fr = new window.FileReader;
+			fr = new window.FileReader();
 
 		if (fr && file) try {
 			fr.onload = function() {
@@ -184,11 +200,15 @@ $(document).ready(function() {
 	$('#colors').buttonset();
 	$('#drawing-mode').buttonset();
 
-	$("#colors > input:radio").click(function() {
+	$("#colors>input:radio").click(function() {
 		editor.editColor = parseInt(this.value);
 		return false;
 	});
-	$("#drawing-mode > input:radio").click(function() {
+	$("#tools>input:radio").click(function() {
+		editor.editTool = parseInt(this.value);
+		return false;
+	});
+	$("#drawing-mode>input:radio").click(function() {
 		editor.editMode = parseInt(this.value);
 		return false;
 	});

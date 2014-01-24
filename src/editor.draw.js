@@ -9,7 +9,7 @@ ColorAceEditor.Drawing = function(e) {
 	var self = {};
 
 	/**
-	 * Only putPixel wrapper.
+	 * putPixel wrapper only.
 	 * @param {number} x coordinate in surface (0-287)
 	 * @param {number} y coordinate in surface (0-255)
 	 */

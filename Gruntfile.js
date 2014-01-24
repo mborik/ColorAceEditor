@@ -11,21 +11,12 @@ module.exports = function(grunt) {
 			' */\n',
 
 		jshint: {
-			options: {
-				global: {
-					jQuery: true
-				}
-			},
-			gruntfile: {
-				src: 'Gruntfile.js'
-			},
 			files: [
 				'src/editor.js',
 				'src/editor.pixel.js',
 				'src/editor.draw.js',
 				'src/editor.handler.js',
-				'src/loader.js',
-				'src/init.js'
+				'src/loader.js'
 			]
 		},
 		copy: {
@@ -168,6 +159,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 
 	// Task definitions
-	grunt.registerTask('default', [ 'copy', 'concat', 'uglify', 'cssmin' ]);
+	grunt.registerTask('default', [ 'jshint', 'copy', 'concat', 'uglify', 'cssmin' ]);
 	grunt.registerTask('test', [ 'jshint' ]);
 };
