@@ -1,8 +1,8 @@
-/*!
+/*
  * PMD 85 ColorAce picture editor
  * ColorAceEditor class
  *
- * Copyright (c) 2012 Martin Borik
+ * Copyright (c) 2012-2014 Martin Borik
  */
 
 function ColorAceEditor(opt) {
@@ -23,8 +23,10 @@ function ColorAceEditor(opt) {
 	this.contentWidth  = 0;
 	this.contentHeight = 0;
 
-	this.pixel = ColorAceEditor.Pixelator(this);
+	this.pixel = ColorAceEditor.Pixelator(this)
 	this.draw  = ColorAceEditor.Drawing(this);
+
+	this.pixel.preparePixels();
 	this.scroller = new Scroller(this.pixel.render, {
 		animating: false,
 		bouncing: false,

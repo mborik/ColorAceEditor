@@ -155,6 +155,9 @@ module.exports = function(grunt) {
 		}
 	});
 
+	// Default line endings
+	grunt.util.linefeed = '\n';
+
 	// Load required modules
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-jshint');

@@ -1,8 +1,8 @@
-/*!
+/*
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.Drawing - custom artistic methods
  *
- * Copyright (c) 2012 Martin Borik
+ * Copyright (c) 2012-2014 Martin Borik
  */
 
 ColorAceEditor.Drawing = function(e) {

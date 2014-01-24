@@ -3,7 +3,7 @@ var http = require('http'),
 	url = require('url'),
 	fs = require('fs');
 
-var port = 8729,
+var port = parseInt(process.argv[2], 10) || 80,
 	mimeTypes = {
 		'.html': 'text/html',
 		'.png': 'image/png',

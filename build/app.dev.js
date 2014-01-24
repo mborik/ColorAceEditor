@@ -1,8 +1,8 @@
-/*!
+/*
  * PMD 85 ColorAce picture editor
  * ColorAceEditor class
  *
- * Copyright (c) 2012 Martin Borik
+ * Copyright (c) 2012-2014 Martin Borik
  */
 
 function ColorAceEditor(opt) {
@@ -23,8 +23,10 @@ function ColorAceEditor(opt) {
 	this.contentWidth  = 0;
 	this.contentHeight = 0;
 
-	this.pixel = ColorAceEditor.Pixelator(this);
+	this.pixel = ColorAceEditor.Pixelator(this)
 	this.draw  = ColorAceEditor.Drawing(this);
+
+	this.pixel.preparePixels();
 	this.scroller = new Scroller(this.pixel.render, {
 		animating: false,
 		bouncing: false,
@@ -62,31 +64,60 @@ function ColorAceEditor(opt) {
 	}
 };
 
-/*!
+/*
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.Pixelator - canvas level methods
  *
- * Copyright (c) 2012 Martin Borik
+ * Copyright (c) 2012-2014 Martin Borik
  */
 
 ColorAceEditor.Pixelator = function(e) {
 	var self = {}, currentZoom = 0, scrollerX = 0, scrollerY = 0,
+		bmp, bmpW, bmpH, bmpBuffer, bmpClamp, bmpDWORD,
 		snapshots = [];
 
 	self.pal = [
 		//  pixels       R    G    B    attr
-		[ null, null,    0,   0,   0,   0, 0 ],
-		[ null, null,  255,   0,   0,   1, 1 ],
-		[ null, null,    0,   0, 255,   2, 2 ],
-		[ null, null,  255,   0, 255,   3, 3 ],
-		[ null, null,    0, 255,   0,   0, 0 ],
-		[ null, null,  255, 255,   0,   1, 0 ],
-		[ null, null,    0, 255, 255,   2, 0 ],
-		[ null, null,  255, 255, 255,   3, 0 ]
+		[ 0, 0, 0, 0,    0,   0,   0,   0, 0 ],
+		[ 0, 0, 0, 0,  255,   0,   0,   1, 1 ],
+		[ 0, 0, 0, 0,    0,   0, 255,   2, 2 ],
+		[ 0, 0, 0, 0,  255,   0, 255,   3, 3 ],
+		[ 0, 0, 0, 0,    0, 255,   0,   0, 0 ],
+		[ 0, 0, 0, 0,  255, 255,   0,   1, 0 ],
+		[ 0, 0, 0, 0,    0, 255, 255,   2, 0 ],
+		[ 0, 0, 0, 0,  255, 255, 255,   3, 0 ]
 	];
 
 	self.surface = e.ctx.createImageData((288 / 4), 256).data;
 	self.attrs = e.ctx.createImageData((288 / 24), 256).data;
+
+	/**
+	 * Initialization of palette color table.
+	 */
+	self.preparePixels = function() {
+		var i, j, r, g, b, y, a = (255 << 24);
+		for (i = 0; i < 8; i++) {
+			r = self.pal[i][4];
+			g = self.pal[i][5];
+			b = self.pal[i][6];
+			y = Math.floor(96 - ((255 + r + g + b) / 16));
+
+			self.pal[i][0] = a | (b << 16) | (g << 8) | r;
+
+			r /= 1.333;
+			g /= 1.333;
+			b /= 1.333;
+
+			self.pal[i][1] = a | (b << 16) | (g << 8) | r;
+
+			r /= 2;
+			g /= 2;
+			b /= 2;
+
+			self.pal[i][2] = a | (b << 16) | (g << 8) | r;
+			self.pal[i][3] = a | (y << 16) | (y << 8) | y;
+		}
+	};
 
 	/**
 	 * Binary decoding of PMD 85 screen.
@@ -186,74 +217,48 @@ ColorAceEditor.Pixelator = function(e) {
 	};
 
 	/**
-	 * Initialization of ImageData pixel for each palette color.
-	 * @param zoom Zoom factor
-	 */
-	self.preparePixels = function(zoom) {
-		var i, j, d1, d2;
-		for (i = 0; i < 8; i++) {
-			self.pal[i][0] = e.ctx.createImageData(zoom, zoom);
-			d1 = self.pal[i][0].data;
-
-			self.pal[i][1] = e.ctx.createImageData(zoom, zoom);
-			d2 = self.pal[i][1].data;
-
-			for (j = 0; j < (zoom * zoom * 4); j += 4) {
-				if (zoom > 3 && ((j % (zoom * 4)) == ((zoom - 1) * 4))) {
-					d1[j + 0] = self.pal[i][2] / 1.33;
-					d1[j + 1] = self.pal[i][3] / 1.33;
-					d1[j + 2] = self.pal[i][4] / 1.33;
-					d2[j + 0] = d2[j + 1] = d2[j + 2] = (96 - ((255 + self.pal[i][2] + self.pal[i][3] + self.pal[i][4]) / 16));
-				}
-				else if (zoom > 3 && (j > (zoom * (zoom - 1) * 4))) {
-					d1[j + 0] = d2[j + 0] = self.pal[i][2] / 2.66;
-					d1[j + 1] = d2[j + 1] = self.pal[i][3] / 2.66;
-					d1[j + 2] = d2[j + 2] = self.pal[i][4] / 2.66;
-				}
-				else {
-					d1[j + 0] = d2[j + 0] = self.pal[i][2];
-					d1[j + 1] = d2[j + 1] = self.pal[i][3];
-					d1[j + 2] = d2[j + 2] = self.pal[i][4];
-				}
-
-				d1[j + 3] = d2[j + 3] = 255;
-			}
-		}
-	};
-
-	/**
 	 * Main render callback of Scroller.
 	 * @param left Absolute X Scroller position
 	 * @param top Absolute Y Scroller position
 	 * @param zoom Scroller internal zoom factor
 	 */
 	self.render = function(left, top, zoom) {
-		var i, j, f, x = 0, y = 0;
+		var i, j, k, x = 0, y = 0, z = 0,
+			l = Math.max(Math.floor(left / zoom), 0),
+			t = Math.max(Math.floor(top / zoom), 0);
 
-		scrollerX = Math.max(Math.floor(left / zoom), 0) * zoom;
-		scrollerY = Math.max(Math.floor(top / zoom), 0) * zoom;
+		scrollerX = l * zoom;
+		scrollerY = t * zoom;
 
 		if (zoom != currentZoom) {
-			self.preparePixels(zoom);
 			e.zoomFactor = currentZoom = zoom;
-			e.canvas.width = Math.min(288 * zoom, e.contentWidth);
-			e.canvas.height = Math.min(256 * zoom, e.contentHeight);
+			bmpW = e.canvas.width = Math.min(288 * zoom, e.contentWidth);
+			bmpH = e.canvas.height = Math.min(256 * zoom, e.contentHeight);
+
+			bmp = e.ctx.createImageData(bmpW, bmpH);
+			bmpBuffer = new ArrayBuffer(bmp.data.length);
+			bmpClamp = new Uint8ClampedArray(bmpBuffer);
+			bmpDWORD = new Uint32Array(bmpBuffer);
 		}
 
-		for (i = Math.max(Math.floor(top / zoom), 0); i < 256; i++) {
+		for (i = t; i < 256; i++) {
 			x = 0;
-			for (j = Math.max(Math.floor(left / zoom), 0); j < 288; j++) {
-				f = ((zoom > 3 && ((j % 6) == 5) && e.showGrid) ? 1 : 0);
-				e.ctx.putImageData(self.pal[(self.surface[((i * 288) + j)])][f], x, y);
+			for (j = l, k = ((i * 288) + j); j < 288; j++, k++) {
+				self.scalers[zoom](z + x, self.pal[self.surface[k]], (((j % 6) == 5) && e.showGrid));
+
 				x += zoom;
-				if (x >= e.contentWidth)
+				if (x >= bmpW)
 					break;
 			}
 
 			y += zoom;
-			if (y >= e.contentHeight)
+			z += zoom * bmpW;
+			if (y >= bmpH)
 				break;
 		}
+
+		bmp.data.set(bmpClamp);
+		e.ctx.putImageData(bmp, 0, 0);
 	};
 
 	/**
@@ -261,14 +266,15 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param refreshAttributes (optional) Refresh color from attributes.
 	 */
 	self.redrawRect = function(x, y, w, h, refreshAttributes) {
-		var i, j, c, d, f, sx, sy;
+		var i, j, k, c, d, sx, sy, z;
 
 		sy = (y * currentZoom) - scrollerY;
+		z = sy * bmpW;
+
 		for (i = y; i < (y + h); i++) {
 			sx = (x * currentZoom) - scrollerX;
-			for (j = x; j < (x + w); j++) {
-				f = ((i * 288) + j);
-				c = self.surface[f];
+			for (j = x, k = ((i * 288) + j); j < (x + w); j++, k++) {
+				c = self.surface[k];
 				if (refreshAttributes && c) {
 					d = (Math.floor((i * 48) + Math.floor(j / 6)));
 					c = d - ((((i % 2) << 1) - 1) * 48);
@@ -276,22 +282,25 @@ ColorAceEditor.Pixelator = function(e) {
 					d = self.attrs[d];
 					c = self.attrs[c];
 					c = (d | c | ((d * c) ? 0 : 4));
-					self.surface[f] = c;
+					self.surface[k] = c;
 				}
 
-				f = ((currentZoom > 3 && ((j % 6) == 5) && e.showGrid) ? 1 : 0);
 				if (sx >= 0 && sy >= 0)
-					e.ctx.putImageData(self.pal[c][f], sx, sy);
+					self.scalers[currentZoom]((sy * bmpW) + sx, self.pal[c], (((j % 6) == 5) && e.showGrid));
 
 				sx += currentZoom;
-				if (sx >= e.contentWidth)
+				if (sx >= bmpW)
 					break;
 			}
 
+			z += currentZoom * bmpW;
 			sy += currentZoom;
-			if (sy >= e.contentHeight)
+			if (sy >= bmpH)
 				break;
 		}
+
+		bmp.data.set(bmpClamp);
+		e.ctx.putImageData(bmp, 0, 0);
 	};
 
 	/**
@@ -319,8 +328,8 @@ ColorAceEditor.Pixelator = function(e) {
 
 		if (color) {
 			c = color;
-			self.attrs[a1] = self.pal[c][5];
-			self.attrs[a2] = self.pal[c][6];
+			self.attrs[a1] = self.pal[c][7];
+			self.attrs[a2] = self.pal[c][8];
 		}
 		else {
 			d = self.attrs[a1];
@@ -344,12 +353,143 @@ ColorAceEditor.Pixelator = function(e) {
 		if (color)
 			self.redrawRect((column * 6), ((a1 - column) / 48), 6, 2, true);
 		else {
-			d = ((currentZoom > 3 && ((x % 6) == 5) && e.showGrid) ? 1 : 0);
+			d = (((x % 6) == 5) && e.showGrid);
+			y = ((y * currentZoom) - scrollerY) * bmpW;
 			x = (x * currentZoom) - scrollerX;
-			y = (y * currentZoom) - scrollerY;
-			e.ctx.putImageData(self.pal[c][d], x, y);
+			self.scalers[currentZoom](y + x, self.pal[c], d);
+
+			bmp.data.set(bmpClamp);
+			e.ctx.putImageData(bmp, 0, 0);
 		}
 	};
+
+	self.scalers = [
+		function() {},
+	// 1x1
+		function (p, c) {
+			bmpDWORD[p] = c[0];
+		},
+	// 2x2
+		function (p, c) {
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[0];
+			p += bmpW - 1;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[0];
+		},
+	// 3x3
+		function (p, c, g) {
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 2;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 2;
+			bmpDWORD[p++] = c[1];
+			bmpDWORD[p++] = c[1];
+			bmpDWORD[p] = c[g ? 3 : 1];
+		},
+	// 4x4
+		function (p, c, g) {
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 3;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[g ? 3 : 1];
+			p += bmpW - 3;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 3;
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p] = c[g ? 3 : 2];
+		},
+	// 5x5
+		function (p, c, g) {
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 4;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 4;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[g ? 3 : 1];
+			p += bmpW - 4;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 4;
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p] = c[g ? 3 : 2];
+		},
+	// 6x6
+		function (p, c, g) {
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 5;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[g ? 3 : 1];
+			p += bmpW - 5;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 5;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[g ? 3 : 1];
+			p += bmpW - 5;
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p++] = c[0];
+			bmpDWORD[p] = c[1];
+			p += bmpW - 5;
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p++] = c[2];
+			bmpDWORD[p] = c[g ? 3 : 2];
+		},
+	]
 
 	self.doSnapshot = function() {
 		var len = snapshots.push([
@@ -374,11 +514,11 @@ ColorAceEditor.Pixelator = function(e) {
 	return self;
 };
 
-/*!
+/*
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.Drawing - custom artistic methods
  *
- * Copyright (c) 2012 Martin Borik
+ * Copyright (c) 2012-2014 Martin Borik
  */
 
 ColorAceEditor.Drawing = function(e) {
@@ -416,11 +556,11 @@ ColorAceEditor.Drawing = function(e) {
 	return self;
 };
 
-/*!
+/*
  * PMD 85 ColorAce picture editor
  * onReady initialization and entry point
  *
- * Copyright (c) 2014 Martin Borik
+ * Copyright (c) 2012-2014 Martin Borik
  */
 
 var editor = null, mousedown = 0, notmoved = false,

@@ -1,8 +1,8 @@
-/*!
+/*
  * PMD 85 ColorAce picture editor
  * onReady initialization and entry point
  *
- * Copyright (c) 2014 Martin Borik
+ * Copyright (c) 2012-2014 Martin Borik
  */
 
 var editor = null, mousedown = 0, notmoved = false,
