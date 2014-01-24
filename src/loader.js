@@ -33,9 +33,13 @@ $(document).ready(function() {
 	});
 
 	$("#mainPanel").mousewheel(function(e, delta) {
-		var self = editor.scroller;
-		self.zoomTo(self.__zoomLevel + (delta < 0 ? -1 : 1), false,
-			e.pageX - self.__clientLeft, e.pageY - self.__clientTop);
+		var scrl = editor.scroller,
+			zoom = editor.zoomFactor + (delta = (delta < 0 ? -1 : 1));
+
+		if (zoom == 0 || zoom >= editor.pixel.scalers.length)
+			return;
+
+		scrl.zoomTo(scrl.__zoomLevel + delta, false, e.pageX - scrl.__clientLeft, e.pageY - scrl.__clientTop);
 	});
 
 	$("#mainPanel").mousedown(function(e) {
@@ -68,8 +72,12 @@ $(document).ready(function() {
 		}
 		else {
 			var coords = editor.translateCoords(e.pageX, e.pageY);
-			if (lastPixelX != coords.x || lastPixelY != coords.y)
-				editor.draw.line(lastPixelX, lastPixelY, coords.x, coords.y, notmoved);
+
+			editor.handler.mouseMove($.extend(coords, {
+				lx: lastPixelX,
+				ly: lastPixelY,
+				mov: notmoved
+			}));
 
 			lastPixelX = coords.x;
 			lastPixelY = coords.y;
@@ -87,10 +95,6 @@ $(document).ready(function() {
 			editor.scroller.doTouchEnd(e.timeStamp);
 		else {
 			var coords = editor.translateCoords(e.pageX, e.pageY);
-			if (notmoved)
-				editor.draw.dot(coords.x, coords.y);
-			else if (lastPixelX != coords.x || lastPixelY != coords.y)
-				editor.draw.line(lastPixelX, lastPixelY, coords.x, coords.y, true);
 		}
 
 		lastPixelX = -1; lastPixelY = -1;

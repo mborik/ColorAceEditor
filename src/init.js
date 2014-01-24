@@ -25,14 +25,13 @@ var initializer = {
 	},
 
 	load: function () {
-		var i, js = /init\.js(\?.*)?$/, path, dev = '', m,
+		var i, js = /init\.js(\?.*)?$/, path,
+			s, dev = window.location.href.match(/[\?&]dev(.*)$/) ? '.dev' : '',
 			a = document.getElementsByTagName('script');
 
 		for (i = 0; i < a.length; i++) {
-			var s = a[i].getAttribute('src');
-			if (m = s.match(js)) {
-				if (m[1] && m[1].indexOf('?dev') == 0)
-					dev = '.dev';
+			s = a[i].getAttribute('src');
+			if (s.match(js)) {
 				path = s.replace(js, '');
 				break;
 			}

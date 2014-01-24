@@ -8,10 +8,23 @@
 ColorAceEditor.Drawing = function(e) {
 	var self = {};
 
+	/**
+	 * Only putPixel wrapper.
+	 * @param {number} x coordinate in surface (0-287)
+	 * @param {number} y coordinate in surface (0-255)
+	 */
 	self.dot = function(x, y) {
 		e.pixel.putPixel(x, y, e.editMode, e.editColor);
 	};
 
+	/**
+	 * Bresenham's scan-line algorithm.
+	 * @param {number} x0 coordinate in surface (0-287)
+	 * @param {number} y0 coordinate in surface (0-255)
+	 * @param {number} x1 coordinate in surface (0-287)
+	 * @param {number} y1 coordinate in surface (0-255)
+	 * @param {boolean} drawFirst flag if it's needed to draw first point of line
+	 */
 	self.line = function(x0, y0, x1, y1, drawFirst) {
 		var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1,
 			dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1,

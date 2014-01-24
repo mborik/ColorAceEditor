@@ -23,10 +23,12 @@ function ColorAceEditor(opt) {
 	this.contentWidth  = 0;
 	this.contentHeight = 0;
 
-	this.pixel = ColorAceEditor.Pixelator(this)
-	this.draw  = ColorAceEditor.Drawing(this);
-
+	this.pixel = ColorAceEditor.Pixelator(this);
 	this.pixel.preparePixels();
+
+	this.draw    = ColorAceEditor.Drawing(this);
+	this.handler = ColorAceEditor.Handler(this);
+
 	this.scroller = new Scroller(this.pixel.render, {
 		animating: false,
 		bouncing: false,
