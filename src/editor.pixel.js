@@ -161,7 +161,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {number} zoom Scroller internal zoom factor
 	 */
 	self.render = function(left, top, zoom) {
-		var i, j, k, x = 0, y = 0, z = 0, w,
+		var i, j, k, s, x = 0, y = 0, z = 0, w,
 			l = Math.max(Math.floor(left / zoom), 0),
 			t = Math.max(Math.floor(top / zoom), 0);
 
@@ -184,8 +184,13 @@ ColorAceEditor.Pixelator = function(e) {
 			for (j = l, k = ((i * 288) + j); j < 288; j++, k++) {
 				self.scalers[zoom](z + x, self.pal[self.surface[k]], self.isGrid(j));
 
+				if ((s = e.selection.testBoundsX(j, i)))
+					self.marqueeX(z + x + (--s * (zoom - 1)), zoom, y);
+				if ((s = e.selection.testBoundsY(j, i)))
+					self.marqueeY(z + x + (--s * (zoom - 1) * bmpW), zoom, x);
+
 				x += zoom;
-				if (x >= w)
+				if (x > w)
 					break;
 			}
 
@@ -208,7 +213,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {boolean} [refreshAttributes] Refresh color from attributes.
 	 */
 	self.redrawRect = function(x, y, w, h, refreshAttributes) {
-		var i, j, k, c, d, sx, sy, sz, sw, bx, by;
+		var i, j, k, c, d, s, sx, sy, sz, sw, bx, by;
 
 		sw = bmpW - currentZoom;
 		sz = (sy = (y * currentZoom) - scrollerY) * bmpW;
@@ -229,6 +234,11 @@ ColorAceEditor.Pixelator = function(e) {
 				if (sx >= 0 && sy >= 0) {
 					self.scalers[currentZoom](sz + sx, self.pal[c], self.isGrid(j));
 
+					if ((s = e.selection.testBoundsX(j, i)))
+						self.marqueeX(sz + sx + (--s * (currentZoom - 1)), currentZoom, sy);
+					if ((s = e.selection.testBoundsY(j, i)))
+						self.marqueeY(sz + sx + (--s * (currentZoom - 1) * bmpW), currentZoom, sx);
+
 					if (bx === undefined) {
 						bx = sx;
 						by = sy;
@@ -236,7 +246,7 @@ ColorAceEditor.Pixelator = function(e) {
 				}
 
 				sx += currentZoom;
-				if (sx >= sw)
+				if (sx > sw)
 					break;
 			}
 
@@ -252,6 +262,14 @@ ColorAceEditor.Pixelator = function(e) {
 			sy -= by;
 			e.ctx.putImageData(bmp, 0, 0, bx, by, sx, sy);
 		}
+	};
+
+	self.redrawSelection = function(callback) {
+		var x1 = e.selection.x1, y1 = e.selection.y1,
+			x2 = e.selection.x2, y2 = e.selection.y2;
+
+		callback(e.selection);
+		self.redrawRect(x1, y1, x2, y2, false);
 	};
 
 	/**
@@ -339,6 +357,32 @@ ColorAceEditor.Pixelator = function(e) {
 		self.surface.set(u[0], 0);
 		self.attrs.set(u[1], 0);
 		return true;
+	};
+
+	/**
+	 * Draw marquee for X coordinate.
+	 * @param  {number} p pointer to bitmap
+	 * @param  {number} z zoom factor
+	 * @param  {number} y coordinate
+	 */
+	self.marqueeX = function(p, z, y) {
+		var a = 0xFFFFFFFF, b = 0x302010, i;
+		for (i = 0; i < z; i++, y++) {
+			bmpDWORD[p] = (y & 4) ? a : (bmpDWORD[p] | b);
+			p += bmpW;
+		}
+	};
+
+	/**
+	 * Draw marquee for Y coordinate.
+	 * @param  {number} p pointer to bitmap
+	 * @param  {number} z zoom factor
+	 * @param  {number} x coordinate
+	 */
+	self.marqueeY = function(p, z, x) {
+		var a = 0xFFFFFFFF, b = 0x302010, i;
+		for (i = 0; i < z; i++, x++, p++)
+			bmpDWORD[p] = (x & 4) ? a : (bmpDWORD[p] | b);
 	};
 
 	/**

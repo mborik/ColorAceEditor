@@ -13,6 +13,9 @@ function ColorAceEditor(opt) {
 	this.canvas = opt.canvas;
 	this.ctx = this.canvas.getContext("2d");
 
+	this.contentWidth  = 0;
+	this.contentHeight = 0;
+
 	this.statusBar  = opt.status;
 	this.zoomFactor = opt.zoom || 1;
 	this.showGrid   = opt.grid || true;
@@ -21,15 +24,12 @@ function ColorAceEditor(opt) {
 	this.editTool   = 2;
 	this.editMode   = 2;
 
-	this.contentWidth  = 0;
-	this.contentHeight = 0;
+	this.pixel      = ColorAceEditor.Pixelator(this);
+	this.draw       = ColorAceEditor.Drawing(this);
+	this.handler    = ColorAceEditor.Handler(this);
+	this.selection  = ColorAceEditor.Selection(this);
 
-	this.pixel = ColorAceEditor.Pixelator(this);
 	this.pixel.preparePixels();
-
-	this.draw    = ColorAceEditor.Drawing(this);
-	this.handler = ColorAceEditor.Handler(this);
-
 	this.scroller = new Scroller(this.pixel.render, {
 		animating: false,
 		bouncing: false,
@@ -71,7 +71,7 @@ function ColorAceEditor(opt) {
 			x = Math.max(0, Math.min(coords.x, 287)),
 			y = Math.max(0, Math.min(coords.y, 255)),
 			c = Math.max(0, Math.min(coords.column, 47)),
-			a = (0xC000 + (y * 64) + c).toString(16).toUpperCase() + 'h',
+			a = (49152 + (y * 64) + c).toString(16).toUpperCase() + 'h',
 			z = this.zoomFactor * 100,
 			pad = function(num, len) {
 				num = '    ' + num;
@@ -245,7 +245,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {number} zoom Scroller internal zoom factor
 	 */
 	self.render = function(left, top, zoom) {
-		var i, j, k, x = 0, y = 0, z = 0, w,
+		var i, j, k, s, x = 0, y = 0, z = 0, w,
 			l = Math.max(Math.floor(left / zoom), 0),
 			t = Math.max(Math.floor(top / zoom), 0);
 
@@ -268,8 +268,13 @@ ColorAceEditor.Pixelator = function(e) {
 			for (j = l, k = ((i * 288) + j); j < 288; j++, k++) {
 				self.scalers[zoom](z + x, self.pal[self.surface[k]], self.isGrid(j));
 
+				if ((s = e.selection.testBoundsX(j, i)))
+					self.marqueeX(z + x + (--s * (zoom - 1)), zoom, y);
+				if ((s = e.selection.testBoundsY(j, i)))
+					self.marqueeY(z + x + (--s * (zoom - 1) * bmpW), zoom, x);
+
 				x += zoom;
-				if (x >= w)
+				if (x > w)
 					break;
 			}
 
@@ -292,7 +297,7 @@ ColorAceEditor.Pixelator = function(e) {
 	 * @param {boolean} [refreshAttributes] Refresh color from attributes.
 	 */
 	self.redrawRect = function(x, y, w, h, refreshAttributes) {
-		var i, j, k, c, d, sx, sy, sz, sw, bx, by;
+		var i, j, k, c, d, s, sx, sy, sz, sw, bx, by;
 
 		sw = bmpW - currentZoom;
 		sz = (sy = (y * currentZoom) - scrollerY) * bmpW;
@@ -313,6 +318,11 @@ ColorAceEditor.Pixelator = function(e) {
 				if (sx >= 0 && sy >= 0) {
 					self.scalers[currentZoom](sz + sx, self.pal[c], self.isGrid(j));
 
+					if ((s = e.selection.testBoundsX(j, i)))
+						self.marqueeX(sz + sx + (--s * (currentZoom - 1)), currentZoom, sy);
+					if ((s = e.selection.testBoundsY(j, i)))
+						self.marqueeY(sz + sx + (--s * (currentZoom - 1) * bmpW), currentZoom, sx);
+
 					if (bx === undefined) {
 						bx = sx;
 						by = sy;
@@ -320,7 +330,7 @@ ColorAceEditor.Pixelator = function(e) {
 				}
 
 				sx += currentZoom;
-				if (sx >= sw)
+				if (sx > sw)
 					break;
 			}
 
@@ -336,6 +346,14 @@ ColorAceEditor.Pixelator = function(e) {
 			sy -= by;
 			e.ctx.putImageData(bmp, 0, 0, bx, by, sx, sy);
 		}
+	};
+
+	self.redrawSelection = function(callback) {
+		var x1 = e.selection.x1, y1 = e.selection.y1,
+			x2 = e.selection.x2, y2 = e.selection.y2;
+
+		callback(e.selection);
+		self.redrawRect(x1, y1, x2, y2, false);
 	};
 
 	/**
@@ -423,6 +441,32 @@ ColorAceEditor.Pixelator = function(e) {
 		self.surface.set(u[0], 0);
 		self.attrs.set(u[1], 0);
 		return true;
+	};
+
+	/**
+	 * Draw marquee for X coordinate.
+	 * @param  {number} p pointer to bitmap
+	 * @param  {number} z zoom factor
+	 * @param  {number} y coordinate
+	 */
+	self.marqueeX = function(p, z, y) {
+		var a = 0xFFFFFFFF, b = 0x302010, i;
+		for (i = 0; i < z; i++, y++) {
+			bmpDWORD[p] = (y & 4) ? a : (bmpDWORD[p] | b);
+			p += bmpW;
+		}
+	};
+
+	/**
+	 * Draw marquee for Y coordinate.
+	 * @param  {number} p pointer to bitmap
+	 * @param  {number} z zoom factor
+	 * @param  {number} x coordinate
+	 */
+	self.marqueeY = function(p, z, x) {
+		var a = 0xFFFFFFFF, b = 0x302010, i;
+		for (i = 0; i < z; i++, x++, p++)
+			bmpDWORD[p] = (x & 4) ? a : (bmpDWORD[p] | b);
 	};
 
 	/**
@@ -619,36 +663,215 @@ ColorAceEditor.Drawing = function(e) {
 
 	/**
 	 * Bresenham's scan-line algorithm.
-	 * @param {number} x0 coordinate in surface (0-287)
-	 * @param {number} y0 coordinate in surface (0-255)
 	 * @param {number} x1 coordinate in surface (0-287)
 	 * @param {number} y1 coordinate in surface (0-255)
+	 * @param {number} x2 coordinate in surface (0-287)
+	 * @param {number} y2 coordinate in surface (0-255)
 	 * @param {boolean} drawFirst flag if it's needed to draw first point of line
 	 */
-	self.line = function(x0, y0, x1, y1, drawFirst) {
-		var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1,
-			dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1,
+	self.line = function(x1, y1, x2, y2, drawFirst) {
+		var dx = Math.abs(x2 - x1), sx = x1 < x2 ? 1 : -1,
+			dy = Math.abs(y2 - y1), sy = y1 < y2 ? 1 : -1,
 			err = (dx > dy ? dx : -dy) / 2, err2;
 
 		while (true) {
 			if (drawFirst)
-				e.pixel.putPixel(x0, y0, e.editMode, e.editColor);
+				e.pixel.putPixel(x1, y1, e.editMode, e.editColor);
 
 			drawFirst = true;
-			if (x0 === x1 && y0 === y1)
+			if (x1 === x2 && y1 === y2)
 				break;
 
 			err2 = err;
 			if (err2 > -dx) {
 				err -= dy;
-				x0 += sx;
+				x1 += sx;
 			}
 			if (err2 < dy) {
 				err += dx;
-				y0 += sy;
+				y1 += sy;
 			}
 		}
 	};
+
+	return self;
+};
+//-----------------------------------------------------------------------------
+
+/*
+ * PMD 85 ColorAce picture editor
+ * ColorAceEditor.Rect - custom rectangle class
+ *
+ * Copyright (c) 2014 Martin Borik
+ */
+
+ColorAceEditor.Selection = function() {
+	var self = {
+		x0: 0, y0: 0,
+		x1: 0, y1: 0,
+		x2: 0, y2: 0,
+		w: 0, h: 0
+	}, sw;
+
+	/**
+	 * Set exact rectangle.
+	 * @param {number} x1 coordinate in surface (0-287)
+	 * @param {number} y1 coordinate in surface (0-255)
+	 * @param {number} x2 coordinate in surface (0-287)
+	 * @param {number} y2 coordinate in surface (0-255)
+	 * @return {ColorAceEditor.Selection}
+	 */
+	self.set = function(x1, y1, x2, y2) {
+		if (x1 > x2) {
+			sw = x1;
+			x1 = x2;
+			x2 = sw;
+		}
+		if (y1 > y2) {
+			sw = y1;
+			y1 = y2;
+			y2 = sw;
+		}
+
+		if (x1 > 287)
+			x1 = 287;
+		if (y1 > 255)
+			y1 = 255;
+		if (x2 > 287)
+			x2 = 287;
+		if (y2 > 255)
+			y2 = 255;
+
+		self.x1 = x1;
+		self.y1 = y1;
+		self.x2 = x2;
+		self.y2 = y2;
+
+		self.w = (x2 - x1) + 1;
+		self.h = (y2 - y1) + 1;
+
+		return self;
+	};
+
+	/**
+	 * Reset rectangle to empty, optionally offset to entry point.
+	 * @param {number} [x] coordinate in surface (0-287)
+	 * @param {number} [y] coordinate in surface (0-255)
+	 * @return {ColorAceEditor.Selection}
+	 */
+	self.reset = function(x, y) {
+		x = x || 0;
+		y = y || 0;
+
+		if (x > 287)
+			x = 287;
+		if (y > 255)
+			y = 255;
+
+		self.x0 = x; self.y0 = y;
+		self.x1 = x; self.y1 = y;
+		self.x2 = x; self.y2 = y;
+		self.w = self.h = 0;
+
+		return self;
+	};
+
+	/**
+	 * Offset rectangle by x,y coordinates.
+	 * @param  {number} x offset
+	 * @param  {number} y offset
+	 * @return {ColorAceEditor.Selection}
+	 */
+	self.offsetBy = function(x, y) {
+		self.x1 += x;
+		self.y1 += y;
+		self.x2 += x;
+		self.y2 += y;
+
+		if (self.x1 > 287 || self.y1 > 255)
+			return self.reset();
+		else if (self.x2 > 287 || self.y2 > 255) {
+			self.x2 = 287;
+			self.y2 = 255;
+			self.w = (self.x2 - self.x1) + 1;
+			self.h = (self.y2 - self.y1) + 1;
+		}
+
+		self.x0 = self.x1;
+		self.y0 = self.y1;
+
+		return self;
+	};
+
+	/**
+	 * Union a expand rectangle with another one.
+	 * @param  {ColorAceEditor.Selection} obj
+	 * @return {ColorAceEditor.Selection}
+	 */
+	self.unionWith = function(obj) {
+		if (typeof obj !== typeof self)
+			return false;
+
+		self.x1 = Math.min(self.x1, obj.x1);
+		self.y1 = Math.min(self.y1, obj.y1);
+		self.x2 = Math.min(self.x2, obj.x2);
+		self.y2 = Math.min(self.y2, obj.y2);
+
+		self.w = (x2 - x1) + 1;
+		self.h = (y2 - y1) + 1;
+
+		return self;
+	};
+
+	/**
+	 * Test empty rectangle.
+	 * @return {boolean}
+	 */
+	self.nonEmpty = function() {
+		return self.x1 < self.x2 && self.y1 < self.y2;
+	};
+
+	/**
+	 * Test if given coordinate lie on X-bounds of rectangle.
+	 * @param {number} [x] coordinate in surface (0-287)
+	 * @param {number} [y] coordinate in surface (0-255)
+	 * @return {number} 1-left, 2-right, 0-not match bounds
+	 */
+	self.testBoundsX = function(x, y) {
+		if (self.x1 < self.x2 && self.y1 <= y && self.y2 >= y) {
+			if (x == self.x1)
+				return 1;
+			else if (x == self.x2)
+				return 2;
+		}
+
+		return 0;
+	};
+
+	/**
+	 * Test if given coordinate lie on Y-bounds of rectangle.
+	 * @param {number} [x] coordinate in surface (0-287)
+	 * @param {number} [y] coordinate in surface (0-255)
+	 * @return {number} 1-left, 2-right, 0-not match bounds
+	 */
+	self.testBoundsY = function(x, y) {
+		if (self.y1 < self.y2 && self.x1 <= x && self.x2 >= x) {
+			if (y == self.y1)
+				return 1;
+			else if (y == self.y2)
+				return 2;
+		}
+
+		return 0;
+	};
+
+
+	if (arguments.length > 0) {
+		if (typeof arguments[0] === 'object')
+			$.extend(self, arguments[0]);
+		else if (typeof arguments[0] === 'number' && arguments.length == 4)
+			self.set(arguments[0], arguments[1], arguments[2], arguments[3]);
+	}
 
 	return self;
 };
@@ -657,26 +880,82 @@ ColorAceEditor.Drawing = function(e) {
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.Handler - translate mouse handlers to function by selected function
  *
- * Copyright (c) 2012-2014 Martin Borik
+ * Copyright (c) 2014 Martin Borik
  */
 
 ColorAceEditor.Handler = function(e) {
 	var self = {}, draw = e.draw;
 
 	self.mouseDown = function(o) {
-		draw.dot(o.x, o.y);
+		switch (e.editTool) {
+		// selection
+			case 0:
+				e.selection.reset(o.x, o.y);
+				e.scroller.zoomTo(editor.zoomFactor);
+				break;
+		// grid selection
+			case 1:
+				e.selection.reset(Math.floor(o.x / 6) * 6, o.y);
+				e.scroller.zoomTo(editor.zoomFactor);
+				break;
+		// pencil
+			case 2:
+				draw.dot(o.x, o.y);
+				break;
+
+			default:
+				break;
+		}
 	};
 
 	self.mouseMove = function(o) {
-		if (o.lx != o.x || o.ly != o.y)
-			draw.line(o.lx, o.ly, o.x, o.y, o.mov);
+		switch (e.editTool) {
+		// selection
+			case 0:
+				if (!o.mov) e.pixel.redrawSelection(function(s) {
+					s.set(s.x0, s.y0, o.x - 1, o.y - 1);
+				});
+				break;
+		// grid selection
+			case 1:
+				if (!o.mov) e.pixel.redrawSelection(function(s) {
+					s.set(s.x0, s.y0, (Math.ceil(o.x / 6) * 6) - 1, o.y - 1);
+				});
+				break;
+		// pencil
+			case 2:
+				if (o.lx != o.x || o.ly != o.y)
+					draw.line(o.lx, o.ly, o.x, o.y, o.mov);
+				break;
+
+			default:
+				break;
+		}
 	};
 
 	self.mouseUp = function(o) {
-		if (o.mov)
-			draw.dot(o.x, o.y);
-		else if (o.lx != o.x || o.ly != o.y)
-			draw.line(o.lx, o.ly, o.x, o.y, true);
+		switch (e.editTool) {
+		// selection
+			case 0:
+				if (!o.mov) e.pixel.redrawSelection(function() {
+					e.selection.set(e.selection.x0, e.selection.y0, o.x - 1, o.y - 1);
+				});
+				break;
+		// grid selection
+			case 1:
+				if (!o.mov) e.pixel.redrawSelection(function() {
+					e.selection.set(e.selection.x0, e.selection.y0, (Math.ceil(o.x / 6) * 6) - 1, o.y - 1);
+				});
+				break;
+		// pencil
+			case 2:
+				if (!o.mov && (o.lx != o.x || o.ly != o.y))
+					draw.line(o.lx, o.ly, o.x, o.y, true);
+				break;
+
+			default:
+				break;
+		}
 	};
 
 	return self;

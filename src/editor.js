@@ -13,6 +13,9 @@ function ColorAceEditor(opt) {
 	this.canvas = opt.canvas;
 	this.ctx = this.canvas.getContext("2d");
 
+	this.contentWidth  = 0;
+	this.contentHeight = 0;
+
 	this.statusBar  = opt.status;
 	this.zoomFactor = opt.zoom || 1;
 	this.showGrid   = opt.grid || true;
@@ -21,15 +24,12 @@ function ColorAceEditor(opt) {
 	this.editTool   = 2;
 	this.editMode   = 2;
 
-	this.contentWidth  = 0;
-	this.contentHeight = 0;
+	this.pixel      = ColorAceEditor.Pixelator(this);
+	this.draw       = ColorAceEditor.Drawing(this);
+	this.handler    = ColorAceEditor.Handler(this);
+	this.selection  = ColorAceEditor.Selection(this);
 
-	this.pixel = ColorAceEditor.Pixelator(this);
 	this.pixel.preparePixels();
-
-	this.draw    = ColorAceEditor.Drawing(this);
-	this.handler = ColorAceEditor.Handler(this);
-
 	this.scroller = new Scroller(this.pixel.render, {
 		animating: false,
 		bouncing: false,
@@ -71,7 +71,7 @@ function ColorAceEditor(opt) {
 			x = Math.max(0, Math.min(coords.x, 287)),
 			y = Math.max(0, Math.min(coords.y, 255)),
 			c = Math.max(0, Math.min(coords.column, 47)),
-			a = (0xC000 + (y * 64) + c).toString(16).toUpperCase() + 'h',
+			a = (49152 + (y * 64) + c).toString(16).toUpperCase() + 'h',
 			z = this.zoomFactor * 100,
 			pad = function(num, len) {
 				num = '    ' + num;
