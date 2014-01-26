@@ -55,11 +55,18 @@ legend {
 	font: normal 10px/normal Arial, Helvetica, sans-serif;
 	padding: .2em;
 }
-#tools,#drawing-set {
+#tools, #drawing-set, #select-func {
 	padding: 5px;
 	width: auto;
 	white-space: nowrap;
 	margin: 1px auto;
+	height: 23px;
+}
+#drawing-mode {
+	float: left;
+}
+#filling-mode {
+	float: right;
 }
 #colors {
 	width: 192px;

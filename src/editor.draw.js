@@ -5,7 +5,7 @@
  * Copyright (c) 2012-2014 Martin Borik
  */
 
-ColorAceEditor.Drawing = function(e) {
+ColorAceEditor.Drawing = function() {
 	var self = {};
 
 	/**
@@ -14,7 +14,7 @@ ColorAceEditor.Drawing = function(e) {
 	 * @param {number} y coordinate in surface (0-255)
 	 */
 	self.dot = function(x, y) {
-		e.pixel.putPixel(x, y, e.editMode, e.editColor);
+		editor.pixel.putPixel(x, y, editor.editMode, editor.editColor);
 	};
 
 	/**
@@ -32,7 +32,7 @@ ColorAceEditor.Drawing = function(e) {
 
 		while (true) {
 			if (drawFirst)
-				e.pixel.putPixel(x1, y1, e.editMode, e.editColor);
+				editor.pixel.putPixel(x1, y1, editor.editMode, editor.editColor);
 
 			drawFirst = true;
 			if (x1 === x2 && y1 === y2)

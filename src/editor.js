@@ -23,11 +23,18 @@ function ColorAceEditor(opt) {
 	this.editColor  = 0;
 	this.editTool   = 2;
 	this.editMode   = 2;
+	this.editSelect = 0;
+	this.editFilled = false;
 
 	this.pixel      = ColorAceEditor.Pixelator(this);
 	this.draw       = ColorAceEditor.Drawing(this);
 	this.handler    = ColorAceEditor.Handler(this);
+
 	this.selection  = ColorAceEditor.Selection(this);
+	this.selectionCallback = function(state) {
+		for (var i = 2; i < 8; i++)
+			$('#select' + i).button('option', 'disabled', !state);
+	};
 
 	this.pixel.preparePixels();
 	this.scroller = new Scroller(this.pixel.render, {
@@ -42,6 +49,8 @@ function ColorAceEditor(opt) {
 
 	/**
 	 * Set editor and scroller dimensions.
+	 * @param {number} w - webpage workspace width
+	 * @param {number} h - webpage workspace height
 	 */
 	this.setDimensions = function(w, h) {
 		this.contentWidth  = w;
@@ -51,6 +60,9 @@ function ColorAceEditor(opt) {
 
 	/**
 	 * Translation of "real world" coordinates on page to our pixel space.
+	 * @param {number} sx - real mouse cursor X position
+	 * @param {number} sy - real mouse cursor X position
+	 * @return {object} object with properties 'x', 'y' and 'column'
 	 */
 	this.translateCoords = function(sx, sy) {
 		var s = this.scroller.getValues(), o = $(this.canvas).offset(), r = {};

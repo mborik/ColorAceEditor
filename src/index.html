@@ -16,7 +16,7 @@
 			<div id="tools" class="ui-widget-content">
 				<input type="radio" id="tool0" name="tool" value="0" /><label for="tool0">Selection</label>
 				<input type="radio" id="tool1" name="tool" value="1" /><label for="tool1">Grid selection</label>
-				<input type="radio" id="tool2" name="tool" value="2" checked="checked" /><label for="tool2">Pencil</label>
+				<input type="radio" id="tool2" name="tool" value="2" /><label for="tool2">Pencil</label>
 				<input type="radio" id="tool3" name="tool" value="3" /><label for="tool3">Brush</label>
 				<input type="radio" id="tool4" name="tool" value="4" /><label for="tool4">Fill</label>
 				<input type="radio" id="tool5" name="tool" value="5" /><label for="tool5">Lines</label>
@@ -25,17 +25,30 @@
 			</div>
 			<div id="drawing-set" class="ui-widget-content">
 				<div id="drawing-mode">
-					<input type="radio" id="mode0" name="pencil-mode" value="0" /><label for="mode0">RES</label>
-					<input type="radio" id="mode1" name="pencil-mode" value="1" /><label for="mode1">SET</label>
-					<input type="radio" id="mode2" name="pencil-mode" value="2" checked="checked" /><label for="mode2">OVR</label>
-					<input type="radio" id="mode3" name="pencil-mode" value="3" /><label for="mode3">COL</label>
+					<input type="radio" id="mode0" name="drawmode" value="0" /><label for="mode0">RES</label>
+					<input type="radio" id="mode1" name="drawmode" value="1" /><label for="mode1">SET</label>
+					<input type="radio" id="mode2" name="drawmode" value="2" /><label for="mode2">OVR</label>
+					<input type="radio" id="mode3" name="drawmode" value="3" /><label for="mode3">COL</label>
 				</div>
+				<div id="filling-mode">
+					<input type="checkbox" id="fillmode" name="fillmode" value="1" /><label for="fillmode">Filled shape</label>
+				</div>
+			</div>
+			<div id="select-func" class="ui-widget-content">
+				<input type="radio" id="select0" name="select" value="0" /><label for="select0">Set selection</label>
+				<input type="radio" id="select1" name="select" value="1" /><label for="select1">Select all</label>
+				<input type="radio" id="select2" name="select" value="2" /><label for="select2">Cut</label>
+				<input type="radio" id="select3" name="select" value="3" /><label for="select3">Move</label>
+				<input type="radio" id="select4" name="select" value="4" /><label for="select4">Copy</label>
+				<input type="radio" id="select5" name="select" value="5" /><label for="select5">Invert</label>
+				<input type="radio" id="select6" name="select" value="6" /><label for="select6">Flip horizontal</label>
+				<input type="radio" id="select7" name="select" value="7" /><label for="select7">Flip vertical</label>
 			</div>
 		</fieldset>
 		<fieldset class="ui-widget ui-widget-content ui-corner-all">
 			<legend class="ui-widget-header ui-corner-all">palette:</legend>
 			<div id="colors">
-				<input type="radio" id="color0" name="color" value="0" checked="checked" /><label for="color0" class="color color0"></label>
+				<input type="radio" id="color0" name="color" value="0" /><label for="color0" class="color color0"></label>
 				<input type="radio" id="color1" name="color" value="1" /><label for="color1" class="color color1"></label>
 				<input type="radio" id="color2" name="color" value="2" /><label for="color2" class="color color2"></label>
 				<input type="radio" id="color3" name="color" value="3" /><label for="color3" class="color color3"></label>

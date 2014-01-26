@@ -23,11 +23,18 @@ function ColorAceEditor(opt) {
 	this.editColor  = 0;
 	this.editTool   = 2;
 	this.editMode   = 2;
+	this.editSelect = 0;
+	this.editFilled = false;
 
 	this.pixel      = ColorAceEditor.Pixelator(this);
 	this.draw       = ColorAceEditor.Drawing(this);
 	this.handler    = ColorAceEditor.Handler(this);
+
 	this.selection  = ColorAceEditor.Selection(this);
+	this.selectionCallback = function(state) {
+		for (var i = 2; i < 8; i++)
+			$('#select' + i).button('option', 'disabled', !state);
+	};
 
 	this.pixel.preparePixels();
 	this.scroller = new Scroller(this.pixel.render, {
@@ -42,6 +49,8 @@ function ColorAceEditor(opt) {
 
 	/**
 	 * Set editor and scroller dimensions.
+	 * @param {number} w - webpage workspace width
+	 * @param {number} h - webpage workspace height
 	 */
 	this.setDimensions = function(w, h) {
 		this.contentWidth  = w;
@@ -51,6 +60,9 @@ function ColorAceEditor(opt) {
 
 	/**
 	 * Translation of "real world" coordinates on page to our pixel space.
+	 * @param {number} sx - real mouse cursor X position
+	 * @param {number} sy - real mouse cursor X position
+	 * @return {object} object with properties 'x', 'y' and 'column'
 	 */
 	this.translateCoords = function(sx, sy) {
 		var s = this.scroller.getValues(), o = $(this.canvas).offset(), r = {};
@@ -649,7 +661,7 @@ ColorAceEditor.Pixelator = function(e) {
  * Copyright (c) 2012-2014 Martin Borik
  */
 
-ColorAceEditor.Drawing = function(e) {
+ColorAceEditor.Drawing = function() {
 	var self = {};
 
 	/**
@@ -658,7 +670,7 @@ ColorAceEditor.Drawing = function(e) {
 	 * @param {number} y coordinate in surface (0-255)
 	 */
 	self.dot = function(x, y) {
-		e.pixel.putPixel(x, y, e.editMode, e.editColor);
+		editor.pixel.putPixel(x, y, editor.editMode, editor.editColor);
 	};
 
 	/**
@@ -676,7 +688,7 @@ ColorAceEditor.Drawing = function(e) {
 
 		while (true) {
 			if (drawFirst)
-				e.pixel.putPixel(x1, y1, e.editMode, e.editColor);
+				editor.pixel.putPixel(x1, y1, editor.editMode, editor.editColor);
 
 			drawFirst = true;
 			if (x1 === x2 && y1 === y2)
@@ -884,23 +896,23 @@ ColorAceEditor.Selection = function() {
  */
 
 ColorAceEditor.Handler = function(e) {
-	var self = {}, draw = e.draw;
+	var self = {};
 
 	self.mouseDown = function(o) {
-		switch (e.editTool) {
+		switch (editor.editTool) {
 		// selection
 			case 0:
-				e.selection.reset(o.x, o.y);
-				e.scroller.zoomTo(editor.zoomFactor);
+				editor.selection.reset(o.x, o.y);
+				editor.scroller.zoomTo(editor.zoomFactor);
 				break;
 		// grid selection
 			case 1:
-				e.selection.reset(Math.floor(o.x / 6) * 6, o.y);
-				e.scroller.zoomTo(editor.zoomFactor);
+				editor.selection.reset(Math.floor(o.x / 6) * 6, o.y);
+				editor.scroller.zoomTo(editor.zoomFactor);
 				break;
 		// pencil
 			case 2:
-				draw.dot(o.x, o.y);
+				editor.draw.dot(o.x, o.y);
 				break;
 
 			default:
@@ -909,23 +921,23 @@ ColorAceEditor.Handler = function(e) {
 	};
 
 	self.mouseMove = function(o) {
-		switch (e.editTool) {
+		switch (editor.editTool) {
 		// selection
 			case 0:
-				if (!o.mov) e.pixel.redrawSelection(function(s) {
+				if (!o.mov) editor.pixel.redrawSelection(function(s) {
 					s.set(s.x0, s.y0, o.x - 1, o.y - 1);
 				});
 				break;
 		// grid selection
 			case 1:
-				if (!o.mov) e.pixel.redrawSelection(function(s) {
+				if (!o.mov) editor.pixel.redrawSelection(function(s) {
 					s.set(s.x0, s.y0, (Math.ceil(o.x / 6) * 6) - 1, o.y - 1);
 				});
 				break;
 		// pencil
 			case 2:
 				if (o.lx != o.x || o.ly != o.y)
-					draw.line(o.lx, o.ly, o.x, o.y, o.mov);
+					editor.draw.line(o.lx, o.ly, o.x, o.y, o.mov);
 				break;
 
 			default:
@@ -934,28 +946,33 @@ ColorAceEditor.Handler = function(e) {
 	};
 
 	self.mouseUp = function(o) {
-		switch (e.editTool) {
+		switch (editor.editTool) {
 		// selection
 			case 0:
-				if (!o.mov) e.pixel.redrawSelection(function() {
-					e.selection.set(e.selection.x0, e.selection.y0, o.x - 1, o.y - 1);
+				if (!o.mov) editor.pixel.redrawSelection(function() {
+					editor.selection.set(editor.selection.x0, editor.selection.y0, o.x - 1, o.y - 1);
 				});
+				editor.selectionCallback(editor.selection.nonEmpty());
 				break;
 		// grid selection
 			case 1:
-				if (!o.mov) e.pixel.redrawSelection(function() {
-					e.selection.set(e.selection.x0, e.selection.y0, (Math.ceil(o.x / 6) * 6) - 1, o.y - 1);
+				if (!o.mov) editor.pixel.redrawSelection(function() {
+					editor.selection.set(editor.selection.x0, editor.selection.y0, (Math.ceil(o.x / 6) * 6) - 1, o.y - 1);
 				});
+				editor.selectionCallback(editor.selection.nonEmpty());
 				break;
 		// pencil
 			case 2:
 				if (!o.mov && (o.lx != o.x || o.ly != o.y))
-					draw.line(o.lx, o.ly, o.x, o.y, true);
+					editor.draw.line(o.lx, o.ly, o.x, o.y, true);
 				break;
 
 			default:
 				break;
 		}
+	};
+
+	self.selectFunction = function() {
 	};
 
 	return self;
@@ -1127,41 +1144,42 @@ $(document).ready(function() {
 	});
 
 	$('#tools').buttonset();
-	$('#tool0').button({
-		icons: { primary: "ui-icon-select" },
-		text: false
-	});
-	$('#tool1').button({
-		icons: { primary: "ui-icon-select-grid" },
-		text: false
-	});
-	$('#tool2').button({
-		icons: { primary: "ui-icon-pencil" },
-		text: false
-	});
-	$('#tool3').button({
-		icons: { primary: "ui-icon-brush" },
-		text: false
-	});
-	$('#tool4').button({
-		icons: { primary: "ui-icon-fill" },
-		text: false
-	});
-	$('#tool5').button({
-		icons: { primary: "ui-icon-lines" },
-		text: false
-	});
-	$('#tool6').button({
-		icons: { primary: "ui-icon-ellipse" },
-		text: false
-	});
-	$('#tool7').button({
-		icons: { primary: "ui-icon-rectangle" },
-		text: false
-	});
-
 	$('#colors').buttonset();
 	$('#drawing-mode').buttonset();
+	$('#select-func').buttonset();
+
+	$.each({
+		'tool0': 'select',
+		'tool1': 'select-grid',
+		'tool2': 'pencil',
+		'tool3': 'brush',
+		'tool4': 'fill',
+		'tool5': 'lines',
+		'tool6': 'ellipse',
+		'tool7': 'rectangle',
+		'select0': 'select',
+		'select1': 'resize',
+		'select2': 'select-cut',
+		'select3': 'select-move',
+		'select4': 'select-copy',
+		'select5': 'select-invert',
+		'select6': 'select-flip-x',
+		'select7': 'select-flip-y',
+		'fillmode': 'fill'
+	}, function(index, val) {
+		$('#' + index).button({
+			icons: { primary: 'ui-icon-' + val },
+			text: false
+		});
+	});
+
+	$('#tool' + editor.editTool).click();
+	$('#mode' + editor.editMode).click();
+	$('#color' + editor.editColor).click();
+	$('#select' + editor.editSelect).click();
+	$('#filling-mode').hide();
+	$('#select-func').hide();
+	editor.selectionCallback(false);
 
 	$("#colors>input:radio").click(function() {
 		editor.editColor = parseInt(this.value);
@@ -1169,10 +1187,43 @@ $(document).ready(function() {
 	});
 	$("#tools>input:radio").click(function() {
 		editor.editTool = parseInt(this.value);
+
+		if (editor.editTool > 5)
+			$('#filling-mode').show();
+		else {
+			$('#filling-mode').hide();
+
+			if (editor.editTool < 2) {
+				$('#select-func').show();
+				$('#drawing-set').hide();
+			}
+			else {
+				$('#select-func').hide();
+				$('#drawing-set').show();
+			}
+		}
+
 		return false;
 	});
 	$("#drawing-mode>input:radio").click(function() {
 		editor.editMode = parseInt(this.value);
+		return false;
+	});
+	$("#select-func>input:radio").click(function() {
+		editor.editSelect = parseInt(this.value);
+
+		if (editor.selection.nonEmpty() && editor.editSelect > 0) {
+			editor.handler.selectFunction();
+			if (editor.editSelect < 3 || editor.editSelect > 4) {
+				$('input#select0').click();
+				editor.editSelect = 0;
+			}
+		}
+
+		return false;
+	});
+	$("#filling-mode>input:checkbox").change(function() {
+		editor.editFilled = this.checked;
 		return false;
 	});
 });

@@ -164,41 +164,42 @@ $(document).ready(function() {
 	});
 
 	$('#tools').buttonset();
-	$('#tool0').button({
-		icons: { primary: "ui-icon-select" },
-		text: false
-	});
-	$('#tool1').button({
-		icons: { primary: "ui-icon-select-grid" },
-		text: false
-	});
-	$('#tool2').button({
-		icons: { primary: "ui-icon-pencil" },
-		text: false
-	});
-	$('#tool3').button({
-		icons: { primary: "ui-icon-brush" },
-		text: false
-	});
-	$('#tool4').button({
-		icons: { primary: "ui-icon-fill" },
-		text: false
-	});
-	$('#tool5').button({
-		icons: { primary: "ui-icon-lines" },
-		text: false
-	});
-	$('#tool6').button({
-		icons: { primary: "ui-icon-ellipse" },
-		text: false
-	});
-	$('#tool7').button({
-		icons: { primary: "ui-icon-rectangle" },
-		text: false
-	});
-
 	$('#colors').buttonset();
 	$('#drawing-mode').buttonset();
+	$('#select-func').buttonset();
+
+	$.each({
+		'tool0': 'select',
+		'tool1': 'select-grid',
+		'tool2': 'pencil',
+		'tool3': 'brush',
+		'tool4': 'fill',
+		'tool5': 'lines',
+		'tool6': 'ellipse',
+		'tool7': 'rectangle',
+		'select0': 'select',
+		'select1': 'resize',
+		'select2': 'select-cut',
+		'select3': 'select-move',
+		'select4': 'select-copy',
+		'select5': 'select-invert',
+		'select6': 'select-flip-x',
+		'select7': 'select-flip-y',
+		'fillmode': 'fill'
+	}, function(index, val) {
+		$('#' + index).button({
+			icons: { primary: 'ui-icon-' + val },
+			text: false
+		});
+	});
+
+	$('#tool' + editor.editTool).click();
+	$('#mode' + editor.editMode).click();
+	$('#color' + editor.editColor).click();
+	$('#select' + editor.editSelect).click();
+	$('#filling-mode').hide();
+	$('#select-func').hide();
+	editor.selectionCallback(false);
 
 	$("#colors>input:radio").click(function() {
 		editor.editColor = parseInt(this.value);
@@ -206,10 +207,43 @@ $(document).ready(function() {
 	});
 	$("#tools>input:radio").click(function() {
 		editor.editTool = parseInt(this.value);
+
+		if (editor.editTool > 5)
+			$('#filling-mode').show();
+		else {
+			$('#filling-mode').hide();
+
+			if (editor.editTool < 2) {
+				$('#select-func').show();
+				$('#drawing-set').hide();
+			}
+			else {
+				$('#select-func').hide();
+				$('#drawing-set').show();
+			}
+		}
+
 		return false;
 	});
 	$("#drawing-mode>input:radio").click(function() {
 		editor.editMode = parseInt(this.value);
+		return false;
+	});
+	$("#select-func>input:radio").click(function() {
+		editor.editSelect = parseInt(this.value);
+
+		if (editor.selection.nonEmpty() && editor.editSelect > 0) {
+			editor.handler.selectFunction();
+			if (editor.editSelect < 3 || editor.editSelect > 4) {
+				$('input#select0').click();
+				editor.editSelect = 0;
+			}
+		}
+
+		return false;
+	});
+	$("#filling-mode>input:checkbox").change(function() {
+		editor.editFilled = this.checked;
 		return false;
 	});
 });
