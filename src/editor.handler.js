@@ -25,6 +25,18 @@ ColorAceEditor.Handler = function(e) {
 				editor.draw.dot(o.x, o.y);
 				break;
 
+		// brush [pomocka na oznacovanie bodov ;]
+			case 3:
+				editor.draw.dot(o.x, o.y);
+				if (!editor.a80data)
+					editor.a80data = [];
+
+				if (!editor.a80data.some(function (v) {
+					return (v.x === o.x && v.y === o.y);
+				})) {
+					editor.a80data.push({ x: o.x, y: o.y });
+				}
+				break;
 			default:
 				break;
 		}

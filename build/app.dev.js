@@ -155,16 +155,16 @@ ColorAceEditor.Pixelator = function(e) {
 	 */
 	self.readPMD85vram = function(data) {
 		var i, j = 0, k = 0, h = 256, dst = 0, b, c, d;
-	
+
 		if (data.length != 16384)
 			return;
-	
+
 		while (h--) {
 			for (i = 0; i < 48; ++i) {
 				d = ((b = data[j + i]) & 0xC0) >> 6;
 				c = (data[j + i + ((((h % 2) << 1) - 1) * 64)] & 0xC0) >> 6;
 				c = (d | c | ((d * c) ? 0 : 4));
-	
+
 				self.surface[dst++] = (b & 0x01) ? c : 0;
 				self.surface[dst++] = (b & 0x02) ? c : 0;
 				self.surface[dst++] = (b & 0x04) ? c : 0;
@@ -173,7 +173,7 @@ ColorAceEditor.Pixelator = function(e) {
 				self.surface[dst++] = (b & 0x20) ? c : 0;
 				self.attrs[k++] = d;
 			}
-	
+
 			j += 64;
 		}
 	};
@@ -241,7 +241,7 @@ ColorAceEditor.Pixelator = function(e) {
 			}
 		}
 
-		return url || 'data:application/octet-stream;base64,' + data.BASE64;
+		return url || 'data:application/octet-stream;base64,' + base64;
 	};
 
 	/**
@@ -915,6 +915,18 @@ ColorAceEditor.Handler = function(e) {
 				editor.draw.dot(o.x, o.y);
 				break;
 
+		// brush [pomocka na oznacovanie bodov ;]
+			case 3:
+				editor.draw.dot(o.x, o.y);
+				if (!editor.a80data)
+					editor.a80data = [];
+
+				if (!editor.a80data.some(function (v) {
+					return (v.x === o.x && v.y === o.y);
+				})) {
+					editor.a80data.push({ x: o.x, y: o.y });
+				}
+				break;
 			default:
 				break;
 		}
@@ -1123,6 +1135,8 @@ $(document).ready(function() {
 				var b = new Uint8Array(this.result);
 				editor.pixel.readPMD85vram(b);
 				editor.scroller.zoomTo(editor.zoomFactor);
+
+				$('#upload-file:file').val('');
 			};
 
 			fr.readAsArrayBuffer(file);
@@ -1224,6 +1238,52 @@ $(document).ready(function() {
 	});
 	$("#filling-mode>input:checkbox").change(function() {
 		editor.editFilled = this.checked;
+		return false;
+	});
+
+	// keyboard handling
+	$(window).on('keydown', function(e) {
+		if (e.target && (/^a|input|button$/i.test(e.target.tagName)))
+			return true;
+
+		var key = e.which || e.charCode || e.keyCode;
+
+		// F9 - dialog pomocky na oznacovanie bodov...
+		if (key === 120 && editor.a80data instanceof Array) {
+			var txt = editor.a80data.map(function(v) {
+				return "\t\tdb\t" + v.x + ", " + v.y;
+			}).join('\n');
+
+			$('<textarea />')
+				.val(txt)
+				.dialog({
+					width: 800,
+					height: 800,
+					modal: true
+				})
+				.css({
+					fontFamily: 'monospace',
+					width: 760,
+					height: 760
+				});
+
+			txt = null;
+		}
+		// Backspace - odobratie posledne pridaneho bodu
+		else if (key === 8 && editor.a80data instanceof Array) {
+			var last = editor.a80data.pop();
+			if (last)
+				editor.draw.dot(last.x, last.y);
+		}
+		// G - show/hide grid
+		else if (key === 71) {
+			editor.showGrid = !editor.showGrid;
+			editor.scroller.zoomTo(editor.zoomFactor);
+		}
+		else
+			return true;
+
+		e.preventDefault();
 		return false;
 	});
 });

@@ -59,16 +59,16 @@ ColorAceEditor.Pixelator = function(e) {
 	 */
 	self.readPMD85vram = function(data) {
 		var i, j = 0, k = 0, h = 256, dst = 0, b, c, d;
-	
+
 		if (data.length != 16384)
 			return;
-	
+
 		while (h--) {
 			for (i = 0; i < 48; ++i) {
 				d = ((b = data[j + i]) & 0xC0) >> 6;
 				c = (data[j + i + ((((h % 2) << 1) - 1) * 64)] & 0xC0) >> 6;
 				c = (d | c | ((d * c) ? 0 : 4));
-	
+
 				self.surface[dst++] = (b & 0x01) ? c : 0;
 				self.surface[dst++] = (b & 0x02) ? c : 0;
 				self.surface[dst++] = (b & 0x04) ? c : 0;
@@ -77,7 +77,7 @@ ColorAceEditor.Pixelator = function(e) {
 				self.surface[dst++] = (b & 0x20) ? c : 0;
 				self.attrs[k++] = d;
 			}
-	
+
 			j += 64;
 		}
 	};
@@ -145,7 +145,7 @@ ColorAceEditor.Pixelator = function(e) {
 			}
 		}
 
-		return url || 'data:application/octet-stream;base64,' + data.BASE64;
+		return url || 'data:application/octet-stream;base64,' + base64;
 	};
 
 	/**

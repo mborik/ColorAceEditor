@@ -143,6 +143,8 @@ $(document).ready(function() {
 				var b = new Uint8Array(this.result);
 				editor.pixel.readPMD85vram(b);
 				editor.scroller.zoomTo(editor.zoomFactor);
+
+				$('#upload-file:file').val('');
 			};
 
 			fr.readAsArrayBuffer(file);
@@ -244,6 +246,52 @@ $(document).ready(function() {
 	});
 	$("#filling-mode>input:checkbox").change(function() {
 		editor.editFilled = this.checked;
+		return false;
+	});
+
+	// keyboard handling
+	$(window).on('keydown', function(e) {
+		if (e.target && (/^a|input|button$/i.test(e.target.tagName)))
+			return true;
+
+		var key = e.which || e.charCode || e.keyCode;
+
+		// F9 - dialog pomocky na oznacovanie bodov...
+		if (key === 120 && editor.a80data instanceof Array) {
+			var txt = editor.a80data.map(function(v) {
+				return "\t\tdb\t" + v.x + ", " + v.y;
+			}).join('\n');
+
+			$('<textarea />')
+				.val(txt)
+				.dialog({
+					width: 800,
+					height: 800,
+					modal: true
+				})
+				.css({
+					fontFamily: 'monospace',
+					width: 760,
+					height: 760
+				});
+
+			txt = null;
+		}
+		// Backspace - odobratie posledne pridaneho bodu
+		else if (key === 8 && editor.a80data instanceof Array) {
+			var last = editor.a80data.pop();
+			if (last)
+				editor.draw.dot(last.x, last.y);
+		}
+		// G - show/hide grid
+		else if (key === 71) {
+			editor.showGrid = !editor.showGrid;
+			editor.scroller.zoomTo(editor.zoomFactor);
+		}
+		else
+			return true;
+
+		e.preventDefault();
 		return false;
 	});
 });
