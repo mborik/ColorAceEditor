@@ -1,12 +1,12 @@
 /*!
- * jQuery UI CSS Framework 1.10.3
+ * jQuery UI CSS Framework 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
- * http://docs.jquery.com/UI/Theming/API
+ * http://api.jqueryui.com/category/theming/
  */
 
 /* Layout helpers
@@ -93,14 +93,14 @@
 }
 
 /*!
- * jQuery UI Button 1.10.3
+ * jQuery UI Button 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
- * http://docs.jquery.com/UI/Button#theming
+ * http://api.jqueryui.com/button/#theming
  */
 .ui-button {
 	display: inline-block;
@@ -208,16 +208,17 @@ button.ui-button::-moz-focus-inner {
 }
 
 /*!
- * jQuery UI Dialog 1.10.3
+ * jQuery UI Dialog 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
- * http://docs.jquery.com/UI/Dialog#theming
+ * http://api.jqueryui.com/dialog/#theming
  */
 .ui-dialog {
+	overflow: hidden;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -240,7 +241,7 @@ button.ui-button::-moz-focus-inner {
 	position: absolute;
 	right: .3em;
 	top: 50%;
-	width: 21px;
+	width: 20px;
 	margin: -10px 0 0 0;
 	padding: 1px;
 	height: 20px;
@@ -278,14 +279,14 @@ button.ui-button::-moz-focus-inner {
 }
 
 /*!
- * jQuery UI Slider 1.10.3
+ * jQuery UI Slider 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
- * http://docs.jquery.com/UI/Slider#theming
+ * http://api.jqueryui.com/slider/#theming
  */
 .ui-slider {
 	position: relative;

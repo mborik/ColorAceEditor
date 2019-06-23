@@ -1,8 +1,8 @@
 /*!
- * jQuery UI Core 1.10.3
+ * jQuery UI Core 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -17,7 +17,7 @@ var uuid = 0,
 $.ui = $.ui || {};
 
 $.extend( $.ui, {
-	version: "1.10.3",
+	version: "1.10.4",
 
 	keyCode: {
 		BACKSPACE: 8,
@@ -320,10 +320,10 @@ $.extend( $.ui, {
 })( jQuery );
 
 /*!
- * jQuery UI Widget 1.10.3
+ * jQuery UI Widget 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -427,7 +427,7 @@ $.widget = function( name, base, prototype ) {
 		// TODO: remove support for widgetEventPrefix
 		// always use the name + a colon as the prefix, e.g., draggable:start
 		// don't prefix for widgets that aren't DOM-based
-		widgetEventPrefix: existingConstructor ? basePrototype.widgetEventPrefix : name
+		widgetEventPrefix: existingConstructor ? (basePrototype.widgetEventPrefix || name) : name
 	}, proxiedPrototype, {
 		constructor: constructor,
 		namespace: namespace,
@@ -636,12 +636,12 @@ $.Widget.prototype = {
 					curOption = curOption[ parts[ i ] ];
 				}
 				key = parts.pop();
-				if ( value === undefined ) {
+				if ( arguments.length === 1 ) {
 					return curOption[ key ] === undefined ? null : curOption[ key ];
 				}
 				curOption[ key ] = value;
 			} else {
-				if ( value === undefined ) {
+				if ( arguments.length === 1 ) {
 					return this.options[ key ] === undefined ? null : this.options[ key ];
 				}
 				options[ key ] = value;
@@ -842,10 +842,10 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
 })( jQuery );
 
 /*!
- * jQuery UI Mouse 1.10.3
+ * jQuery UI Mouse 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -862,7 +862,7 @@ $( document ).mouseup( function() {
 });
 
 $.widget("ui.mouse", {
-	version: "1.10.3",
+	version: "1.10.4",
 	options: {
 		cancel: "input,textarea,button,select,option",
 		distance: 1,
@@ -1012,10 +1012,10 @@ $.widget("ui.mouse", {
 })(jQuery);
 
 /*!
- * jQuery UI Button 1.10.3
+ * jQuery UI Button 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -1027,9 +1027,8 @@ $.widget("ui.mouse", {
  */
 (function( $, undefined ) {
 
-var lastActive, startXPos, startYPos, clickDragged,
+var lastActive,
 	baseClasses = "ui-button ui-widget ui-state-default ui-corner-all",
-	stateClasses = "ui-state-hover ui-state-active ",
 	typeClasses = "ui-button-icons-only ui-button-icon-only ui-button-text-icons ui-button-text-icon-primary ui-button-text-icon-secondary ui-button-text-only",
 	formResetHandler = function() {
 		var form = $( this );
@@ -1056,7 +1055,7 @@ var lastActive, startXPos, startYPos, clickDragged,
 	};
 
 $.widget( "ui.button", {
-	version: "1.10.3",
+	version: "1.10.4",
 	defaultElement: "<button>",
 	options: {
 		disabled: null,
@@ -1084,8 +1083,7 @@ $.widget( "ui.button", {
 		var that = this,
 			options = this.options,
 			toggleButton = this.type === "checkbox" || this.type === "radio",
-			activeClass = !toggleButton ? "ui-state-active" : "",
-			focusClass = "ui-state-focus";
+			activeClass = !toggleButton ? "ui-state-active" : "";
 
 		if ( options.label === null ) {
 			options.label = (this.type === "input" ? this.buttonElement.val() : this.buttonElement.html());
@@ -1117,53 +1115,32 @@ $.widget( "ui.button", {
 				}
 			});
 
-		this.element
-			.bind( "focus" + this.eventNamespace, function() {
-				// no need to check disabled, focus won't be triggered anyway
-				that.buttonElement.addClass( focusClass );
-			})
-			.bind( "blur" + this.eventNamespace, function() {
-				that.buttonElement.removeClass( focusClass );
-			});
+		// Can't use _focusable() because the element that receives focus
+		// and the element that gets the ui-state-focus class are different
+		this._on({
+			focus: function() {
+				this.buttonElement.addClass( "ui-state-focus" );
+			},
+			blur: function() {
+				this.buttonElement.removeClass( "ui-state-focus" );
+			}
+		});
 
 		if ( toggleButton ) {
 			this.element.bind( "change" + this.eventNamespace, function() {
-				if ( clickDragged ) {
-					return;
-				}
 				that.refresh();
-			});
-			// if mouse moves between mousedown and mouseup (drag) set clickDragged flag
-			// prevents issue where button state changes but checkbox/radio checked state
-			// does not in Firefox (see ticket #6970)
-			this.buttonElement
-				.bind( "mousedown" + this.eventNamespace, function( event ) {
-					if ( options.disabled ) {
-						return;
-					}
-					clickDragged = false;
-					startXPos = event.pageX;
-					startYPos = event.pageY;
-				})
-				.bind( "mouseup" + this.eventNamespace, function( event ) {
-					if ( options.disabled ) {
-						return;
-					}
-					if ( startXPos !== event.pageX || startYPos !== event.pageY ) {
-						clickDragged = true;
-					}
 			});
 		}
 
 		if ( this.type === "checkbox" ) {
 			this.buttonElement.bind( "click" + this.eventNamespace, function() {
-				if ( options.disabled || clickDragged ) {
+				if ( options.disabled ) {
 					return false;
 				}
 			});
 		} else if ( this.type === "radio" ) {
 			this.buttonElement.bind( "click" + this.eventNamespace, function() {
-				if ( options.disabled || clickDragged ) {
+				if ( options.disabled ) {
 					return false;
 				}
 				$( this ).addClass( "ui-state-active" );
@@ -1273,7 +1250,7 @@ $.widget( "ui.button", {
 		this.element
 			.removeClass( "ui-helper-hidden-accessible" );
 		this.buttonElement
-			.removeClass( baseClasses + " " + stateClasses + " " + typeClasses )
+			.removeClass( baseClasses + " ui-state-active " + typeClasses )
 			.removeAttr( "role" )
 			.removeAttr( "aria-pressed" )
 			.html( this.buttonElement.find(".ui-button-text").html() );
@@ -1286,10 +1263,9 @@ $.widget( "ui.button", {
 	_setOption: function( key, value ) {
 		this._super( key, value );
 		if ( key === "disabled" ) {
+			this.element.prop( "disabled", !!value );
 			if ( value ) {
-				this.element.prop( "disabled", true );
-			} else {
-				this.element.prop( "disabled", false );
+				this.buttonElement.removeClass( "ui-state-focus" );
 			}
 			return;
 		}
@@ -1373,7 +1349,7 @@ $.widget( "ui.button", {
 });
 
 $.widget( "ui.buttonset", {
-	version: "1.10.3",
+	version: "1.10.4",
 	options: {
 		items: "button, input[type=button], input[type=submit], input[type=reset], input[type=checkbox], input[type=radio], a, :data(ui-button)"
 	},
@@ -1432,10 +1408,10 @@ $.widget( "ui.buttonset", {
 }( jQuery ) );
 
 /*!
- * jQuery UI Position 1.10.3
+ * jQuery UI Position 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -1503,7 +1479,7 @@ $.position = {
 			return cachedScrollbarWidth;
 		}
 		var w1, w2,
-			div = $( "<div style='display:block;width:50px;height:50px;overflow:hidden;'><div style='height:100px;width:auto;'></div></div>" ),
+			div = $( "<div style='display:block;position:absolute;width:50px;height:50px;overflow:hidden;'><div style='height:100px;width:auto;'></div></div>" ),
 			innerDiv = div.children()[0];
 
 		$( "body" ).append( div );
@@ -1521,8 +1497,10 @@ $.position = {
 		return (cachedScrollbarWidth = w1 - w2);
 	},
 	getScrollInfo: function( within ) {
-		var overflowX = within.isWindow ? "" : within.element.css( "overflow-x" ),
-			overflowY = within.isWindow ? "" : within.element.css( "overflow-y" ),
+		var overflowX = within.isWindow || within.isDocument ? "" :
+				within.element.css( "overflow-x" ),
+			overflowY = within.isWindow || within.isDocument ? "" :
+				within.element.css( "overflow-y" ),
 			hasOverflowX = overflowX === "scroll" ||
 				( overflowX === "auto" && within.width < within.element[0].scrollWidth ),
 			hasOverflowY = overflowY === "scroll" ||
@@ -1534,10 +1512,12 @@ $.position = {
 	},
 	getWithinInfo: function( element ) {
 		var withinElement = $( element || window ),
-			isWindow = $.isWindow( withinElement[0] );
+			isWindow = $.isWindow( withinElement[0] ),
+			isDocument = !!withinElement[ 0 ] && withinElement[ 0 ].nodeType === 9;
 		return {
 			element: withinElement,
 			isWindow: isWindow,
+			isDocument: isDocument,
 			offset: withinElement.offset() || { left: 0, top: 0 },
 			scrollLeft: withinElement.scrollLeft(),
 			scrollTop: withinElement.scrollTop(),
@@ -1869,7 +1849,7 @@ $.ui.position = {
 				}
 			}
 			else if ( overBottom > 0 ) {
-				newOverTop = position.top -  data.collisionPosition.marginTop + myOffset + atOffset + offset - offsetTop;
+				newOverTop = position.top - data.collisionPosition.marginTop + myOffset + atOffset + offset - offsetTop;
 				if ( ( position.top + myOffset + atOffset + offset) > overBottom && ( newOverTop > 0 || abs( newOverTop ) < overBottom ) ) {
 					position.top += myOffset + atOffset + offset;
 				}
@@ -1930,10 +1910,10 @@ $.ui.position = {
 }( jQuery ) );
 
 /*!
- * jQuery UI Dialog 1.10.3
+ * jQuery UI Dialog 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -1967,7 +1947,7 @@ var sizeRelatedOptions = {
 	};
 
 $.widget( "ui.dialog", {
-	version: "1.10.3",
+	version: "1.10.4",
 	options: {
 		appendTo: "body",
 		autoOpen: true,
@@ -2100,7 +2080,8 @@ $.widget( "ui.dialog", {
 	enable: $.noop,
 
 	close: function( event ) {
-		var that = this;
+		var activeElement,
+			that = this;
 
 		if ( !this._isOpen || this._trigger( "beforeClose", event ) === false ) {
 			return;
@@ -2110,10 +2091,22 @@ $.widget( "ui.dialog", {
 		this._destroyOverlay();
 
 		if ( !this.opener.filter(":focusable").focus().length ) {
-			// Hiding a focused element doesn't trigger blur in WebKit
-			// so in case we have nothing to focus on, explicitly blur the active element
-			// https://bugs.webkit.org/show_bug.cgi?id=47182
-			$( this.document[0].activeElement ).blur();
+
+			// support: IE9
+			// IE9 throws an "Unspecified error" accessing document.activeElement from an <iframe>
+			try {
+				activeElement = this.document[ 0 ].activeElement;
+
+				// Support: IE9, IE10
+				// If the <body> is blurred, IE will switch windows, see #4520
+				if ( activeElement && activeElement.nodeName.toLowerCase() !== "body" ) {
+
+					// Hiding a focused element doesn't trigger blur in WebKit
+					// so in case we have nothing to focus on, explicitly blur the active element
+					// https://bugs.webkit.org/show_bug.cgi?id=47182
+					$( activeElement ).blur();
+				}
+			} catch ( error ) {}
 		}
 
 		this._hide( this.uiDialog, this.options.hide, function() {
@@ -2273,7 +2266,10 @@ $.widget( "ui.dialog", {
 			}
 		});
 
-		this.uiDialogTitlebarClose = $("<button></button>")
+		// support: IE
+		// Use type="button" to prevent enter keypresses in textboxes from closing the
+		// dialog in IE (#9312)
+		this.uiDialogTitlebarClose = $( "<button type='button'></button>" )
 			.button({
 				label: this.options.closeText,
 				icons: {
@@ -2487,7 +2483,6 @@ $.widget( "ui.dialog", {
 	},
 
 	_setOption: function( key, value ) {
-		/*jshint maxcomplexity:15*/
 		var isDraggable, isResizable,
 			uiDialog = this.uiDialog;
 
@@ -2739,10 +2734,10 @@ if ( $.uiBackCompat !== false ) {
 }( jQuery ) );
 
 /*!
- * jQuery UI Slider 1.10.3
+ * jQuery UI Slider 1.10.4
  * http://jqueryui.com
  *
- * Copyright 2013 jQuery Foundation and other contributors
+ * Copyright 2014 jQuery Foundation and other contributors
  * Released under the MIT license.
  * http://jquery.org/license
  *
@@ -2760,7 +2755,7 @@ if ( $.uiBackCompat !== false ) {
 var numPages = 5;
 
 $.widget( "ui.slider", $.ui.mouse, {
-	version: "1.10.3",
+	version: "1.10.4",
 	widgetEventPrefix: "slide",
 
 	options: {
@@ -2871,7 +2866,10 @@ $.widget( "ui.slider", $.ui.mouse, {
 			this.range.addClass( classes +
 				( ( options.range === "min" || options.range === "max" ) ? " ui-slider-range-" + options.range : "" ) );
 		} else {
-			this.range = $([]);
+			if ( this.range ) {
+				this.range.remove();
+			}
+			this.range = null;
 		}
 	},
 
@@ -2885,7 +2883,9 @@ $.widget( "ui.slider", $.ui.mouse, {
 
 	_destroy: function() {
 		this.handles.remove();
-		this.range.remove();
+		if ( this.range ) {
+			this.range.remove();
+		}
 
 		this.element
 			.removeClass( "ui-slider" +
@@ -3057,7 +3057,7 @@ $.widget( "ui.slider", $.ui.mouse, {
 				} );
 				otherVal = this.values( index ? 0 : 1 );
 				if ( allowed !== false ) {
-					this.values( index, newVal, true );
+					this.values( index, newVal );
 				}
 			}
 		} else {
@@ -3329,7 +3329,6 @@ $.widget( "ui.slider", $.ui.mouse, {
 
 	_handleEvents: {
 		keydown: function( event ) {
-			/*jshint maxcomplexity:25*/
 			var allowed, curVal, newVal, step,
 				index = $( event.target ).data( "ui-slider-handle-index" );
 

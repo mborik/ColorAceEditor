@@ -61,7 +61,7 @@ module.exports = function(grunt) {
 			},
 			"jquery": {
 				src: [
-					'bower_components/jquery/jquery.js',
+					'bower_components/jquery/dist/jquery.js',
 					'bower_components/jquery-mousewheel/jquery.mousewheel.js'
 				],
 				dest: 'build/jquery.dev.js'
