@@ -29,6 +29,7 @@ function ColorAceEditor(opt) {
 	this.pixel      = ColorAceEditor.Pixelator(this);
 	this.draw       = ColorAceEditor.Drawing(this);
 	this.handler    = ColorAceEditor.Handler(this);
+	this.uploader   = ColorAceEditor.Uploader(this, opt.upload);
 
 	this.selection  = ColorAceEditor.Selection(this);
 	this.selectionCallback = function(state) {

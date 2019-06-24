@@ -16,6 +16,7 @@ module.exports = function(grunt) {
 				'src/editor.pixel.js',
 				'src/editor.draw.js',
 				'src/editor.handler.js',
+				'src/editor.upload.js',
 				'src/loader.js'
 			]
 		},
@@ -55,6 +56,7 @@ module.exports = function(grunt) {
 					'src/editor.pixel.js',
 					'src/editor.draw.js',
 					'src/editor.handler.js',
+					'src/editor.upload.js',
 					'src/loader.js'
 				],
 				dest: 'build/app.dev.js'

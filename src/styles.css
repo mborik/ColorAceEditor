@@ -130,7 +130,6 @@ legend {
 	white-space: nowrap;
 }
 #upload-form {
-	float: left;
     display: inline;
     margin: 0;
     padding: 0;
@@ -145,14 +144,14 @@ legend {
     padding: 0;
     margin: 0;
 }
-#upload-button {
-    margin: 0;
-	width: 100px;
-	height: 24px;
-	cursor: default;
+#upload-canvas {
+	position: absolute;
+	top: -100vw;
+	left: -100vw;
+	opacity: 0;
 }
-#save-button {
-	margin: 0;
+#upload-button, #save-button {
+    margin: 0;
 	width: 100px;
 	height: 24px;
 	cursor: default;

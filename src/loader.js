@@ -21,6 +21,7 @@ var resizeWrapper = function() {
 $(document).ready(function() {
 	editor = new ColorAceEditor({
 		canvas : $("#myCanvas")[0],
+		upload : $("#upload-canvas")[0],
 		status : $("#statusBar"),
 		grid   : true,
 		undo   : 20
@@ -135,21 +136,14 @@ $(document).ready(function() {
 	});
 
 	$('#upload-file:file').change(function() {
-		var file = this.files[0],
-			fr = new window.FileReader();
+		editor.uploader(this.files[0], function(result) {
+			$('#upload-file:file').val('');
 
-		if (fr && file) try {
-			fr.onload = function() {
-				var b = new Uint8Array(this.result);
-				editor.pixel.readPMD85vram(b);
-				editor.scroller.zoomTo(editor.zoomFactor);
-
-				$('#upload-file:file').val('');
-			};
-
-			fr.readAsArrayBuffer(file);
-		}
-		catch(e) { console.error(e); }
+			if (typeof result === 'object' && result.error) {
+				$('<div title="upload error">' + result.error + '</div>')
+					.dialog({ modal: true, buttons: ['ok'] });
+			}
+		});
 	});
 
 	$('#save-button').button({
