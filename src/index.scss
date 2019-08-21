@@ -1,0 +1,37 @@
+@import "~@blueprintjs/core/src/common/variables";
+
+$sidebar-width: 18rem;
+
+body {
+	font-family: "Montserrat", $pt-font-family;
+	overflow: hidden;
+
+	&.#{$ns}-dark {
+		background-color: $black;
+	}
+}
+
+#wrapper {
+	@include pt-flex-container(row);
+	min-width: 100vw;
+
+	* {
+		user-select: none;
+	}
+
+	nav {
+		flex-basis: $sidebar-width;
+		position: relative;
+		z-index: $pt-z-index-content;
+
+		> .#{$ns}-navbar {
+			@include pt-flex-container(column);
+			height: 100vw;
+
+			.#{$ns}-navbar-heading {
+				margin: 0 auto;
+				font-weight: bold;
+			}
+		}
+	}
+}
