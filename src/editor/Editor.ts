@@ -67,7 +67,7 @@ export class Editor extends Uploader {
 		}
 
 		this.canvas = opt.canvas;
-		this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+		this.ctx = this.canvas.getContext("2d");
 
 		this.zoomFactor = opt.zoom || 1;
 		this.showGrid = opt.grid || true;
@@ -87,7 +87,7 @@ export class Editor extends Uploader {
 		this.contentHeight = h;
 
 		this.scroller.setDimensions(w - 276, h, 288, 256);
-	};
+	}
 
 	/**
 	* Translation of "real world" coordinates on page to our pixel space.
@@ -129,7 +129,7 @@ export class Editor extends Uploader {
 		const pad = (num: string | number, len: number) => num.toString().padStart(len);
 
 		this.statusBar = `${pad(z, 4)}%   X:${pad(x, 3)} Y:${pad(y, 3)}  C:${pad(c, 2)}   ${a}`;
-	};
+	}
 }
 
 /**

@@ -1,56 +1,43 @@
-import React from 'react';
-import { Button, ButtonGroup, Label, Navbar, Tooltip, Position } from "@blueprintjs/core";
-import { IconName } from "@blueprintjs/icons";
+/*
+ * PMD 85 ColorAce picture editor
+ * Toolbar component
+ *
+ * Copyright (c) 2019 Martin Bórik
+ */
 
-interface ToolbarItem {
-	id: string;
-	icon: IconName;
-	title: string;
-	active?: boolean;
-}
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Button, ButtonGroup, Navbar, Tooltip, Position } from "@blueprintjs/core";
+
+import { Editor } from '../editor/Editor';
+import { toolChanged } from '../actions/editor';
+import { ToolbarItems } from '../params/Toolbar';
+
 
 const Toolbar: React.FunctionComponent = () => {
-	const tools: ToolbarItem[] = [{
-		id: 'tool0',
-		icon: 'select',
-		title: 'selection',
-		active: true
-	}, {
-		id: 'tool1',
-		icon: 'new-grid-item',
-		title: 'grid selection'
-	}, {
-		id: 'tool2',
-		icon: 'edit',
-		title: 'pencil'
-	}, {
-		id: 'tool3',
-		icon: 'highlight',
-		title: 'brush'
-	}, {
-		id: 'tool4',
-		icon: 'tint',
-		title: 'fill'
-	}, {
-		id: 'tool5',
-		icon: 'new-link',
-		title: 'lines'
-	}, {
-		id: 'tool6',
-		icon: 'layout-circle',
-		title: 'ellipse'
-	}, {
-		id: 'tool7',
-		icon: 'widget',
-		title: 'rectangle'
-	}];
+	const tools = useSelector((state: any) => {
+		const editor: Editor = state.editor;
+
+		if (editor) {
+			return ToolbarItems.map((tool, i) => ({
+				...tool,
+				active: (i === editor.editTool)
+			}));
+		}
+
+		return ToolbarItems;
+	});
+
+	const dispatch = useDispatch();
+	const dispatchChange = useCallback(
+		(editTool: number) => dispatch(toolChanged(editTool)),
+		[ dispatch ]
+	);
 
 	return (
-		<Label>
-			tool:
-			<Navbar.Group align="center">
-				<ButtonGroup fill={true}>
-				{tools.map(t => (
+		<Navbar.Group align="center">
+			<ButtonGroup fill={true}>
+				{tools.map((t, i) => (
 					<Tooltip
 						key={`${t.id}tip`}
 						content={t.title}
@@ -60,14 +47,14 @@ const Toolbar: React.FunctionComponent = () => {
 						<Button
 							id={t.id}
 							icon={t.icon}
-							active={!!t.active}
+							active={t.active}
 							intent={t.active ? 'primary' : undefined}
+							onClick={() => dispatchChange(i)}
 						/>
 					</Tooltip>
 				))}
-				</ButtonGroup>
-			</Navbar.Group>
-		</Label>
+			</ButtonGroup>
+		</Navbar.Group>
 	);
 }
 

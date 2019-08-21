@@ -1,3 +1,10 @@
+/*
+ * PMD 85 ColorAce picture editor
+ * Main component, drawing canvas container
+ *
+ * Copyright (c) 2019 Martin Bórik
+ */
+
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { initEditorInstance } from '../actions/editor';

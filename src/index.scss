@@ -1,3 +1,10 @@
+/*
+ * PMD 85 ColorAce picture editor
+ * base style definitions
+ *
+ * Copyright (c) 2019 Martin Bórik
+ */
+
 @import "~@blueprintjs/core/src/common/variables";
 
 $sidebar-width: 18rem;
@@ -31,6 +38,18 @@ body {
 			.#{$ns}-navbar-heading {
 				margin: 0 auto;
 				font-weight: bold;
+			}
+		}
+
+		fieldset {
+			margin: 0;
+			padding: 0 .75rem;
+			border: 1px solid $gray1;
+
+			> legend {
+				margin: 0;
+				padding: 0 .5em;
+				color: $gray3;
 			}
 		}
 	}

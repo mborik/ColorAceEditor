@@ -15,7 +15,7 @@ export class Uploader {
 
 	constructor(private uploadCanvas?: HTMLCanvasElement) {
 		if (uploadCanvas instanceof HTMLCanvasElement) {
-			this.uploadCtx = uploadCanvas.getContext("2d") as CanvasRenderingContext2D;
+			this.uploadCtx = uploadCanvas.getContext("2d");
 		} else {
 			console.error("ColorAceEditor: Image render canvas element not defined!");
 		}

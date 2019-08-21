@@ -1,3 +1,10 @@
+/*
+ * PMD 85 ColorAce picture editor
+ * Navigation panel component
+ *
+ * Copyright (c) 2019 Martin Bórik
+ */
+
 import React from 'react';
 import { Navbar } from "@blueprintjs/core";
 import Toolbar from './Toolbar';
@@ -9,7 +16,10 @@ const Navigation: React.FunctionComponent = () => {
 				<Navbar.Heading>ColorACE Screen Editor</Navbar.Heading>
 			</Navbar.Group>
 
-			<Toolbar />
+			<fieldset>
+				<legend>tool:</legend>
+				<Toolbar />
+			</fieldset>
 		</Navbar>
 	</nav>;
 }
