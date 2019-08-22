@@ -44,6 +44,8 @@ export class Editor extends FileOps {
 	editSelect: number = 0;
 	editFilled: boolean = false;
 
+	coordsRecorder: { x: number, y: number }[] = [];
+
 	action: ActionHandler = new ActionHandler();
 	draw: Drawing = new Drawing();
 	pixel: Pixelator = new Pixelator();
