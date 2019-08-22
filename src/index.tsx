@@ -17,9 +17,15 @@ import { editorReducer } from './reducers/editor';
 import * as serviceWorker from './serviceWorker';
 import './index.scss';
 
+
+const dev: boolean = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development');
+
 const store = createStore(
 	editorReducer,
-	applyMiddleware(thunkMiddleware, createLogger())
+	applyMiddleware(
+		thunkMiddleware,
+		...(dev ? [ createLogger() ] : [])
+	)
 );
 
 ReactDOM.render(
@@ -29,6 +35,5 @@ ReactDOM.render(
 	document.getElementById('wrapper')
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-serviceWorker.unregister();
+// in production we want to work offline and load faster...
+serviceWorker[dev ? 'unregister' : 'register']();

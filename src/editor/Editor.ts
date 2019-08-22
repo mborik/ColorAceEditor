@@ -5,9 +5,9 @@
  * Copyright (c) 2012-2019 Martin Bórik
  */
 
-import { Uploader } from "./Uploader";
 import { ActionHandler } from "./ActionHandler";
 import { Drawing } from "./Drawing";
+import { FileOps } from "./FileOps";
 import { Pixelator } from "./Pixelator";
 import { Selection } from "./Selection";
 import { Scroller } from "scroller";
@@ -15,7 +15,7 @@ import { Scroller } from "scroller";
 
 export interface EditorOptions {
 	canvas: HTMLCanvasElement;
-	upload?: HTMLCanvasElement;
+	upload: HTMLCanvasElement;
 	zoom?: number;
 	undo: number;
 	grid: boolean;
@@ -28,7 +28,7 @@ interface CanvasCoordinates {
 }
 
 export var editor: Editor = null;
-export class Editor extends Uploader {
+export class Editor extends FileOps {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 
@@ -49,15 +49,18 @@ export class Editor extends Uploader {
 	pixel: Pixelator = new Pixelator();
 	selection: Selection = new Selection();
 
-	scroller = new Scroller(this.pixel.render, {
-		animating: false,
-		bouncing: false,
-		snapping: false,
-		locking: false,
-		zooming: 1,
-		maxZoom: 16,
-		minZoom: 1
-	});
+	scroller = new Scroller(
+		this.pixel.render.bind(this.pixel),
+		{
+			animating: false,
+			bouncing: false,
+			snapping: false,
+			locking: false,
+			zooming: 1,
+			maxZoom: 16,
+			minZoom: 1
+		}
+	);
 
 	constructor(opt: EditorOptions) {
 		super(opt.upload);

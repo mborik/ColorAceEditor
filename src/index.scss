@@ -7,7 +7,6 @@
 
 @import "~@blueprintjs/core/src/common/variables";
 
-$sidebar-width: 18rem;
 
 body {
 	font-family: "Montserrat", $pt-font-family;
@@ -22,14 +21,26 @@ body {
 	@include pt-flex-container(row);
 	min-width: 100vw;
 
-	* {
+	> * {
 		user-select: none;
+		overflow: hidden;
 	}
 
-	nav {
-		flex-basis: $sidebar-width;
+	> nav {
 		position: relative;
 		z-index: $pt-z-index-content;
+		margin-right: .25rem;
+
+		&::after {
+			content: '\200b';
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 0;
+			height: 100%;
+			border-left: 1px solid $gray1;
+			z-index: $pt-z-index-content + 1;
+		}
 
 		> .#{$ns}-navbar {
 			@include pt-flex-container(column);
@@ -52,5 +63,14 @@ body {
 				color: $gray3;
 			}
 		}
+	}
+
+	> output[hidden] {
+		display: block;
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 0;
+		height: 0;
 	}
 }

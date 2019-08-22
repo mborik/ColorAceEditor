@@ -67,6 +67,14 @@ export class Pixelator {
 	}
 
 	/**
+	 * Clear whole viewport to black.
+	 */
+	clearViewport() {
+		this.surface.fill(0);
+		this.attrs.fill(0);
+	}
+
+	/**
 	 * Binary decoding of PMD 85 screen.
 	 * @param {(Uint8Array|number[])} videoRam with dump of PMD 85 VRAM (0xC000-0xFFFF)
 	 */
@@ -98,53 +106,12 @@ export class Pixelator {
 				this.surface[ptr++] = (bt & 0x08) ? c : 0;
 				this.surface[ptr++] = (bt & 0x10) ? c : 0;
 				this.surface[ptr++] = (bt & 0x20) ? c : 0;
+
 				this.attrs[atptr++] = at;
 			}
 
 			vramptr += 16;
 		}
-	}
-
-	/**
-	 * Store PMD 85 VRAM dump to Blob URL or BASE64 data URL.
-	 * @returns {string} url to Blob or BASE64 data
-	 */
-	savePMD85vram(): string {
-		const mime = 'application/octet-stream';
-		const bin = editor.ctx.createImageData(16, 256).data;
-
-		let blob: Blob = null;
-		let url: string = null;
-
-		try {
-			blob = new Blob([ bin ], { type: mime });
-		}
-		catch(ex) {
-			console.error(ex);
-
-			try {
-				// @ts-ignore
-				const bb = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder)();
-				bb.append(bin);
-				blob = bb.getBlob(mime);
-			}
-			catch(ex2) {
-				console.error(ex2);
-				blob = null;
-			}
-		}
-
-		if (blob) {
-			try {
-				url = URL.createObjectURL(blob) + '';
-			}
-			catch(ex) {
-				console.error(ex);
-				url = null;
-			}
-		}
-
-		return url;
 	}
 
 	/**
@@ -173,6 +140,7 @@ export class Pixelator {
 			this.bmpH = editor.canvas.height = Math.min(256 * zoom, editor.contentHeight);
 
 			this.bmp = editor.ctx.createImageData(this.bmpW, this.bmpH);
+
 			const bmpBuffer = new ArrayBuffer(this.bmp.data.length);
 			this.bmpClamp = new Uint8ClampedArray(bmpBuffer);
 			this.bmpDWORD = new Uint32Array(bmpBuffer);
@@ -271,8 +239,7 @@ export class Pixelator {
 	}
 
 	redrawSelection(callback: (arg0: any) => void) {
-		var x1 = editor.selection.x1, y1 = editor.selection.y1,
-			x2 = editor.selection.x2, y2 = editor.selection.y2;
+		const { x1, y1, x2, y2 } = editor.selection;
 
 		callback(editor.selection);
 		this.redrawRect(x1, y1, x2, y2, false);
@@ -327,8 +294,9 @@ export class Pixelator {
 				break;
 		}
 
-		if (color)
+		if (color) {
 			this.redrawRect((column * 6), ((a1 - column) / 48), 6, 2, true);
+		}
 		else {
 			const zoom = this.currentZoom;
 
