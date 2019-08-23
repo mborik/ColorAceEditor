@@ -6,10 +6,12 @@
  */
 
 import { IconName } from "@blueprintjs/core";
+import { EditorTool } from "../editor/Editor";
+
 
 export interface ToolbarItem {
 	/** Unique identifier */
-	id: string;
+	id: EditorTool;
 
 	/**
 	 * BlueprintJS icon identifier
@@ -25,35 +27,35 @@ export interface ToolbarItem {
 }
 
 export const ToolbarItems: ToolbarItem[] = [{
-	id: 'tool0',
+	id: EditorTool.Selection,
 	icon: 'select',
 	title: 'selection'
 }, {
-	id: 'tool1',
+	id: EditorTool.GridSelect,
 	icon: 'new-grid-item',
 	title: 'grid selection'
 }, {
-	id: 'tool2',
+	id: EditorTool.Pencil,
 	icon: 'edit',
 	title: 'pencil'
 }, {
-	id: 'tool3',
+	id: EditorTool.Brush,
 	icon: 'highlight',
 	title: 'brush'
 }, {
-	id: 'tool4',
+	id: EditorTool.Fill,
 	icon: 'tint',
 	title: 'fill'
 }, {
-	id: 'tool5',
+	id: EditorTool.Lines,
 	icon: 'new-link',
 	title: 'lines'
 }, {
-	id: 'tool6',
+	id: EditorTool.Ellipse,
 	icon: 'layout-circle',
 	title: 'ellipse'
 }, {
-	id: 'tool7',
+	id: EditorTool.Rectangle,
 	icon: 'widget',
 	title: 'rectangle'
 }];

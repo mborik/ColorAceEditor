@@ -1,4 +1,4 @@
-import { EditorOptions, getInstance as ColorAceEditor } from "../editor/Editor";
+import { EditorOptions, EditorTool, getInstance as ColorAceEditor } from "../editor/Editor";
 
 
 export const INIT_EDITOR_INSTANCE = 'INIT_EDITOR_INSTANCE';
@@ -12,7 +12,7 @@ export function initEditorInstance(opt: EditorOptions) {
 	};
 }
 
-export function toolChanged(editTool: number) {
+export function toolChanged(editTool: EditorTool) {
 	return {
 		type: TOOL_CHANGED,
 		payload: { editTool }

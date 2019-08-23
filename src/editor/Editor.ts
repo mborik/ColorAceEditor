@@ -13,6 +13,17 @@ import { Selection } from "./Selection";
 import { Scroller } from "scroller";
 
 
+export enum EditorTool {
+	Selection  = 'TBFN_SELECT',
+	GridSelect = 'TBFN_GRID',
+	Pencil     = 'TBFN_PENCIL',
+	Brush      = 'TBFN_BRUSH',
+	Fill       = 'TBFN_FILL',
+	Lines      = 'TBFN_LINES',
+	Ellipse    = 'TBFN_ELLIPSE',
+	Rectangle  = 'TBFN_RECT'
+}
+
 export interface EditorOptions {
 	canvas: HTMLCanvasElement;
 	upload: HTMLCanvasElement;
@@ -39,7 +50,7 @@ export class Editor extends FileOps {
 	showGrid: boolean = true;
 	undoLevels: number = 10;
 	editColor: number = 0;
-	editTool: number = 2;
+	editTool: EditorTool = EditorTool.Pencil;
 	editMode: number = 2;
 	editSelect: number = 0;
 	editFilled: boolean = false;

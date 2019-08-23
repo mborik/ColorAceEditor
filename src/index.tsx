@@ -36,4 +36,8 @@ ReactDOM.render(
 );
 
 // in production we want to work offline and load faster...
-serviceWorker[dev ? 'unregister' : 'register']();
+if (dev) {
+	serviceWorker.unregister();
+} else {
+	serviceWorker.register();
+}

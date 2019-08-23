@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { debounce } from "typescript-debounce-decorator";
-import { editor } from "./Editor";
+import { editor, EditorTool } from "./Editor";
 
 
 export interface MouseMoveEvent extends MouseEvent {
@@ -35,25 +35,21 @@ export class ActionHandler {
 			const { x, y } = editor.translateCoords(e.pageX, e.pageY);
 
 			switch (editor.editTool) {
-			// selection
-				case 0:
+				case EditorTool.Selection:
 					editor.selection.reset(x, y);
 					editor.scroller.zoomTo(editor.zoomFactor);
 					break;
 
-			// grid selection
-				case 1:
+				case EditorTool.GridSelect:
 					editor.selection.reset(Math.floor(x / 6) * 6, y);
 					editor.scroller.zoomTo(editor.zoomFactor);
 					break;
 
-			// pencil
-				case 2:
+				case EditorTool.Pencil:
 					editor.draw.dot(x, y);
 					break;
 
-			// brush
-				case 3:
+				case EditorTool.Brush:
 					editor.draw.dot(x, y);
 
 					// secret weapon for point selection
@@ -87,8 +83,7 @@ export class ActionHandler {
 			const { x, y } = editor.translateCoords(e.pageX, e.pageY);
 
 			switch (editor.editTool) {
-			// selection
-				case 0:
+				case EditorTool.Selection:
 					if (!this.mouseNotMoved) {
 						editor.pixel.redrawSelection(s => {
 							s.set(s.x0, s.y0, x - 1, y - 1);
@@ -96,8 +91,7 @@ export class ActionHandler {
 					}
 					break;
 
-			// grid selection
-				case 1:
+				case EditorTool.GridSelect:
 					if (!this.mouseNotMoved) {
 						editor.pixel.redrawSelection(s => {
 							s.set(s.x0, s.y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
@@ -105,8 +99,7 @@ export class ActionHandler {
 					}
 					break;
 
-			// pencil
-				case 2:
+				case EditorTool.Pencil:
 					if (this.lastPixelX !== x || this.lastPixelY !== y) {
 						editor.draw.line(
 							this.lastPixelX,
@@ -134,8 +127,7 @@ export class ActionHandler {
 			const { x, y } = editor.translateCoords(e.pageX, e.pageY);
 
 			switch (editor.editTool) {
-			// selection
-				case 0:
+				case EditorTool.Selection:
 					if (!this.mouseNotMoved) {
 						editor.pixel.redrawSelection(s => {
 							s.set(s.x0, s.y0, x - 1, y - 1);
@@ -143,8 +135,7 @@ export class ActionHandler {
 					}
 					break;
 
-			// grid selection
-				case 1:
+				case EditorTool.GridSelect:
 					if (!this.mouseNotMoved) {
 						editor.pixel.redrawSelection(s => {
 							s.set(s.x0, s.y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
@@ -152,8 +143,7 @@ export class ActionHandler {
 					}
 					break;
 
-			// pencil
-				case 2:
+				case EditorTool.Pencil:
 					if (!this.mouseNotMoved &&
 						(this.lastPixelX !== x || this.lastPixelY !== y)) {
 
