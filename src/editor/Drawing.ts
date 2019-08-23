@@ -27,17 +27,19 @@ export class Drawing {
 	 * @param {boolean} drawFirst flag if it's needed to draw first point of line
 	 */
 	line(x1: number, y1: number, x2: number, y2: number, drawFirst: boolean) {
-		var dx = Math.abs(x2 - x1), sx = x1 < x2 ? 1 : -1,
-			dy = Math.abs(y2 - y1), sy = y1 < y2 ? 1 : -1,
-			err = (dx > dy ? dx : -dy) / 2, err2: number;
+		const dx = Math.abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
+		const dy = Math.abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
+		let err = (dx > dy ? dx : -dy) / 2, err2: number;
 
 		while (true) {
-			if (drawFirst)
+			if (drawFirst) {
 				editor.pixel.putPixel(x1, y1, editor.editMode, editor.editColor);
+			}
 
 			drawFirst = true;
-			if (x1 === x2 && y1 === y2)
+			if (x1 === x2 && y1 === y2) {
 				break;
+			}
 
 			err2 = err;
 			if (err2 > -dx) {

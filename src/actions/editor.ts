@@ -1,8 +1,9 @@
-import { EditorOptions, EditorTool, getInstance as ColorAceEditor } from "../editor/Editor";
+import { EditorOptions, EditorTool, getInstance as ColorAceEditor, EditorDrawMode } from "../editor/Editor";
 
 
 export const INIT_EDITOR_INSTANCE = 'INIT_EDITOR_INSTANCE';
 export const TOOL_CHANGED = 'TOOL_CHANGED';
+export const DRAW_MODE_CHANGED = 'DRAW_MODE_CHANGED';
 
 //---------------------------------------------------------------------------------------
 export function initEditorInstance(opt: EditorOptions) {
@@ -16,5 +17,12 @@ export function toolChanged(editTool: EditorTool) {
 	return {
 		type: TOOL_CHANGED,
 		payload: { editTool }
+	};
+}
+
+export function drawModeChanged(editMode: EditorDrawMode) {
+	return {
+		type: DRAW_MODE_CHANGED,
+		payload: { editMode }
 	};
 }

@@ -24,6 +24,13 @@ export enum EditorTool {
 	Rectangle  = 'TBFN_RECT'
 }
 
+export enum EditorDrawMode {
+	Reset = 'TBDM_RESET',
+	Set   = 'TBDM_SET',
+	Over  = 'TBDM_OVER',
+	Color = 'TBDM_COLOR'
+}
+
 export interface EditorOptions {
 	canvas: HTMLCanvasElement;
 	upload: HTMLCanvasElement;
@@ -51,7 +58,7 @@ export class Editor extends FileOps {
 	undoLevels: number = 10;
 	editColor: number = 0;
 	editTool: EditorTool = EditorTool.Pencil;
-	editMode: number = 2;
+	editMode: EditorDrawMode = EditorDrawMode.Over;
 	editSelect: number = 0;
 	editFilled: boolean = false;
 

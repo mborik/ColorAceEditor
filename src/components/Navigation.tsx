@@ -8,6 +8,7 @@
 import React from 'react';
 import { Navbar } from "@blueprintjs/core";
 import Toolbar from './Toolbar';
+import DrawMode from './DrawMode';
 
 const Navigation: React.FunctionComponent = () => {
 	return <nav>
@@ -19,6 +20,7 @@ const Navigation: React.FunctionComponent = () => {
 			<fieldset>
 				<legend>tool:</legend>
 				<Toolbar />
+				<DrawMode />
 			</fieldset>
 		</Navbar>
 	</nav>;

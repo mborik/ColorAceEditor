@@ -9,6 +9,7 @@ import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, ButtonGroup, Navbar, Tooltip, Position } from "@blueprintjs/core";
 
+import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
 import { toolChanged } from '../actions/editor';
 import { ToolbarItems } from '../params/Toolbar';
@@ -37,12 +38,12 @@ const Toolbar: React.FunctionComponent = () => {
 	return (
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
-				{tools.map((t, i) => (
+				{tools.map(t => (
 					<Tooltip
-						key={`TT_${t.id}`}
+						key={`${t.id}_TT`}
 						content={t.title}
 						position={Position.TOP_RIGHT}
-						hoverOpenDelay={250}>
+						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
 
 						<Button
 							id={t.id}

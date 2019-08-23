@@ -19,7 +19,7 @@ export interface ToolbarItem {
 	 */
 	icon: IconName;
 
-	/** Button display name */
+	/** Tooltip */
 	title: string;
 
 	/** Currently active button flag */

@@ -5,7 +5,7 @@
  * Copyright (c) 2012-2014 Martin Borik
  */
 
-import { editor } from "./Editor";
+import { editor, EditorDrawMode } from "./Editor";
 
 
 const FULL_ALPHA = 0xFFFFFFFF;
@@ -249,12 +249,12 @@ export class Pixelator {
 	 * Putting pixel onto surface in specified color and mode.
 	 * @param {number} x coordinate in surface (0-287)
 	 * @param {number} y coordinate in surface (0-255)
-	 * @param {number} mode 0 = reset, 1 = set, 2 = toggle, 3 = only color
+	 * @param {EditorDrawMode} mode of drawing
 	 * @param {number} color 0 = no color change, 1 - 7 change to palette color
 	 */
-	putPixel(x: number, y: number, mode: number, color: number) {
+	putPixel(x: number, y: number, mode: EditorDrawMode, color: number) {
 		if (x < 0 || x >= 288 || y < 0 || y >= 256 ||
-			mode < 0 || mode >= 4 || color < 0 || color >= 8) {
+			color < 0 || color >= 8) {
 
 			return false;
 		}
@@ -283,13 +283,15 @@ export class Pixelator {
 
 		const ptr = ((y * 288) + x);
 		switch (mode) {
-			case 0:
+			case EditorDrawMode.Reset:
 				c = this.surface[ptr] = 0;
 				break;
-			case 1:
+
+			case EditorDrawMode.Set:
 				this.surface[ptr] = c;
 				break;
-			case 2:
+
+			case EditorDrawMode.Over:
 				c = this.surface[ptr] = (this.surface[ptr] ? 0 : c);
 				break;
 		}
@@ -297,7 +299,7 @@ export class Pixelator {
 		if (color) {
 			this.redrawRect((column * 6), ((a1 - column) / 48), 6, 2, true);
 		}
-		else {
+		else if (mode !== EditorDrawMode.Color) {
 			const zoom = this.currentZoom;
 
 			y = (y * zoom) - this.scrollerY;
