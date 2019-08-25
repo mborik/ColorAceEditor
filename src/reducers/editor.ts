@@ -7,7 +7,8 @@ import { Editor } from "../editor/Editor";
 import {
 	INIT_EDITOR_INSTANCE,
 	TOOL_CHANGED,
-	DRAW_MODE_CHANGED
+	DRAW_MODE_CHANGED,
+	FILL_SHAPE_CHANGED
 } from "../actions/editor";
 
 
@@ -31,19 +32,15 @@ export const editorReducer = (state = defaultState, action: any) => {
 
 		case TOOL_CHANGED:
 			editor.editTool = action.payload.editTool;
-
-			return {
-				...state,
-				editor
-			};
+			break;
 
 		case DRAW_MODE_CHANGED:
 			editor.editMode = action.payload.editMode;
+			break;
 
-			return {
-				...state,
-				editor
-			};
+		case FILL_SHAPE_CHANGED:
+			editor.editFilled = action.payload.editFilled;
+			break;
 	}
 
 	return state;

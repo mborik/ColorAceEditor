@@ -4,6 +4,7 @@ import { EditorOptions, EditorTool, getInstance as ColorAceEditor, EditorDrawMod
 export const INIT_EDITOR_INSTANCE = 'INIT_EDITOR_INSTANCE';
 export const TOOL_CHANGED = 'TOOL_CHANGED';
 export const DRAW_MODE_CHANGED = 'DRAW_MODE_CHANGED';
+export const FILL_SHAPE_CHANGED = 'FILL_SHAPE_CHANGED';
 
 //---------------------------------------------------------------------------------------
 export function initEditorInstance(opt: EditorOptions) {
@@ -24,5 +25,12 @@ export function drawModeChanged(editMode: EditorDrawMode) {
 	return {
 		type: DRAW_MODE_CHANGED,
 		payload: { editMode }
+	};
+}
+
+export function fillShapeChanged(editFilled: boolean) {
+	return {
+		type: FILL_SHAPE_CHANGED,
+		payload: { editFilled }
 	};
 }

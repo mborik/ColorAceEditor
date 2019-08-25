@@ -10,23 +10,32 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Button, ButtonGroup, Navbar, Tooltip, Position } from "@blueprintjs/core";
 
 import constants from '../params/constants';
-import { Editor, EditorDrawMode } from '../editor/Editor';
+import { Editor, EditorTool, EditorDrawMode } from '../editor/Editor';
 import { drawModeChanged } from '../actions/editor';
 import { DrawModeItems } from '../params/DrawMode';
 
 
 const DrawMode: React.FunctionComponent = () => {
-	const modes = useSelector((state: any) => {
+	const { modes, noSelection } = useSelector((state: any) => {
 		const editor: Editor = state.editor;
 
-		if (editor) {
-			return DrawModeItems.map(mode => ({
-				...mode,
-				active: (mode.id === editor.editMode)
-			}));
+		if (editor == null) {
+			return {
+				tools: DrawModeItems,
+				noSelection: false
+			};
 		}
 
-		return DrawModeItems;
+		return {
+			noSelection: (
+				editor.editTool !== EditorTool.Selection &&
+				editor.editTool !== EditorTool.GridSelect
+			),
+			modes: DrawModeItems.map(mode => ({
+				...mode,
+				active: (mode.id === editor.editMode)
+			}))
+		};
 	});
 
 	const dispatch = useDispatch();
@@ -35,8 +44,8 @@ const DrawMode: React.FunctionComponent = () => {
 		[ dispatch ]
 	);
 
-	return (
-		<Navbar.Group align="center">
+	return noSelection ? (
+		<Navbar.Group align="left">
 			<ButtonGroup>
 				{modes.map(m => (
 					<Tooltip
@@ -57,7 +66,7 @@ const DrawMode: React.FunctionComponent = () => {
 				))}
 			</ButtonGroup>
 		</Navbar.Group>
-	);
+	) : null;
 }
 
 export default DrawMode;

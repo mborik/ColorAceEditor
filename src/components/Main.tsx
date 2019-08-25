@@ -40,19 +40,19 @@ const Main: React.FunctionComponent = () => {
 	}, [ editor ]);
 
 	const handleMouseWheel = useCallback(
-		(e: React.WheelEvent) => editor.action.mouseWheel(e),
+		(e: React.WheelEvent) => editor && editor.action.mouseWheel(e),
 	[ editor ]);
 
 	const handleMouseDown = useCallback(
-		(e: React.MouseEvent) => editor.action.mouseDown(e),
+		(e: React.MouseEvent) => editor && editor.action.mouseDown(e),
 	[ editor ]);
 
 	const handleMouseMove = useCallback(
-		(e: React.MouseEvent) => editor.action.mouseMove(e),
+		(e: React.MouseEvent) => editor && editor.action.mouseMove(e),
 	[ editor ]);
 
 	const handleMouseUp = useCallback(
-		(e: React.MouseEvent) => editor.action.mouseUp(e),
+		(e: React.MouseEvent) => editor && editor.action.mouseUp(e),
 	[ editor ]);
 
 	useEventListener('contextmenu', e => e.preventDefault(), document.documentElement);

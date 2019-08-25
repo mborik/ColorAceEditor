@@ -44,6 +44,7 @@ body {
 		}
 
 		> .#{$ns}-navbar {
+			background: $dark-gray4;
 			@include pt-flex-container(column);
 			height: 100vh;
 
@@ -73,5 +74,9 @@ body {
 		right: 0;
 		width: 0;
 		height: 0;
+	}
+
+	.#{$ns}-disabled {
+		cursor: default !important;
 	}
 }

@@ -21,7 +21,9 @@ export enum EditorTool {
 	Fill       = 'TBFN_FILL',
 	Lines      = 'TBFN_LINES',
 	Ellipse    = 'TBFN_ELLIPSE',
-	Rectangle  = 'TBFN_RECT'
+	Rectangle  = 'TBFN_RECT',
+	// filled shape mode
+	FillShape  = 'TBSM_FILLSHAPE'
 }
 
 export enum EditorDrawMode {
@@ -59,8 +61,9 @@ export class Editor extends FileOps {
 	editColor: number = 0;
 	editTool: EditorTool = EditorTool.Pencil;
 	editMode: EditorDrawMode = EditorDrawMode.Over;
-	editSelect: number = 0;
 	editFilled: boolean = false;
+	editSelectFnShiftWrap: boolean = false;
+	editSelectFnShiftAttr: boolean = false;
 
 	coordsRecorder: { x: number, y: number }[] = [];
 
