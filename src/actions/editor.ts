@@ -3,6 +3,7 @@ import { EditorOptions, EditorTool, getInstance as ColorAceEditor, EditorDrawMod
 
 export const INIT_EDITOR_INSTANCE = 'INIT_EDITOR_INSTANCE';
 export const TOOL_CHANGED = 'TOOL_CHANGED';
+export const COLOR_CHANGED = 'COLOR_CHANGED';
 export const DRAW_MODE_CHANGED = 'DRAW_MODE_CHANGED';
 export const FILL_SHAPE_CHANGED = 'FILL_SHAPE_CHANGED';
 
@@ -18,6 +19,13 @@ export function toolChanged(editTool: EditorTool) {
 	return {
 		type: TOOL_CHANGED,
 		payload: { editTool }
+	};
+}
+
+export function colorChanged(editColor: number) {
+	return {
+		type: COLOR_CHANGED,
+		payload: { editColor }
 	};
 }
 

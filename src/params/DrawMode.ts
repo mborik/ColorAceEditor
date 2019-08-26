@@ -1,6 +1,6 @@
 /*
  * PMD 85 ColorAce picture editor
- * Toolbar item definitions
+ * Drawing mode toolbar item definitions
  *
  * Copyright (c) 2019 Martin Bórik
  */

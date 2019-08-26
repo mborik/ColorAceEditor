@@ -11,6 +11,7 @@ import Toolbar from './Toolbar';
 import DrawMode from './DrawMode';
 import FillShape from './FillShape';
 import SelectTools from './SelectTools';
+import Palette from './Palette';
 
 const Navigation: React.FunctionComponent = () => {
 	return <nav>
@@ -25,6 +26,11 @@ const Navigation: React.FunctionComponent = () => {
 				<DrawMode />
 				<FillShape />
 				<SelectTools />
+			</fieldset>
+
+			<fieldset>
+				<legend>palette:</legend>
+				<Palette />
 			</fieldset>
 		</Navbar>
 	</nav>;

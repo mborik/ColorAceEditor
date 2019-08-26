@@ -16,13 +16,19 @@ import { fillShapeChanged } from '../actions/editor';
 
 
 const FillShape: React.FunctionComponent = () => {
-	const btn = useSelector((state: any) => {
+	const { status, visible } = useSelector((state: any) => {
 		const editor: Editor = state.editor;
-		let status: any = {};
+
+		let visible: boolean = false;
+		let status: any = {
+			id: EditorTool.FillShape,
+			key: EditorTool.FillShape,
+			icon: 'tint' as IconName
+		};
 
 		if (editor != null) {
 			status.active = editor.editFilled;
-			status.visible = (
+			visible = (
 				editor.editTool !== EditorTool.Selection &&
 				editor.editTool !== EditorTool.GridSelect
 			) && (
@@ -32,11 +38,9 @@ const FillShape: React.FunctionComponent = () => {
 		}
 
 		return {
-			id: EditorTool.FillShape,
-			key: EditorTool.FillShape,
-			icon: 'tint' as IconName,
-			...status
-		}
+			status,
+			visible
+		};
 	});
 
 	const dispatch = useDispatch();
@@ -45,18 +49,18 @@ const FillShape: React.FunctionComponent = () => {
 		[ dispatch ]
 	);
 
-	return btn.visible ? (
+	return visible ? (
 		<Navbar.Group align="right">
 			<Tooltip
-				key={`${btn.key}_TT`}
+				key={`${status.key}_TT`}
 				content="filled shape"
 				position={Position.BOTTOM_RIGHT}
 				hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
 
 				<Button
-					{...btn}
-					intent={btn.active ? 'primary' : undefined}
-					onClick={() => dispatchChange(!btn.active)}
+					{...status}
+					intent={status.active ? 'primary' : undefined}
+					onClick={() => dispatchChange(!status.active)}
 				/>
 			</Tooltip>
 		</Navbar.Group>

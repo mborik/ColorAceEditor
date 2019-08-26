@@ -1,6 +1,6 @@
 /*
  * PMD 85 ColorAce picture editor
- * Toolbar item definitions
+ * Selection toolbar item definitions
  *
  * Copyright (c) 2019 Martin Bórik
  */
@@ -54,7 +54,7 @@ export interface SelectToolSubMenuItem {
 
 export const SelectToolItems: SelectToolItem[] = [{
 	id: 'TBST_SELECTALL',
-	icon: 'fullscreen',
+	icon: 'zoom-to-fit',
 	title: 'select all',
 	enabled: true
 }, {

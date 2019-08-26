@@ -7,6 +7,7 @@ import { Editor } from "../editor/Editor";
 import {
 	INIT_EDITOR_INSTANCE,
 	TOOL_CHANGED,
+	COLOR_CHANGED,
 	DRAW_MODE_CHANGED,
 	FILL_SHAPE_CHANGED
 } from "../actions/editor";
@@ -32,6 +33,10 @@ export const editorReducer = (state = defaultState, action: any) => {
 
 		case TOOL_CHANGED:
 			editor.editTool = action.payload.editTool;
+			break;
+
+		case COLOR_CHANGED:
+			editor.editColor = action.payload.editColor;
 			break;
 
 		case DRAW_MODE_CHANGED:

@@ -1,6 +1,6 @@
 /*
  * PMD 85 ColorAce picture editor
- * Selection component
+ * SelectTools component
  *
  * Copyright (c) 2019 Martin Bórik
  */
