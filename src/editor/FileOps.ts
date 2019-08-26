@@ -137,7 +137,23 @@ export class FileOps {
 	 */
 	download(filename: string = 'screen.bin'): void {
 		const type = 'application/octet-stream';
-		const bin = editor.ctx.createImageData(16, 256).data;
+		const bin = new Uint8Array(16384);
+
+		for (let i = 0, j = 0, k = 0, src = 0; i < 16384;) {
+			for (j = 0; j < 48; j++, i++) {
+				bin[i] =
+					(editor.pixel.surface[src++] ? 0x01 : 0) |
+					(editor.pixel.surface[src++] ? 0x02 : 0) |
+					(editor.pixel.surface[src++] ? 0x04 : 0) |
+					(editor.pixel.surface[src++] ? 0x08 : 0) |
+					(editor.pixel.surface[src++] ? 0x10 : 0) |
+					(editor.pixel.surface[src++] ? 0x20 : 0) |
+					(editor.pixel.attrs[k++] << 6);
+			}
+
+			i += 16;
+		}
+
 
 		let blob: Blob = null;
 

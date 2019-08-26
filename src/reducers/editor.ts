@@ -3,13 +3,18 @@
  * Copyright (c) 2019 Martin Bórik
  */
 
+import { Toaster } from "@blueprintjs/core";
 import { Editor } from "../editor/Editor";
 import {
 	INIT_EDITOR_INSTANCE,
 	TOOL_CHANGED,
 	COLOR_CHANGED,
 	DRAW_MODE_CHANGED,
-	FILL_SHAPE_CHANGED
+	FILL_SHAPE_CHANGED,
+	VIEWPORT_REFRESH,
+	SHOW_TOAST,
+	VIEWPORT_CLEANUP,
+	SAVE_FILE
 } from "../actions/editor";
 
 
@@ -17,6 +22,7 @@ export interface EditorReducerState {
 	editor: Editor;
 }
 
+const toast = Toaster.create();
 const defaultState: EditorReducerState = {
 	editor: null
 };
@@ -45,6 +51,23 @@ export const editorReducer = (state = defaultState, action: any) => {
 
 		case FILL_SHAPE_CHANGED:
 			editor.editFilled = action.payload.editFilled;
+			break;
+
+		case VIEWPORT_REFRESH:
+			editor.scroller.zoomTo(editor.zoomFactor);
+			break;
+
+		case VIEWPORT_CLEANUP:
+			editor.pixel.clearViewport();
+			editor.scroller.zoomTo(editor.zoomFactor);
+			break;
+
+		case SHOW_TOAST:
+			toast.show(action.payload);
+			break;
+
+		case SAVE_FILE:
+			editor.download(action.payload.fileName);
 			break;
 	}
 

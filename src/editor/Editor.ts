@@ -98,9 +98,6 @@ export class Editor extends FileOps {
 		this.zoomFactor = opt.zoom || 1;
 		this.showGrid = opt.grid || true;
 		this.undoLevels = opt.undo || 10;
-
-		this.pixel.surface = this.ctx.createImageData((288 / 4), 256).data;
-		this.pixel.attrs  = this.ctx.createImageData((288 / 24), 256).data;
 	}
 
 	/**

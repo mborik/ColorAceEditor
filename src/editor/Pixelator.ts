@@ -34,8 +34,8 @@ export class Pixelator {
 		[ 0, 0, 0, 0,  255, 255, 255,   3, 0 ]
 	];
 
-	surface: Uint8ClampedArray = null;
-	attrs: Uint8ClampedArray = null;
+	surface: Uint8ClampedArray = new Uint8ClampedArray((288 / 4) * 1024);
+	attrs: Uint8ClampedArray  = new Uint8ClampedArray((288 / 24) * 1024);
 
 	/**
 	 * Initialization of palette color table.

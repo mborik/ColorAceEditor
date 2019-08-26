@@ -9,7 +9,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useEventListener from '@use-it/event-listener';
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core';
-import { actionInitEditorInstance } from '../actions/editor';
+import { actionInitEditorInstance, actionUploadFile } from '../actions/editor';
 import { Editor } from '../editor/Editor';
 import devLog from '../utils/logger';
 
@@ -56,8 +56,8 @@ const Main: React.FunctionComponent = () => {
 	[ editor ]);
 
 	const handleUploadFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
-		editor && editor.upload(e.target.files[0]),
-	[ editor ]);
+		dispatch(actionUploadFile(e.target.files[0])),
+	[ dispatch ]);
 
 	useEventListener('contextmenu', e => e.preventDefault(), document.documentElement);
 	useEventListener('mousemove', handleMouseMove, document.documentElement);
@@ -73,12 +73,10 @@ const Main: React.FunctionComponent = () => {
 			</main>
 		</ResizeSensor>
 
-		<output hidden>
-			<form encType="multipart/form-data">
-				<input type="file" id="uploadFile" onChange={handleUploadFile} />
-			</form>
+		<form hidden encType="multipart/form-data">
+			<input type="file" id="uploadFile" onChange={handleUploadFile} />
 			<canvas id="uploadCanvas" />
-		</output>
+		</form>
 	</>;
 }
 
