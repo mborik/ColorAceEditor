@@ -44,7 +44,7 @@ export const ToolbarItems: ToolbarItem[] = [{
 	title: 'brush'
 }, {
 	id: EditorTool.Fill,
-	icon: 'eraser',
+	icon: 'tint',
 	title: 'fill'
 }, {
 	id: EditorTool.Lines,

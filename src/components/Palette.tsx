@@ -11,7 +11,7 @@ import { Button, ButtonGroup, Navbar, Tooltip, Position, Icon } from "@blueprint
 
 import constants from '../params/constants';
 import { Editor } from '../editor/Editor';
-import { colorChanged } from '../actions/editor';
+import { actionColorChanged } from '../actions/editor';
 import { PaletteItems } from '../params/Palette';
 
 
@@ -30,7 +30,7 @@ const Palette: React.FunctionComponent = () => {
 					attr0: <b>{item.attrs[0]}</b><br/>
 					attr1: <b>{item.attrs[1]}</b>
 				</code> : <>
-					transparent<br />
+					no color change<br />
 					<i>(attrs not modified)</i>
 				</>
 			}));
@@ -41,7 +41,7 @@ const Palette: React.FunctionComponent = () => {
 
 	const dispatch = useDispatch();
 	const dispatchChange = useCallback(
-		(editColor: number) => dispatch(colorChanged(editColor)),
+		(editColor: number) => dispatch(actionColorChanged(editColor)),
 		[ dispatch ]
 	);
 

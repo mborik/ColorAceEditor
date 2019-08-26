@@ -71,7 +71,7 @@ export const SelectToolItems: SelectToolItem[] = [{
 	title: 'clone'
 }, {
 	id: 'TBST_CLEAN',
-	icon: 'trash',
+	icon: 'eraser',
 	title: 'clean'
 }];
 

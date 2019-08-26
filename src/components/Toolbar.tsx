@@ -11,7 +11,7 @@ import { Button, ButtonGroup, Navbar, Tooltip, Position } from "@blueprintjs/cor
 
 import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
-import { toolChanged } from '../actions/editor';
+import { actionToolChanged } from '../actions/editor';
 import { ToolbarItems } from '../params/Toolbar';
 
 
@@ -31,7 +31,7 @@ const Toolbar: React.FunctionComponent = () => {
 
 	const dispatch = useDispatch();
 	const dispatchChange = useCallback(
-		(editTool: EditorTool) => dispatch(toolChanged(editTool)),
+		(editTool: EditorTool) => dispatch(actionToolChanged(editTool)),
 		[ dispatch ]
 	);
 

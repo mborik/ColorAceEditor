@@ -1,4 +1,4 @@
-import { EditorOptions, EditorTool, getInstance as ColorAceEditor, EditorDrawMode } from "../editor/Editor";
+import { getInstance as ColorAceEditor, EditorOptions, EditorTool, EditorDrawMode } from "../editor/Editor";
 
 
 export const INIT_EDITOR_INSTANCE = 'INIT_EDITOR_INSTANCE';
@@ -8,35 +8,35 @@ export const DRAW_MODE_CHANGED = 'DRAW_MODE_CHANGED';
 export const FILL_SHAPE_CHANGED = 'FILL_SHAPE_CHANGED';
 
 //---------------------------------------------------------------------------------------
-export function initEditorInstance(opt: EditorOptions) {
+export const actionInitEditorInstance = (opt: EditorOptions) => {
 	return {
 		type: INIT_EDITOR_INSTANCE,
 		payload: ColorAceEditor(opt)
 	};
 }
 
-export function toolChanged(editTool: EditorTool) {
+export const actionToolChanged = (editTool: EditorTool) => {
 	return {
 		type: TOOL_CHANGED,
 		payload: { editTool }
 	};
 }
 
-export function colorChanged(editColor: number) {
+export const actionColorChanged = (editColor: number) => {
 	return {
 		type: COLOR_CHANGED,
 		payload: { editColor }
 	};
 }
 
-export function drawModeChanged(editMode: EditorDrawMode) {
+export const actionDrawModeChanged = (editMode: EditorDrawMode) => {
 	return {
 		type: DRAW_MODE_CHANGED,
 		payload: { editMode }
 	};
 }
 
-export function fillShapeChanged(editFilled: boolean) {
+export const actionFillShapeChanged = (editFilled: boolean) => {
 	return {
 		type: FILL_SHAPE_CHANGED,
 		payload: { editFilled }

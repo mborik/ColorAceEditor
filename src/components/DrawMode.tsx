@@ -11,7 +11,7 @@ import { Button, ButtonGroup, Navbar, Tooltip, Position } from "@blueprintjs/cor
 
 import constants from '../params/constants';
 import { Editor, EditorTool, EditorDrawMode } from '../editor/Editor';
-import { drawModeChanged } from '../actions/editor';
+import { actionDrawModeChanged } from '../actions/editor';
 import { DrawModeItems } from '../params/DrawMode';
 
 
@@ -40,7 +40,7 @@ const DrawMode: React.FunctionComponent = () => {
 
 	const dispatch = useDispatch();
 	const dispatchChange = useCallback(
-		(editMode: EditorDrawMode) => dispatch(drawModeChanged(editMode)),
+		(editMode: EditorDrawMode) => dispatch(actionDrawModeChanged(editMode)),
 		[ dispatch ]
 	);
 

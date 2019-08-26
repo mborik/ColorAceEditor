@@ -9,7 +9,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useEventListener from '@use-it/event-listener';
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core';
-import { initEditorInstance } from '../actions/editor';
+import { actionInitEditorInstance } from '../actions/editor';
 import { Editor } from '../editor/Editor';
 import devLog from '../utils/logger';
 
@@ -21,7 +21,7 @@ const Main: React.FunctionComponent = () => {
 	useEffect(() => {
 		devLog('initializing ColorAceEditor instance...');
 
-		dispatch(initEditorInstance({
+		dispatch(actionInitEditorInstance({
 			canvas: document.getElementById('drawingCanvas') as HTMLCanvasElement,
 			upload: document.getElementById('uploadCanvas') as HTMLCanvasElement,
 			grid: true,
@@ -55,6 +55,10 @@ const Main: React.FunctionComponent = () => {
 		(e: React.MouseEvent) => editor && editor.action.mouseUp(e),
 	[ editor ]);
 
+	const handleUploadFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
+		editor && editor.upload(e.target.files[0]),
+	[ editor ]);
+
 	useEventListener('contextmenu', e => e.preventDefault(), document.documentElement);
 	useEventListener('mousemove', handleMouseMove, document.documentElement);
 	useEventListener('mouseup', handleMouseUp, document.documentElement);
@@ -70,6 +74,9 @@ const Main: React.FunctionComponent = () => {
 		</ResizeSensor>
 
 		<output hidden>
+			<form encType="multipart/form-data">
+				<input type="file" id="uploadFile" onChange={handleUploadFile} />
+			</form>
 			<canvas id="uploadCanvas" />
 		</output>
 	</>;

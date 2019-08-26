@@ -12,6 +12,7 @@ import DrawMode from './DrawMode';
 import FillShape from './FillShape';
 import SelectTools from './SelectTools';
 import Palette from './Palette';
+import FileMenu from './FileMenu';
 
 const Navigation: React.FunctionComponent = () => {
 	return <nav>
@@ -20,7 +21,7 @@ const Navigation: React.FunctionComponent = () => {
 				<Navbar.Heading>ColorACE Screen Editor</Navbar.Heading>
 			</Navbar.Group>
 
-			<fieldset>
+			<fieldset key="NAV_TOOL">
 				<legend>tool:</legend>
 				<Toolbar />
 				<DrawMode />
@@ -28,9 +29,14 @@ const Navigation: React.FunctionComponent = () => {
 				<SelectTools />
 			</fieldset>
 
-			<fieldset>
+			<fieldset key="NAV_PAL">
 				<legend>palette:</legend>
 				<Palette />
+			</fieldset>
+
+			<fieldset key="NAV_FILE">
+				<legend>file:</legend>
+				<FileMenu />
 			</fieldset>
 		</Navbar>
 	</nav>;
