@@ -11,21 +11,13 @@ import { Button, Navbar, ButtonGroup, Popover, Classes } from "@blueprintjs/core
 import { actionSaveFile, actionCleanup } from '../actions/editor';
 
 const FileMenu: React.FunctionComponent = () => {
-	const dispatch = useDispatch();
-	const handleClickLoad = useCallback((e: React.MouseEvent) => {
-		const uploadFileElement = document.getElementById('uploadFile') as HTMLCanvasElement;
-
-		e.preventDefault();
-		return uploadFileElement.click();
+	const handleClickLoad = useCallback(() => {
+		(document.getElementById('uploadFile') as HTMLCanvasElement).click();
 	}, []);
 
-	const handleClickSave = useCallback(
-		(e: React.MouseEvent) => dispatch(actionSaveFile()),
-	[ dispatch ]);
-
-	const handleClickNew = useCallback(
-		(e: React.MouseEvent) => dispatch(actionCleanup()),
-	[ dispatch ]);
+	const dispatch = useDispatch();
+	const handleClickSave = useCallback(() => dispatch(actionSaveFile()), [ dispatch ]);
+	const handleClickNew = useCallback(() => dispatch(actionCleanup()), [ dispatch ]);
 
 	return (
 		<Navbar.Group align="center">

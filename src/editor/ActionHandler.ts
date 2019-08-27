@@ -133,6 +133,8 @@ export class ActionHandler {
 							s.set(s.x0, s.y0, x - 1, y - 1);
 						});
 					}
+
+					editor.selectionActionCallback(editor.selection.nonEmpty());
 					break;
 
 				case EditorTool.GridSelect:
@@ -141,6 +143,8 @@ export class ActionHandler {
 							s.set(s.x0, s.y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
 						});
 					}
+
+					editor.selectionActionCallback(editor.selection.nonEmpty());
 					break;
 
 				case EditorTool.Pencil:

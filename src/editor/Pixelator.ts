@@ -6,6 +6,7 @@
  */
 
 import { editor, EditorDrawMode } from "./Editor";
+import { Selection } from "./Selection";
 
 
 const FULL_ALPHA = 0xFFFFFFFF;
@@ -20,6 +21,7 @@ export class Pixelator {
 	private bmpH: number = null;
 	private bmpClamp: Uint8ClampedArray = null;
 	private bmpDWORD: Uint32Array = null;
+	private bmpBgColor: string;
 
 	snapshots = [];
 	pal = [
@@ -64,6 +66,9 @@ export class Pixelator {
 			this.pal[i][2] = a | (b << 16) | (g << 8) | r;
 			this.pal[i][3] = a | (y << 16) | (y << 8) | y;
 		}
+
+		this.bmpBgColor = getComputedStyle(document.body)
+			.getPropertyValue('background-color');
 	}
 
 	/**
@@ -146,7 +151,8 @@ export class Pixelator {
 			this.bmpDWORD = new Uint32Array(bmpBuffer);
 		}
 
-		for (let i = t, w = this.bmpW - zoom; i < 256; i++) {
+		const w = this.bmpW - zoom;
+		for (let i = t; i < 256; i++) {
 			x = 0;
 
 			for (let j = l, k = ((i * 288) + j); j < 288; j++, k++) {
@@ -170,6 +176,16 @@ export class Pixelator {
 
 		this.bmp.data.set(this.bmpClamp);
 		editor.ctx.putImageData(this.bmp, 0, 0);
+
+		// clear overlapped areas if needed...
+		if (x < w) {
+			editor.ctx.fillStyle = this.bmpBgColor;
+			editor.ctx.fillRect(x, 0, this.bmpW - x, this.bmpH);
+		}
+		if (y < (this.bmpH - zoom)) {
+			editor.ctx.fillStyle = this.bmpBgColor;
+			editor.ctx.fillRect(0, y, x, this.bmpH - y);
+		}
 	}
 
 	/**
@@ -238,10 +254,10 @@ export class Pixelator {
 		}
 	}
 
-	redrawSelection(callback: (arg0: any) => void) {
+	redrawSelection(doBefore: (s: Selection) => void) {
 		const { x1, y1, x2, y2 } = editor.selection;
 
-		callback(editor.selection);
+		doBefore(editor.selection);
 		this.redrawRect(x1, y1, x2, y2, false);
 	}
 

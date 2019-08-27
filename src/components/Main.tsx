@@ -9,7 +9,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useEventListener from '@use-it/event-listener';
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core';
-import { actionInitEditorInstance, actionUploadFile } from '../actions/editor';
+import { actionInitEditorInstance, actionUploadFile, actionSelectionChanged } from '../actions/editor';
 import { Editor } from '../editor/Editor';
 import devLog from '../utils/logger';
 
@@ -17,17 +17,6 @@ import devLog from '../utils/logger';
 const Main: React.FunctionComponent = () => {
 	const dispatch = useDispatch();
 	const editor = useSelector((state: any) => state.editor as Editor);
-
-	useEffect(() => {
-		devLog('initializing ColorAceEditor instance...');
-
-		dispatch(actionInitEditorInstance({
-			canvas: document.getElementById('drawingCanvas') as HTMLCanvasElement,
-			upload: document.getElementById('uploadCanvas') as HTMLCanvasElement,
-			grid: true,
-			undo: 20
-		}));
-	}, [ dispatch ]);
 
 	const handleResize = useCallback((entries: IResizeEntry[]) => {
 		const entry = entries.shift();
@@ -37,7 +26,8 @@ const Main: React.FunctionComponent = () => {
 			devLog('viewport dimensions set to renderer', rect);
 			editor.setDimensions(rect.width, rect.height);
 		}
-	}, [ editor ]);
+	},
+	[ editor ]);
 
 	const handleMouseWheel = useCallback(
 		(e: React.WheelEvent) => editor && editor.action.mouseWheel(e),
@@ -62,6 +52,21 @@ const Main: React.FunctionComponent = () => {
 	useEventListener('contextmenu', e => e.preventDefault(), document.documentElement);
 	useEventListener('mousemove', handleMouseMove, document.documentElement);
 	useEventListener('mouseup', handleMouseUp, document.documentElement);
+
+	//-----------------------------------------------------------------------------------
+	useEffect(() => {
+		devLog('initializing ColorAceEditor instance...');
+
+		dispatch(actionInitEditorInstance({
+			selectCB: (nonEmpty: boolean) => dispatch(actionSelectionChanged(nonEmpty)),
+			canvas: document.getElementById('drawingCanvas') as HTMLCanvasElement,
+			upload: document.getElementById('uploadCanvas') as HTMLCanvasElement,
+			grid: true,
+			undo: 20
+		}));
+	},
+	[ dispatch ]);
+
 
 	return <>
 		<ResizeSensor onResize={handleResize}>

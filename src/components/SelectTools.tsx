@@ -38,17 +38,28 @@ const SelectTools: React.FunctionComponent = () => {
 				active: false,
 				enabled: tool.enabled || editor.selection.nonEmpty()
 			})),
-			menu: editor.selection.nonEmpty() ? SelectToolSubMenu.map((item: any) => item.divider ? item :
-				item.checkbox ? {
-					id: item.id,
-					icon: item.icon,
-					text: item.text,
-					shouldDismissPopover: false,
-					labelElement: <Icon icon={editor[item.checkboxProperty] ? 'tick' : 'blank'} />,
-					onClick: () => dispatch(() => {
-						editor[item.checkboxProperty] = !editor[item.checkboxProperty];
-					})
-				} : { ...item }
+			menu: editor.selection.nonEmpty() ? SelectToolSubMenu.map(
+				(item: any, idx: number) => {
+					if (item.divider) {
+						return { key: `TBSD_${idx}`, ...item };
+
+					} else if (item.checkbox) {
+						return {
+							key: item.id,
+							id: item.id,
+							icon: item.icon,
+							text: item.text,
+							shouldDismissPopover: false,
+							labelElement: <Icon icon={editor[item.checkboxProperty] ? 'tick' : 'blank'} />,
+							onClick: () => dispatch(() => {
+								editor[item.checkboxProperty] = !editor[item.checkboxProperty];
+							})
+						};
+					}
+					else {
+						return { key: item.id, ...item };
+					}
+				}
 			) : []
 		};
 	});
@@ -85,7 +96,9 @@ const SelectTools: React.FunctionComponent = () => {
 					position={Position.BOTTOM_LEFT}
 					content={<Menu>
 						{menu.map(item =>
-							item.divider ? <MenuDivider /> : <MenuItem {...item} />
+							item.divider ?
+								<MenuDivider {...item} /> :
+								<MenuItem {...item} />
 						)}
 					</Menu>}>
 					<Button

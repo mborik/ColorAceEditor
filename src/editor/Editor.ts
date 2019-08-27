@@ -33,12 +33,15 @@ export enum EditorDrawMode {
 	Color = 'TBDM_COLOR'
 }
 
+type EditorSelectionActionFn = (nonEmpty: boolean) => {};
 export interface EditorOptions {
 	canvas: HTMLCanvasElement;
 	upload: HTMLCanvasElement;
 	zoom?: number;
 	undo: number;
 	grid: boolean;
+
+	selectCB: EditorSelectionActionFn;
 }
 
 interface CanvasCoordinates {
@@ -64,6 +67,8 @@ export class Editor extends FileOps {
 	editFilled: boolean = false;
 	editSelectFnShiftWrap: boolean = false;
 	editSelectFnShiftAttr: boolean = false;
+
+	selectionActionCallback: EditorSelectionActionFn = (() => null);
 
 	coordsRecorder: { x: number, y: number }[] = [];
 
@@ -98,6 +103,7 @@ export class Editor extends FileOps {
 		this.zoomFactor = opt.zoom || 1;
 		this.showGrid = opt.grid || true;
 		this.undoLevels = opt.undo || 10;
+		this.selectionActionCallback = opt.selectCB;
 	}
 
 	/**
@@ -109,7 +115,9 @@ export class Editor extends FileOps {
 		this.contentWidth = w;
 		this.contentHeight = h;
 
-		this.scroller.setDimensions(w - 276, h, 288, 256);
+		// reduce viewport size by these constants to properly uncover marginal
+		// pixels on the edge of screen while panning on higher zoom factor...
+		this.scroller.setDimensions(w - 64, h - 32, 288, 256);
 	}
 
 	/**

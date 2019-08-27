@@ -3,6 +3,7 @@ import { IToastProps } from "@blueprintjs/core";
 
 
 export const INIT_EDITOR_INSTANCE = 'INIT_EDITOR_INSTANCE';
+export const SELECTION_CHANGED = 'SELECTION_CHANGED';
 export const TOOL_CHANGED = 'TOOL_CHANGED';
 export const COLOR_CHANGED = 'COLOR_CHANGED';
 export const DRAW_MODE_CHANGED = 'DRAW_MODE_CHANGED';
@@ -16,6 +17,11 @@ export const SAVE_FILE = 'SAVE_FILE';
 export const actionInitEditorInstance = (opt: EditorOptions) => ({
 	type: INIT_EDITOR_INSTANCE,
 	payload: ColorAceEditor(opt)
+});
+
+export const actionSelectionChanged = (nonEmpty: boolean) => ({
+	type: SELECTION_CHANGED,
+	payload: { nonEmpty }
 });
 
 export const actionToolChanged = (editTool: EditorTool) => ({
