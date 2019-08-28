@@ -111,15 +111,15 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 	divider: true
 }, {
 	id: 'TBSM_CHECKBOX_SCROLL',
-	icon: 'locate',
+	icon: 'flows',
 	text: 'Scroll shift',
 	checkbox: true,
 	checkboxProperty: 'editSelectFnShiftWrap',
 	checkedText: 'Wrap around (roll)'
 }, {
 	id: 'TBSM_CHECKBOX_ATTRS',
-	icon: 'panel-stats',
-	text: 'Consider & keep attributes',
+	icon: 'split-columns',
+	text: 'Shift by attributes',
 	checkbox: true,
 	checkboxProperty: 'editSelectFnShiftAttr'
 }];

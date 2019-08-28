@@ -11,9 +11,10 @@ import {
 	COLOR_CHANGED,
 	DRAW_MODE_CHANGED,
 	FILL_SHAPE_CHANGED,
+	SELECT_FN_CHECKBOX_CHANGED,
 	VIEWPORT_REFRESH,
-	SHOW_TOAST,
 	VIEWPORT_CLEANUP,
+	SHOW_TOAST,
 	SAVE_FILE
 } from "../actions/editor";
 
@@ -52,6 +53,12 @@ export const editorReducer = (state = defaultState, action: any) => {
 		case FILL_SHAPE_CHANGED:
 			editor.editFilled = action.payload.editFilled;
 			break;
+
+		case SELECT_FN_CHECKBOX_CHANGED: {
+			const prop = action.payload.checkboxProperty;
+			editor[prop] = !editor[prop];
+			break;
+		}
 
 		case VIEWPORT_REFRESH:
 			editor.scroller.zoomTo(editor.zoomFactor);

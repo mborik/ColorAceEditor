@@ -268,10 +268,8 @@ export class Pixelator {
 	 * @param {EditorDrawMode} mode of drawing
 	 * @param {number} color 0 = no color change, 1 - 7 change to palette color
 	 */
-	putPixel(x: number, y: number, mode: EditorDrawMode, color: number) {
-		if (x < 0 || x >= 288 || y < 0 || y >= 256 ||
-			color < 0 || color >= 8) {
-
+	putPixel(x: number, y: number, mode: EditorDrawMode = editor.editMode, color: number = editor.editColor) {
+		if (x < 0 || x >= 288 || y < 0 || y >= 256 || color < 0 || color >= 8) {
 			return false;
 		}
 

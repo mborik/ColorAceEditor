@@ -15,7 +15,7 @@ export class Drawing {
 	 * @param {number} y coordinate in surface (0-255)
 	 */
 	dot(x: number, y: number) {
-		editor.pixel.putPixel(x, y, editor.editMode, editor.editColor);
+		editor.pixel.putPixel(x, y);
 	};
 
 	/**
@@ -33,7 +33,7 @@ export class Drawing {
 
 		while (true) {
 			if (drawFirst) {
-				editor.pixel.putPixel(x1, y1, editor.editMode, editor.editColor);
+				editor.pixel.putPixel(x1, y1);
 			}
 
 			drawFirst = true;

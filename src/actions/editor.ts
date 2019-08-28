@@ -8,6 +8,7 @@ export const TOOL_CHANGED = 'TOOL_CHANGED';
 export const COLOR_CHANGED = 'COLOR_CHANGED';
 export const DRAW_MODE_CHANGED = 'DRAW_MODE_CHANGED';
 export const FILL_SHAPE_CHANGED = 'FILL_SHAPE_CHANGED';
+export const SELECT_FN_CHECKBOX_CHANGED = 'SELECT_FN_CHECKBOX_CHANGED';
 export const VIEWPORT_REFRESH = 'VIEWPORT_REFRESH';
 export const VIEWPORT_CLEANUP = 'VIEWPORT_CLEANUP';
 export const SHOW_TOAST = 'SHOW_TOAST';
@@ -42,6 +43,11 @@ export const actionDrawModeChanged = (editMode: EditorDrawMode) => ({
 export const actionFillShapeChanged = (editFilled: boolean) => ({
 	type: FILL_SHAPE_CHANGED,
 	payload: { editFilled }
+});
+
+export const actionSelectFnCheckboxChanged = (checkboxProperty: string) => ({
+	type: SELECT_FN_CHECKBOX_CHANGED,
+	payload: { checkboxProperty }
 });
 
 export const actionRefresh = () => ({

@@ -49,12 +49,11 @@ export class ActionHandler {
 					editor.draw.dot(x, y);
 					break;
 
-				case EditorTool.Brush:
-					editor.draw.dot(x, y);
-
+				case EditorTool.Lines:
 					// secret weapon for point selection
 					if (!editor.coordsRecorder.some(v => (v.x === x && v.y === y))) {
 						editor.coordsRecorder.push({ x, y });
+						editor.draw.dot(x, y);
 					}
 					break;
 			}

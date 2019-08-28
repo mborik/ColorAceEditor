@@ -65,7 +65,7 @@ export class Editor extends FileOps {
 	editTool: EditorTool = EditorTool.Pencil;
 	editMode: EditorDrawMode = EditorDrawMode.Over;
 	editFilled: boolean = false;
-	editSelectFnShiftWrap: boolean = false;
+	editSelectFnShiftWrap: boolean = true;
 	editSelectFnShiftAttr: boolean = false;
 
 	selectionActionCallback: EditorSelectionActionFn = (() => null);

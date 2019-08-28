@@ -12,10 +12,15 @@ import { Button, ButtonGroup, Navbar, Tooltip, Position, Popover, Menu, MenuItem
 import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
 import { SelectToolItems, SelectToolSubMenu } from '../params/SelectTool';
+import { actionSelectFnCheckboxChanged } from '../actions/editor';
 
 
 const SelectTools: React.FunctionComponent = () => {
 	const dispatch = useDispatch();
+	const dispatchCheckboxChange = useCallback((checkboxProperty: string) =>
+		dispatch(actionSelectFnCheckboxChanged(checkboxProperty)),
+		[ dispatch ]
+	);
 
 	const { selection, tools, menu } = useSelector((state: any) => {
 		const editor: Editor = state.editor;
@@ -44,16 +49,15 @@ const SelectTools: React.FunctionComponent = () => {
 						return { key: `TBSD_${idx}`, ...item };
 
 					} else if (item.checkbox) {
+						const checked = editor[item.checkboxProperty];
 						return {
 							key: item.id,
 							id: item.id,
 							icon: item.icon,
-							text: item.text,
+							text: (checked && item.checkedText) ? item.checkedText : item.text,
 							shouldDismissPopover: false,
-							labelElement: <Icon icon={editor[item.checkboxProperty] ? 'tick' : 'blank'} />,
-							onClick: () => dispatch(() => {
-								editor[item.checkboxProperty] = !editor[item.checkboxProperty];
-							})
+							labelElement: <Icon icon={checked ? 'tick' : 'blank'} />,
+							onClick: () => dispatchCheckboxChange(item.checkboxProperty)
 						};
 					}
 					else {
