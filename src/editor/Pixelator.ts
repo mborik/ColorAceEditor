@@ -264,7 +264,7 @@ export class Pixelator {
 		const { x1, y1, x2, y2 } = editor.selection;
 
 		doBefore(editor.selection);
-		this.redrawRect(x1, y1, x2, y2, false);
+		this.redrawRect(x1, y1, x2 + 1, y2 + 1, false);
 	}
 
 	/**

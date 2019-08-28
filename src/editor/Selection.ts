@@ -42,19 +42,10 @@ export class Selection implements SelectionObject {
 			y2 = sw;
 		}
 
-		if (x1 > 287)
-			x1 = 287;
-		if (y1 > 255)
-			y1 = 255;
-		if (x2 > 287)
-			x2 = 287;
-		if (y2 > 255)
-			y2 = 255;
-
-		this.x1 = x1;
-		this.y1 = y1;
-		this.x2 = x2;
-		this.y2 = y2;
+		this.x1 = Math.max(0, Math.min(287, x1));
+		this.y1 = Math.max(0, Math.min(255, y1));
+		this.x2 = Math.max(0, Math.min(287, x2));
+		this.y2 = Math.max(0, Math.min(255, y2));
 
 		this.w = (x2 - x1) + 1;
 		this.h = (y2 - y1) + 1;
