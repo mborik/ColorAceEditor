@@ -8,19 +8,17 @@
 import React from 'react';
 import { debounce } from "typescript-debounce-decorator";
 import { editor, EditorTool } from "./Editor";
+import { EditorSnapshot } from './Pixelator';
 
-
-export interface MouseMoveEvent extends MouseEvent {
-	lastXCoord: number;
-	lastYCoord: number;
-	notMoved: boolean;
-}
 
 export class ActionHandler {
 	private mouseNotMoved: boolean = true;
 	private mouseBtnFlag: number = 0;
 	private lastPixelX: number = 0;
 	private lastPixelY: number = 0;
+	private startPixelX: number = 0;
+	private startPixelY: number = 0;
+	private actionSnapshot: EditorSnapshot = null;
 
 	mouseDown(e: React.MouseEvent) {
 		if (e.button > 0) {
@@ -56,10 +54,14 @@ export class ActionHandler {
 						editor.draw.dot(x, y);
 					}
 					break;
+
+				case EditorTool.Rectangle:
+					this.actionSnapshot = editor.pixel.doSnapshot(true);
+					break;
 			}
 
-			this.lastPixelX = x;
-			this.lastPixelY = y;
+			this.startPixelX = this.lastPixelX = x;
+			this.startPixelY = this.lastPixelY = y;
 			this.mouseBtnFlag = 1;
 		}
 
@@ -108,6 +110,14 @@ export class ActionHandler {
 						);
 					}
 					break;
+
+				case EditorTool.Rectangle:
+					this.drawRectangle(
+						this.startPixelX,
+						this.startPixelY,
+						x, y, editor.editFilled
+					);
+					break;
 			}
 
 			this.lastPixelX = x;
@@ -153,6 +163,14 @@ export class ActionHandler {
 						editor.draw.line(this.lastPixelX, this.lastPixelY, x, y, true);
 					}
 					break;
+
+				case EditorTool.Rectangle:
+					this.drawRectangle(
+						this.startPixelX,
+						this.startPixelY,
+						x, y, editor.editFilled
+					);
+					break;
 			}
 		}
 
@@ -175,7 +193,33 @@ export class ActionHandler {
 		}
 	}
 
-	zoomViewport(delta: number, x: number = this.lastPixelX, y: number = this.lastPixelY) {
+	private drawRectangle(x1: number, y1: number, x2: number, y2: number, filled: boolean) {
+		editor.pixel.undo(this.actionSnapshot);
+		editor.draw.rectangle(x1, y1, x2, y2, filled);
+
+		if (x1 > this.lastPixelX) {
+			x2 = x1;
+			x1 = this.lastPixelX;
+		} else {
+			x2 = this.lastPixelX;
+		}
+
+		if (y1 > this.lastPixelY) {
+			y2 = y1;
+			y1 = this.lastPixelY;
+		} else {
+			y2 = this.lastPixelY;
+		}
+
+		x1 = Math.floor(x1 / 6) * 6;
+		x2 = Math.ceil(++x2 / 6) * 6;
+		y1 = (y1 & ~1);
+		y2 = (++y2 & ~1) + 2;
+
+		editor.pixel.redrawRect(x1, y1, (x2 - x1), (y2 - y1), true);
+	}
+
+	private zoomViewport(delta: number, x: number = this.lastPixelX, y: number = this.lastPixelY) {
 		const zoom = editor.zoomFactor + delta;
 
 		if (zoom > 0 && zoom <= 16) {

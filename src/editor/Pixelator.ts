@@ -12,6 +12,12 @@ import { Selection } from "./Selection";
 const FULL_ALPHA = 0xFFFFFFFF;
 const MARQUEE_COLOR = 0x302010;
 
+
+export interface EditorSnapshot {
+	surface: Uint8ClampedArray;
+	attrs: Uint8ClampedArray;
+}
+
 export class Pixelator {
 	private currentZoom: number = 0;
 	private scrollerX: number = 0;
@@ -23,7 +29,7 @@ export class Pixelator {
 	private bmpDWORD: Uint32Array = null;
 	private bmpBgColor: string;
 
-	snapshots = [];
+	snapshots: EditorSnapshot[] = [];
 	pal = [
 		//  pixels       R    G    B    attr
 		[ 0, 0, 0, 0,    0,   0,   0,   0, 0 ],
@@ -36,8 +42,8 @@ export class Pixelator {
 		[ 0, 0, 0, 0,  255, 255, 255,   3, 0 ]
 	];
 
-	surface: Uint8ClampedArray = new Uint8ClampedArray((288 / 4) * 1024);
-	attrs: Uint8ClampedArray  = new Uint8ClampedArray((288 / 24) * 1024);
+	surface: Uint8ClampedArray = new Uint8ClampedArray(288 * 256);
+	attrs: Uint8ClampedArray  = new Uint8ClampedArray((288 * 256) / 6);
 
 	/**
 	 * Initialization of palette color table.
@@ -268,9 +274,12 @@ export class Pixelator {
 	 * @param {EditorDrawMode} mode of drawing
 	 * @param {number} color 0 = no color change, 1 - 7 change to palette color
 	 */
-	putPixel(x: number, y: number, mode: EditorDrawMode = editor.editMode, color: number = editor.editColor) {
+	putPixel(x: number, y: number,
+		mode: EditorDrawMode = editor.editMode, color: number = editor.editColor,
+		shouldRedraw: boolean = true) {
+
 		if (x < 0 || x >= 288 || y < 0 || y >= 256 || color < 0 || color >= 8) {
-			return false;
+			return;
 		}
 
 		const column = Math.floor(x / 6);
@@ -310,6 +319,10 @@ export class Pixelator {
 				break;
 		}
 
+		if (!shouldRedraw) {
+			return;
+		}
+
 		if (color) {
 			this.redrawRect((column * 6), ((a1 - column) / 48), 6, 2, true);
 		}
@@ -328,30 +341,39 @@ export class Pixelator {
 
 	/**
 	 * Do snapshot of current screen to undo buffer.
-	 * @todo not yet fully implemented
+	 *
+	 * @param {boolean} justGet (optional) just return snapshot, not put into undo-buffer
+	 * @returns {EditorSnapshot} current screen snapshot
 	 */
-	doSnapshot() {
-		const len = this.snapshots.push([
-			this.surface.subarray(0, this.surface.length),
-			this.attrs.subarray(0, this.attrs.length)
-		]);
+	doSnapshot(justGet: boolean = false): EditorSnapshot {
+		const result: EditorSnapshot = {
+			surface: this.surface.slice(),
+			attrs: this.attrs.slice()
+		};
 
-		if (len > editor.undoLevels)
-			this.snapshots.shift();
+		if (!justGet) {
+			const len = this.snapshots.push(result);
+			if (len > editor.undoLevels) {
+				this.snapshots.shift();
+			}
+		}
+
+		return result;
 	}
 
 	/**
 	 * Do undo operation.
+	 *
+	 * @param {EditorSnapshot} (optional) snapshot to restore
 	 * @returns {boolean} operation result
 	 */
-	undo(): boolean {
-		const u = this.snapshots.pop();
-		if (u) {
+	undo(snapshot: EditorSnapshot = this.snapshots.pop()): boolean {
+		if (!snapshot) {
 			return false;
 		}
 
-		this.surface.set(u[0], 0);
-		this.attrs.set(u[1], 0);
+		this.surface = snapshot.surface.slice();
+		this.attrs = snapshot.attrs.slice();
 
 		return true;
 	}

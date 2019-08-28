@@ -52,4 +52,50 @@ export class Drawing {
 			}
 		}
 	}
+
+	/**
+	 * Simple rectangle drawing algorithm.
+	 * @param {number} x1 coordinate in surface (0-287)
+	 * @param {number} y1 coordinate in surface (0-255)
+	 * @param {number} x2 coordinate in surface (0-287)
+	 * @param {number} y2 coordinate in surface (0-255)
+	 * @param {boolean} filled flag if we filling the rectangle
+	 */
+	rectangle(x1: number, y1: number, x2: number, y2: number, filled: boolean) {
+		const putPixel = (x: number, y: number) => editor.pixel.putPixel(
+			x, y, editor.editMode, editor.editColor, false
+		);
+
+		if (x1 === x2 || y1 === y2) {
+			putPixel(x1, y1);
+		} else {
+			let flip: number;
+			if (x1 > x2) {
+				flip = x2;
+				x2 = x1;
+				x1 = flip;
+			}
+			if (y1 > y2) {
+				flip = y2;
+				y2 = y1;
+				y1 = flip;
+			}
+
+			for (let y = y1; y <= y2; y++) {
+				let x = x1;
+
+				putPixel(x, y);
+
+				if (filled || y === y1 || y === y2) {
+					for (++x; x < x2; x++) {
+						putPixel(x, y);
+					}
+				} else {
+					x = x2;
+				}
+
+				putPixel(x, y);
+			}
+		}
+	}
 }
