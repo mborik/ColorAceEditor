@@ -55,6 +55,7 @@ export class ActionHandler {
 					}
 					break;
 				}
+				case EditorTool.Ellipse:
 				case EditorTool.Rectangle:
 					this.actionSnapshot = editor.pixel.doSnapshot(true);
 					break;
@@ -109,6 +110,17 @@ export class ActionHandler {
 							this.mouseNotMoved
 						);
 					}
+					break;
+				}
+				case EditorTool.Ellipse: {
+					editor.pixel.undo(this.actionSnapshot);
+					editor.draw.ellipse(
+						this.startPixelX,
+						this.startPixelY,
+						x, y, editor.editFilled
+					);
+
+					this.redrawRect(x, y);
 					break;
 				}
 				case EditorTool.Rectangle: {
@@ -166,6 +178,17 @@ export class ActionHandler {
 
 						editor.draw.line(this.lastPixelX, this.lastPixelY, x, y, true);
 					}
+					break;
+				}
+				case EditorTool.Ellipse: {
+					editor.pixel.undo(this.actionSnapshot);
+					editor.draw.ellipse(
+						this.startPixelX,
+						this.startPixelY,
+						x, y, editor.editFilled
+					);
+
+					this.redrawRect(x, y);
 					break;
 				}
 				case EditorTool.Rectangle: {
@@ -230,9 +253,9 @@ export class ActionHandler {
 		}
 
 		x1 = Math.floor(x1 / 6) * 6;
-		x2 = Math.ceil(++x2 / 6) * 6;
+		x2 = Math.min(288, Math.ceil(++x2 / 6) * 6);
 		y1 = (y1 & ~1);
-		y2 = (y2 & ~1) + 2;
+		y2 = Math.min(256, (y2 & ~1) + 2);
 
 		editor.pixel.redrawRect(x1, y1, (x2 - x1), (y2 - y1), true);
 	}
