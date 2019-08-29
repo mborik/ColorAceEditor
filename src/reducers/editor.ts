@@ -23,12 +23,18 @@ export interface EditorReducerState {
 	editor: Editor;
 }
 
+export interface EditorRootAction {
+	type: string;
+	payload?: any;
+}
+
+
 const toast = Toaster.create();
 const defaultState: EditorReducerState = {
 	editor: null
 };
 
-export const editorReducer = (state = defaultState, action: any) => {
+export const editorReducer = (state = defaultState, action: any): EditorReducerState => {
 	const editor: Editor = state.editor;
 
 	switch (action.type) {

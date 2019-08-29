@@ -7,7 +7,7 @@
 
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button, Navbar, Tooltip, Position } from "@blueprintjs/core";
+import { Button, Navbar, Tooltip, Position, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
@@ -24,9 +24,6 @@ const FillShape: React.FunctionComponent = () => {
 		if (editor != null) {
 			active = editor.editFilled;
 			visible = (
-				editor.editTool !== EditorTool.Selection &&
-				editor.editTool !== EditorTool.GridSelect
-			) && (
 				editor.editTool === EditorTool.Ellipse ||
 				editor.editTool === EditorTool.Rectangle
 			);
@@ -44,7 +41,10 @@ const FillShape: React.FunctionComponent = () => {
 	return visible ? (
 		<Navbar.Group align="right">
 			<Tooltip
-				content="filled shape"
+				content={<>
+					<label>filled shape</label>
+					<KeyCombo combo="V" />
+				</>}
 				position={Position.BOTTOM_RIGHT}
 				hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
 

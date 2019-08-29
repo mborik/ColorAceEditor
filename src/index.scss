@@ -19,6 +19,22 @@ body {
 	.#{$ns}-disabled {
 		cursor: default !important;
 	}
+
+	.#{$ns}-popover-content {
+		display: flex;
+		flex-direction: row;
+
+		> :first-child {
+			align-self: center;
+		}
+
+		> .#{$ns}-key-combo {
+			align-self: start;
+			margin-left: .75rem;
+			border-left: 1px solid $gray5;
+			padding-left: .75rem;
+		}
+	}
 }
 
 #wrapper {

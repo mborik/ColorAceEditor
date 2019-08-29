@@ -7,7 +7,7 @@
 
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button, ButtonGroup, Navbar, Tooltip, Position } from "@blueprintjs/core";
+import { Button, ButtonGroup, Navbar, Tooltip, Position, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
@@ -20,9 +20,13 @@ const Toolbar: React.FunctionComponent = () => {
 		const editor: Editor = state.editor;
 
 		if (editor) {
-			return ToolbarItems.map(tool => ({
+			return ToolbarItems.map((tool: any) => ({
 				...tool,
-				active: (tool.id === editor.editTool)
+				active: (tool.id === editor.editTool),
+				content: <>
+					<label>{tool.title}</label>
+					<KeyCombo combo={tool.hotkey} />
+				</>
 			}));
 		}
 
@@ -41,7 +45,7 @@ const Toolbar: React.FunctionComponent = () => {
 				{tools.map(t => (
 					<Tooltip
 						key={`${t.id}_TT`}
-						content={t.title}
+						content={t.content}
 						position={Position.TOP_RIGHT}
 						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
 

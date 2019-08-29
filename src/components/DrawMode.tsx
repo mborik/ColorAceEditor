@@ -7,7 +7,7 @@
 
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button, ButtonGroup, Navbar, Tooltip, Position } from "@blueprintjs/core";
+import { Button, ButtonGroup, Navbar, Tooltip, Position, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
 import { Editor, EditorTool, EditorDrawMode } from '../editor/Editor';
@@ -33,7 +33,11 @@ const DrawMode: React.FunctionComponent = () => {
 			),
 			modes: DrawModeItems.map(mode => ({
 				...mode,
-				active: (mode.id === editor.editMode)
+				active: (mode.id === editor.editMode),
+				content: <>
+					<label>{mode.title}</label>
+					<KeyCombo combo={mode.hotkey} />
+				</>
 			}))
 		};
 	});
@@ -50,7 +54,7 @@ const DrawMode: React.FunctionComponent = () => {
 				{modes.map(m => (
 					<Tooltip
 						key={`${m.id}_TT`}
-						content={m.title}
+						content={m.content}
 						position={Position.BOTTOM_RIGHT}
 						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
 

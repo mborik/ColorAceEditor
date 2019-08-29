@@ -7,7 +7,7 @@
 
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button, ButtonGroup, Navbar, Tooltip, Position, Icon } from "@blueprintjs/core";
+import { Button, ButtonGroup, Navbar, Tooltip, Position, Icon, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
 import { Editor } from '../editor/Editor';
@@ -26,12 +26,18 @@ const Palette: React.FunctionComponent = () => {
 				iconSize: item.icon ? Icon.SIZE_STANDARD : 24,
 				color: item.color || '#ffffff7f',
 				active: (item.value === editor.editColor),
-				content: item.attrs && item.attrs.length ? <code>
-					attr0: <b>{item.attrs[0]}</b><br/>
-					attr1: <b>{item.attrs[1]}</b>
-				</code> : <>
-					no color change<br />
-					<i>(attrs not modified)</i>
+				content: item.attrs && item.attrs.length ? <>
+					<code>
+						attr0: <b>{item.attrs[0]}</b><br/>
+						attr1: <b>{item.attrs[1]}</b>
+					</code>
+					<KeyCombo combo={item.value.toString()} />
+				</> : <>
+					<span>
+						no color change<br />
+						<i>(attrs not modified)</i>
+					</span>
+					<KeyCombo combo="D" />
 				</>
 			}));
 		}

@@ -22,6 +22,9 @@ export interface ToolbarItem {
 	/** Tooltip */
 	title: string;
 
+	/** Key combo */
+	hotkey: string;
+
 	/** Currently active button flag */
 	active?: boolean;
 }
@@ -29,33 +32,41 @@ export interface ToolbarItem {
 export const ToolbarItems: ToolbarItem[] = [{
 	id: EditorTool.Selection,
 	icon: 'select',
-	title: 'selection'
+	title: 'selection',
+	hotkey: 'S'
 }, {
 	id: EditorTool.GridSelect,
 	icon: 'new-grid-item',
-	title: 'grid selection'
+	title: 'attr.selection',
+	hotkey: 'A'
 }, {
 	id: EditorTool.Pencil,
 	icon: 'edit',
-	title: 'pencil'
+	title: 'pencil',
+	hotkey: 'P'
 }, {
 	id: EditorTool.Brush,
 	icon: 'highlight',
-	title: 'brush'
+	title: 'brush',
+	hotkey: 'B'
 }, {
 	id: EditorTool.Fill,
 	icon: 'tint',
-	title: 'fill'
+	title: 'fill',
+	hotkey: 'F'
 }, {
 	id: EditorTool.Lines,
 	icon: 'new-link',
-	title: 'lines'
+	title: 'lines',
+	hotkey: 'L'
 }, {
 	id: EditorTool.Ellipse,
 	icon: 'layout-circle',
-	title: 'ellipse'
+	title: 'ellipse',
+	hotkey: 'E'
 }, {
 	id: EditorTool.Rectangle,
 	icon: 'widget',
-	title: 'rectangle'
+	title: 'rectangle',
+	hotkey: 'R'
 }];

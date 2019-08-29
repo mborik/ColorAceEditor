@@ -18,6 +18,9 @@ export interface DrawModeItem {
 	/** Tooltip */
 	title: string;
 
+	/** Key combo */
+	hotkey: string;
+
 	/** Currently active button flag */
 	active?: boolean;
 }
@@ -25,17 +28,21 @@ export interface DrawModeItem {
 export const DrawModeItems: DrawModeItem[] = [{
 	id: EditorDrawMode.Reset,
 	caption: 'RES',
-	title: 'reset'
+	title: 'reset',
+	hotkey: 'X'
 }, {
 	id: EditorDrawMode.Set,
 	caption: 'SET',
-	title: 'set'
+	title: 'set',
+	hotkey: 'X'
 }, {
 	id: EditorDrawMode.Over,
 	caption: 'OVR',
-	title: 'over'
+	title: 'over',
+	hotkey: 'Z'
 }, {
 	id: EditorDrawMode.Color,
 	caption: 'COL',
-	title: 'colorize'
+	title: 'colorize',
+	hotkey: 'C'
 }];

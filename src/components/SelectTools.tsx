@@ -7,7 +7,7 @@
 
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button, ButtonGroup, Navbar, Tooltip, Position, Popover, Menu, MenuItem, MenuDivider, Icon } from "@blueprintjs/core";
+import { Button, ButtonGroup, Navbar, Tooltip, Position, Popover, Menu, MenuItem, MenuDivider, Icon, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
@@ -41,12 +41,16 @@ const SelectTools: React.FunctionComponent = () => {
 			tools: SelectToolItems.map(tool => ({
 				...tool,
 				active: false,
-				enabled: tool.enabled || editor.selection.nonEmpty()
+				enabled: tool.enabled || editor.selection.nonEmpty(),
+				content: <>
+					<label>{tool.title}</label>
+					<KeyCombo combo={tool.hotkey} />
+				</>
 			})),
 			menu: editor.selection.nonEmpty() ? SelectToolSubMenu.map(
 				(item: any, idx: number) => {
 					if (item.divider) {
-						return { key: `TBSD_${idx}`, ...item };
+						return { ...item, key: `TBSD_${idx}` };
 
 					} else if (item.checkbox) {
 						const checked = editor[item.checkboxProperty];
@@ -61,7 +65,12 @@ const SelectTools: React.FunctionComponent = () => {
 						};
 					}
 					else {
-						return { key: item.id, ...item };
+						return {
+							...item,
+							key: item.id,
+							hotkey: undefined,
+							labelElement: item.hotkey ? <KeyCombo combo={item.hotkey} /> : undefined
+						};
 					}
 				}
 			) : []
@@ -79,7 +88,7 @@ const SelectTools: React.FunctionComponent = () => {
 				{tools.map(t => (
 					<Tooltip
 						key={`${t.id}_TT`}
-						content={t.title}
+						content={t.content}
 						disabled={!t.enabled}
 						position={Position.BOTTOM_RIGHT}
 						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>

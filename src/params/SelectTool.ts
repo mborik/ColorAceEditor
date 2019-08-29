@@ -21,6 +21,9 @@ export interface SelectToolItem {
 	/** Tooltip */
 	title: string;
 
+	/** Key combo */
+	hotkey: string;
+
 	/** Force enabled button flag */
 	enabled?: boolean;
 
@@ -44,6 +47,9 @@ export interface SelectToolSubMenuItem {
 	/** Caption */
 	text?: string;
 
+	/** Key combo */
+	hotkey?: string;
+
 	/** Checkbox flag and alternative caption */
 	checkbox?: boolean;
 	checkedText?: string;
@@ -56,29 +62,35 @@ export const SelectToolItems: SelectToolItem[] = [{
 	id: 'TBST_SELECTALL',
 	icon: 'zoom-to-fit',
 	title: 'select all',
+	hotkey: 'mod+A',
 	enabled: true
 }, {
 	id: 'TBST_DESELECT',
 	icon: 'disable',
-	title: 'deselect'
+	title: 'deselect',
+	hotkey: 'mod+D'
 }, {
 	id: 'TBST_CUT',
 	icon: 'cut',
-	title: 'cut'
+	title: 'cut',
+	hotkey: 'mod+X'
 }, {
 	id: 'TBST_CLONE',
 	icon: 'duplicate',
-	title: 'clone'
+	title: 'clone',
+	hotkey: 'mod+C'
 }, {
 	id: 'TBST_CLEAN',
 	icon: 'eraser',
-	title: 'clean'
+	title: 'clean',
+	hotkey: 'del'
 }];
 
 export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 	id: 'TBSM_INVERT',
 	icon: 'right-join',
-	text: 'Invert'
+	text: 'Invert',
+	hotkey: 'mod+I'
 }, {
 	divider: true
 }, {
@@ -94,19 +106,23 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 }, {
 	id: 'TBSM_MOVE_UP',
 	icon: 'double-chevron-up',
-	text: 'Shift Up'
+	text: 'Shift Up',
+	hotkey: 'mod+up'
 }, {
 	id: 'TBSM_MOVE_LEFT',
 	icon: 'double-chevron-left',
-	text: 'Shift Left'
+	text: 'Shift Left',
+	hotkey: 'mod+left'
 }, {
 	id: 'TBSM_MOVE_RIGHT',
 	icon: 'double-chevron-right',
-	text: 'Shift Right'
+	text: 'Shift Right',
+	hotkey: 'mod+right'
 }, {
 	id: 'TBSM_MOVE_DOWN',
 	icon: 'double-chevron-down',
-	text: 'Shift Down'
+	text: 'Shift Down',
+	hotkey: 'mod+down'
 }, {
 	divider: true
 }, {
