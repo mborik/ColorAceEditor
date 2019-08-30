@@ -14,7 +14,10 @@ import {
 	SELECT_FN_CHECKBOX_CHANGED,
 	VIEWPORT_REFRESH,
 	VIEWPORT_CLEANUP,
+	VIEWPORT_ZOOM,
+	VIEWPORT_PAN,
 	SHOW_TOAST,
+	LOAD_FILE,
 	SAVE_FILE
 } from "../actions/editor";
 
@@ -75,8 +78,23 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			editor.scroller.zoomTo(editor.zoomFactor);
 			break;
 
+		case VIEWPORT_ZOOM:
+			editor.action.zoomViewport(action.payload.zoomDelta);
+			break;
+
+		case VIEWPORT_PAN:
+			editor.scroller.scrollBy(
+				action.payload.position.x,
+				action.payload.position.y
+			);
+			break;
+
 		case SHOW_TOAST:
 			toast.show(action.payload);
+			break;
+
+		case LOAD_FILE:
+			(document.getElementById('uploadFile') as HTMLInputElement).click();
 			break;
 
 		case SAVE_FILE:

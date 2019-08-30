@@ -252,6 +252,25 @@ export class ActionHandler {
 		}
 	}
 
+	zoomViewport(delta: number, x: number = this.lastPixelX, y: number = this.lastPixelY) {
+		const zoom = editor.zoomFactor + delta;
+
+		if (zoom > 0 && zoom <= 16) {
+			if (!editor.pixel.scalers[zoom]) {
+				delta *= 2;
+			}
+
+			editor.scroller.zoomTo(
+				editor.scroller.__zoomLevel + delta,
+				false,
+				x - editor.scroller.__clientLeft,
+				y - editor.scroller.__clientTop
+			);
+
+			editor.redrawStatusBar(x, y);
+		}
+	}
+
 	private redrawRect(x2: number, y2: number) {
 		let x1: number, y1: number;
 
@@ -286,24 +305,5 @@ export class ActionHandler {
 		y2 = Math.min(256, (y2 & ~1) + 2);
 
 		editor.pixel.redrawRect(x1, y1, (x2 - x1), (y2 - y1), true);
-	}
-
-	private zoomViewport(delta: number, x: number = this.lastPixelX, y: number = this.lastPixelY) {
-		const zoom = editor.zoomFactor + delta;
-
-		if (zoom > 0 && zoom <= 16) {
-			if (!editor.pixel.scalers[zoom]) {
-				delta *= 2;
-			}
-
-			editor.scroller.zoomTo(
-				editor.scroller.__zoomLevel + delta,
-				false,
-				x - editor.scroller.__clientLeft,
-				y - editor.scroller.__clientTop
-			);
-
-			editor.redrawStatusBar(x, y);
-		}
 	}
 }

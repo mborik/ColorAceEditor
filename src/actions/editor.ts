@@ -1,5 +1,7 @@
-import { getInstance as ColorAceEditor, EditorOptions, EditorTool, EditorDrawMode } from "../editor/Editor";
+import { Dispatch } from "redux";
 import { IToastProps } from "@blueprintjs/core";
+import { getInstance as ColorAceEditor, EditorOptions, EditorTool, EditorDrawMode } from "../editor/Editor";
+import { EditorReducerState } from "../reducers/editor";
 
 
 export const INIT_EDITOR_INSTANCE = 'INIT_EDITOR_INSTANCE';
@@ -11,7 +13,10 @@ export const FILL_SHAPE_CHANGED = 'FILL_SHAPE_CHANGED';
 export const SELECT_FN_CHECKBOX_CHANGED = 'SELECT_FN_CHECKBOX_CHANGED';
 export const VIEWPORT_REFRESH = 'VIEWPORT_REFRESH';
 export const VIEWPORT_CLEANUP = 'VIEWPORT_CLEANUP';
+export const VIEWPORT_ZOOM = 'VIEWPORT_ZOOM';
+export const VIEWPORT_PAN = 'VIEWPORT_PAN';
 export const SHOW_TOAST = 'SHOW_TOAST';
+export const LOAD_FILE = 'LOAD_FILE';
 export const SAVE_FILE = 'SAVE_FILE';
 
 //---------------------------------------------------------------------------------------
@@ -50,6 +55,16 @@ export const actionSelectFnCheckboxChanged = (checkboxProperty: string) => ({
 	payload: { checkboxProperty }
 });
 
+export const actionZoomViewport = (zoomDelta: number) => ({
+	type: VIEWPORT_ZOOM,
+	payload: { zoomDelta }
+});
+
+export const actionPanViewport = (position: WebKitPoint) => ({
+	type: VIEWPORT_PAN,
+	payload: { position }
+});
+
 export const actionRefresh = () => ({
 	type: VIEWPORT_REFRESH
 });
@@ -68,12 +83,16 @@ export const actionToast = (toastParams: IToastProps) => ({
 	}
 });
 
+export const actionLoadFile = () => ({
+	type: LOAD_FILE
+});
+
 export const actionSaveFile = (fileName?: string) => ({
 	type: SAVE_FILE,
 	payload: { fileName }
 });
 
-export const actionUploadFile = (file: File) => (dispatch, getState) => {
+export const actionUploadFile = (file: File) => (dispatch: Dispatch, getState: () => EditorReducerState) => {
 	const state = getState();
 	if (!(file && state.editor)) {
 		return;

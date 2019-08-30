@@ -8,14 +8,11 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button, Navbar, ButtonGroup, Popover, Classes } from "@blueprintjs/core";
-import { actionSaveFile, actionCleanup } from '../actions/editor';
+import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions/editor';
 
 const FileMenu: React.FunctionComponent = () => {
-	const handleClickLoad = useCallback(() => {
-		(document.getElementById('uploadFile') as HTMLCanvasElement).click();
-	}, []);
-
 	const dispatch = useDispatch();
+	const handleClickLoad = useCallback(() => dispatch(actionLoadFile()), [ dispatch ]);
 	const handleClickSave = useCallback(() => dispatch(actionSaveFile()), [ dispatch ]);
 	const handleClickNew = useCallback(() => dispatch(actionCleanup()), [ dispatch ]);
 
