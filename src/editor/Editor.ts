@@ -37,6 +37,7 @@ type EditorSelectionActionFn = (nonEmpty: boolean) => {};
 export interface EditorOptions {
 	canvas: HTMLCanvasElement;
 	upload: HTMLCanvasElement;
+	status?: HTMLDivElement;
 	zoom?: number;
 	undo: number;
 	grid: boolean;
@@ -54,8 +55,8 @@ export var editor: Editor = null;
 export class Editor extends FileOps {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	statusBar: HTMLDivElement;
 
-	statusBar: string = '';
 	contentWidth: number = 0;
 	contentHeight: number = 0;
 	zoomFactor: number = 1;
@@ -104,6 +105,8 @@ export class Editor extends FileOps {
 		this.showGrid = opt.grid || true;
 		this.undoLevels = opt.undo || 10;
 		this.selectionActionCallback = opt.selectCB;
+
+		this.statusBar = opt.status || null;
 	}
 
 	/**
@@ -149,6 +152,10 @@ export class Editor extends FileOps {
 	* @param {number} sy - real mouse cursor X position
 	*/
 	redrawStatusBar(sx: number, sy: number) {
+		if (!this.statusBar) {
+			return;
+		}
+
 		const coords = this.translateCoords(sx, sy);
 
 		const x = Math.max(0, Math.min(coords.x, 287));
@@ -159,7 +166,9 @@ export class Editor extends FileOps {
 
 		const pad = (num: string | number, len: number) => num.toString().padStart(len);
 
-		this.statusBar = `${pad(z, 4)}%   X:${pad(x, 3)} Y:${pad(y, 3)}  C:${pad(c, 2)}   ${a}`;
+		this.statusBar.textContent =
+			`${pad(z, 4)}%   X:${pad(x, 3)} Y:${pad(y, 3)}  C:${pad(c, 2)}   ${a}`
+				.replace(/\s/g, '\u00A0');
 	}
 }
 

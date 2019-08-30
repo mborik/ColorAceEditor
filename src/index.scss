@@ -9,7 +9,8 @@
 
 
 body {
-	font-family: "Montserrat", $pt-font-family;
+	font-family: "Lato", $pt-font-family;
+	font-variant-numeric: tabular-nums;
 	overflow: hidden;
 
 	&.#{$ns}-dark {
@@ -82,9 +83,53 @@ body {
 
 			> legend {
 				margin: 0;
-				padding: 0 .5em;
+				padding: 0 .5rem;
 				color: $gray3;
 			}
+
+			&.help {
+				margin-top: 2rem;
+				padding: .25rem .75rem;
+				color: $gray3;
+
+				> section {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					font-size: 11px;
+					margin: .5rem 0;
+
+					> span {
+						margin-left: 1rem;
+					}
+					> span:nth-child(n+3) {
+						margin-left: 0;
+						vertical-align: middle;
+
+						&:before {
+							content: '\007c';
+							color: $gray1;
+							padding: 0 .5rem;
+						}
+					}
+
+					kbd {
+						font-size: 13px;
+						font-weight: bolder;
+					}
+				}
+			}
+		}
+
+		footer#statusBar {
+			position: absolute;
+			bottom: 2rem;
+			width: calc(100% - 2rem);
+			text-align: center;
+			font-size: 11px;
+			font-family: monospace;
+			letter-spacing: 1px;
+			color: $gray2;
 		}
 	}
 
