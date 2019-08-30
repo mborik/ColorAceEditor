@@ -20,14 +20,28 @@ const Toolbar: React.FunctionComponent = () => {
 		const editor: Editor = state.editor;
 
 		if (editor) {
-			return ToolbarItems.map((tool: any) => ({
-				...tool,
-				active: (tool.id === editor.editTool),
-				content: <>
-					<label>{tool.title}</label>
-					<KeyCombo combo={tool.hotkey} />
-				</>
-			}));
+			return ToolbarItems.map(tool => {
+				const result: any = {
+					active: (tool.id === editor.editTool)
+				};
+
+				if (result.active) {
+					result.intent = 'primary';
+
+				} else if (tool.id === EditorTool.Pencil && editor.editTool === EditorTool.Recorder) {
+					result.active = true;
+					result.intent = 'warning';
+				}
+
+				return {
+					...tool,
+					...result,
+					content: <>
+						<label>{tool.title}</label>
+						<KeyCombo combo={tool.hotkey} />
+					</>
+				};
+			});
 		}
 
 		return ToolbarItems;
@@ -54,7 +68,7 @@ const Toolbar: React.FunctionComponent = () => {
 							key={t.id}
 							icon={t.icon}
 							active={t.active}
-							intent={t.active ? 'primary' : undefined}
+							intent={t.intent}
 							onClick={() => dispatchChange(t.id)}
 						/>
 					</Tooltip>

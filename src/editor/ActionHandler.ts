@@ -48,6 +48,16 @@ export class ActionHandler {
 					break;
 				}
 				case EditorTool.Lines: {
+					this.actionSnapshot = editor.pixel.doSnapshot(true);
+					editor.draw.dot(x, y);
+					break;
+				}
+				case EditorTool.Ellipse:
+				case EditorTool.Rectangle:
+					this.actionSnapshot = editor.pixel.doSnapshot(true);
+					break;
+
+				case EditorTool.Recorder: {
 					// secret weapon for point selection
 					if (!editor.coordsRecorder.some(v => (v.x === x && v.y === y))) {
 						editor.coordsRecorder.push({ x, y });
@@ -55,10 +65,6 @@ export class ActionHandler {
 					}
 					break;
 				}
-				case EditorTool.Ellipse:
-				case EditorTool.Rectangle:
-					this.actionSnapshot = editor.pixel.doSnapshot(true);
-					break;
 			}
 
 			this.startPixelX = this.lastPixelX = x;
@@ -110,6 +116,17 @@ export class ActionHandler {
 							this.mouseNotMoved
 						);
 					}
+					break;
+				}
+				case EditorTool.Lines: {
+					editor.pixel.undo(this.actionSnapshot);
+					editor.draw.line(
+						this.startPixelX,
+						this.startPixelY,
+						x, y, true, false
+					);
+
+					this.redrawRect(x, y);
 					break;
 				}
 				case EditorTool.Ellipse: {
@@ -178,6 +195,17 @@ export class ActionHandler {
 
 						editor.draw.line(this.lastPixelX, this.lastPixelY, x, y, true);
 					}
+					break;
+				}
+				case EditorTool.Lines: {
+					editor.pixel.undo(this.actionSnapshot);
+					editor.draw.line(
+						this.startPixelX,
+						this.startPixelY,
+						x, y, true, false
+					);
+
+					this.redrawRect(x, y);
 					break;
 				}
 				case EditorTool.Ellipse: {

@@ -81,6 +81,12 @@ export const HotkeyItems: HotkeyItem[] = [
 		() => actionToolChanged(EditorTool.Rectangle)
 	),
 	new HotkeyItem(
+		'1. Tools',
+		'Point Coords Recorder',
+		'F9',
+		() => actionToolChanged(EditorTool.Recorder)
+	),
+	new HotkeyItem(
 		'2. Draw mode',
 		'Over',
 		'Z',

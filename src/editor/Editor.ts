@@ -22,6 +22,8 @@ export enum EditorTool {
 	Lines      = 'TBFN_LINES',
 	Ellipse    = 'TBFN_ELLIPSE',
 	Rectangle  = 'TBFN_RECT',
+	// secret weapon for point selection
+	Recorder   = 'TBFN_RECORDER',
 	// filled shape mode
 	FillShape  = 'TBSM_FILLSHAPE'
 }
