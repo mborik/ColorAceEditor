@@ -64,6 +64,10 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			break;
 		}
 
+		case EditorAction.SelectClear:
+			editor.action.clearSelection(action.payload.resetAttrs);
+			break;
+
 		case EditorAction.ViewportRefresh:
 			editor.refresh();
 			break;

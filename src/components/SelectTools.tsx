@@ -77,10 +77,7 @@ const SelectTools: React.FunctionComponent = () => {
 		};
 	});
 
-	const dispatchChange = useCallback(
-		(id) => dispatch(() => {}),
-		[ dispatch ]
-	);
+	const dispatchChange = useCallback((action) => dispatch(action), [ dispatch ]);
 
 	return selection ? (
 		<Navbar.Group align="center">
@@ -100,7 +97,7 @@ const SelectTools: React.FunctionComponent = () => {
 							disabled={!t.enabled}
 							active={t.active}
 							intent={t.active ? 'primary' : undefined}
-							onClick={() => dispatchChange(t.id)}
+							onClick={() => t.action ? dispatchChange(t.action) : null}
 						/>
 					</Tooltip>
 				))}

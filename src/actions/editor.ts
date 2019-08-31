@@ -13,6 +13,7 @@ export enum EditorAction {
 	SelectFnCheckboxChanged = 'SELECT_FN_CHECKBOX_CHANGED',
 	SelectAll = 'SELECT_ALL',
 	SelectNone = 'SELECT_NONE',
+	SelectClear = 'SELECT_CLEAR',
 	ViewportRefresh = 'VIEWPORT_REFRESH',
 	ViewportCleanup = 'VIEWPORT_CLEANUP',
 	ViewportZoom = 'VIEWPORT_ZOOM',
@@ -71,11 +72,16 @@ export const actionSelectFnCheckboxChanged = (checkboxProperty: string): EditorR
 });
 
 export const actionSelectAll = (): EditorReducerAction => ({
-	type: EditorAction.SelectAll,
+	type: EditorAction.SelectAll
 });
 
 export const actionSelectNone = (): EditorReducerAction => ({
-	type: EditorAction.SelectNone,
+	type: EditorAction.SelectNone
+});
+
+export const actionSelectClear = (resetAttrs: boolean = false): EditorReducerAction => ({
+	type: EditorAction.SelectClear,
+	payload: { resetAttrs }
 });
 
 export const actionViewportZoom = (zoomDelta: number): EditorReducerAction => ({
@@ -89,19 +95,19 @@ export const actionViewportPan = (position: WebKitPoint): EditorReducerAction =>
 });
 
 export const actionRefresh = (): EditorReducerAction => ({
-	type: EditorAction.ViewportRefresh,
+	type: EditorAction.ViewportRefresh
 });
 
 export const actionCleanup = (): EditorReducerAction => ({
-	type: EditorAction.ViewportCleanup,
+	type: EditorAction.ViewportCleanup
 });
 
 export const actionCancel = (): EditorReducerAction => ({
-	type: EditorAction.Cancel,
+	type: EditorAction.Cancel
 });
 
 export const actionUndo = (): EditorReducerAction => ({
-	type: EditorAction.Undo,
+	type: EditorAction.Undo
 });
 
 export const actionToast = (toastParams: IToastProps): EditorReducerAction => ({
@@ -115,7 +121,7 @@ export const actionToast = (toastParams: IToastProps): EditorReducerAction => ({
 });
 
 export const actionLoadFile = (): EditorReducerAction => ({
-	type: EditorAction.LoadFile,
+	type: EditorAction.LoadFile
 });
 
 export const actionSaveFile = (fileName?: string): EditorReducerAction => ({

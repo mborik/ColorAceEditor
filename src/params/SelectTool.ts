@@ -6,11 +6,15 @@
  */
 
 import { IconName } from "@blueprintjs/core";
+import { EditorReducerAction, actionSelectAll, actionSelectNone, actionSelectClear } from "../actions/editor";
 
 
 export interface SelectToolItem {
 	/** Unique identifier */
 	id: string;
+
+	/** Reducer action */
+	action?: EditorReducerAction;
 
 	/**
 	 * BlueprintJS icon identifier
@@ -38,6 +42,9 @@ export interface SelectToolSubMenuItem {
 	/** Unique identifier */
 	id?: string;
 
+	/** Reducer action */
+	action?: EditorReducerAction;
+
 	/**
 	 * BlueprintJS icon identifier
 	 * @see https://blueprintjs.com/docs/#icons
@@ -63,12 +70,14 @@ export const SelectToolItems: SelectToolItem[] = [{
 	icon: 'zoom-to-fit',
 	title: 'select all',
 	hotkey: 'mod+A',
-	enabled: true
+	enabled: true,
+	action: actionSelectAll()
 }, {
 	id: 'TBST_DESELECT',
 	icon: 'disable',
 	title: 'deselect',
-	hotkey: 'mod+D'
+	hotkey: 'mod+D',
+	action: actionSelectNone()
 }, {
 	id: 'TBST_CUT',
 	icon: 'cut',
@@ -80,10 +89,11 @@ export const SelectToolItems: SelectToolItem[] = [{
 	title: 'clone',
 	hotkey: 'mod+C'
 }, {
-	id: 'TBST_CLEAN',
+	id: 'TBST_CLEAR',
 	icon: 'eraser',
-	title: 'clean',
-	hotkey: 'del'
+	title: 'clear',
+	hotkey: 'del',
+	action: actionSelectClear()
 }];
 
 export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{

@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { debounce } from "typescript-debounce-decorator";
-import { editor, EditorTool } from "./Editor";
+import { editor, EditorTool, EditorDrawMode } from "./Editor";
 import { EditorSnapshot } from './Pixelator';
 
 
@@ -230,6 +230,7 @@ export class ActionHandler {
 			}
 		}
 
+		this.actionSnapshot = null;
 		this.mouseNotMoved = true;
 		this.mouseBtnFlag = 0;
 	}
@@ -268,6 +269,29 @@ export class ActionHandler {
 		}
 	}
 
+	clearSelection(resetAttrs: boolean = false) {
+		if (editor.selection.nonEmpty()) {
+			const { x1, y1, x2, y2 } = editor.selection;
+
+			editor.pixel.doSnapshot();
+
+			for (let y = y1; y <= y2; y++) {
+				for (let x = x1; x <= x2; x++) {
+					editor.pixel.putPixel(
+						x, y,
+						EditorDrawMode.Reset,
+						resetAttrs ? 4 : 0,
+						false
+					);
+				}
+			}
+
+			this.startPixelX = x1;
+			this.startPixelY = y1;
+			this.redrawRect(x2, y2);
+		}
+	}
+
 	cancel() {
 		if (this.mouseBtnFlag === 1) {
 			switch (editor.editTool) {
@@ -279,6 +303,7 @@ export class ActionHandler {
 					break;
 			}
 
+			this.actionSnapshot = null;
 			this.mouseNotMoved = true;
 			this.mouseBtnFlag = 0;
 

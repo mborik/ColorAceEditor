@@ -86,6 +86,31 @@ export class Pixelator {
 	}
 
 	/**
+	 * Clear current selection to black (optionally reset attributes to green { 0, 0 }.
+	 * @param {boolean} resetAttrs (optional)
+	 */
+	clearSelection(resetAttrs: boolean = false) {
+		if (editor.selection.nonEmpty()) {
+			const { x1, y1, x2, y2 } = editor.selection;
+
+			this.doSnapshot();
+
+			for (let y = y1; y <= y2; y++) {
+				for (let x = x1; x < x2; x++) {
+					this.putPixel(
+						x, y,
+						EditorDrawMode.Reset,
+						resetAttrs ? 4 : 0,
+						false
+					);
+				}
+			}
+
+			return true;
+		}
+	}
+
+	/**
 	 * Binary decoding of PMD 85 screen.
 	 * @param {(Uint8Array|number[])} videoRam with dump of PMD 85 VRAM (0xC000-0xFFFF)
 	 */

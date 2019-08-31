@@ -15,6 +15,7 @@ import {
 	actionFillShapeChanged,
 	actionSelectAll,
 	actionSelectNone,
+	actionSelectClear,
 	actionViewportZoom,
 	actionViewportPan,
 	actionCancel,
@@ -245,9 +246,15 @@ export const HotkeyItems: HotkeyItem[] = [
 	),
 	new HotkeyItem(
 		'5. Selection',
-		'Clean',
+		'Clear pixels',
 		'del',
-		() => null
+		() => actionSelectClear()
+	),
+	new HotkeyItem(
+		'5. Selection',
+		'Clear also attributes',
+		'mod+del',
+		() => actionSelectClear(true)
 	),
 	new HotkeyItem(
 		'5. Selection',
