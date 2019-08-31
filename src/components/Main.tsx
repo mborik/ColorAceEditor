@@ -25,7 +25,7 @@ const Main: React.FunctionComponent = () => {
 
 			devLog('viewport dimensions set to renderer', rect);
 			editor.setDimensions(rect.width, rect.height);
-			editor.redrawStatusBar(rect.x, rect.y);
+			editor.action.zoomViewport();
 		}
 	},
 	[ editor ]);
@@ -64,7 +64,7 @@ const Main: React.FunctionComponent = () => {
 			upload: document.getElementById('uploadCanvas') as HTMLCanvasElement,
 			status: document.getElementById('statusBar') as HTMLDivElement,
 			grid: true,
-			undo: 20
+			undo: 25
 		}));
 	},
 	[ dispatch ]);

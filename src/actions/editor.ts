@@ -3,78 +3,109 @@ import { IToastProps } from "@blueprintjs/core";
 import { getInstance as ColorAceEditor, EditorOptions, EditorTool, EditorDrawMode } from "../editor/Editor";
 import { EditorReducerState } from "../reducers/editor";
 
+export enum EditorAction {
+	InitEditorInstance = 'INIT_EDITOR_INSTANCE',
+	SelectionChanged = 'SELECTION_CHANGED',
+	ToolChanged = 'TOOL_CHANGED',
+	ColorChanged = 'COLOR_CHANGED',
+	DrawModeChanged = 'DRAW_MODE_CHANGED',
+	FillShapeChanged = 'FILL_SHAPE_CHANGED',
+	SelectFnCheckboxChanged = 'SELECT_FN_CHECKBOX_CHANGED',
+	SelectAll = 'SELECT_ALL',
+	SelectNone = 'SELECT_NONE',
+	ViewportRefresh = 'VIEWPORT_REFRESH',
+	ViewportCleanup = 'VIEWPORT_CLEANUP',
+	ViewportZoom = 'VIEWPORT_ZOOM',
+	ViewportPan = 'VIEWPORT_PAN',
+	Cancel = 'CANCEL',
+	Undo = 'UNDO',
+	Toast = 'SHOW_TOAST',
+	LoadFile = 'LOAD_FILE',
+	SaveFile = 'SAVE_FILE'
+}
 
-export const INIT_EDITOR_INSTANCE = 'INIT_EDITOR_INSTANCE';
-export const SELECTION_CHANGED = 'SELECTION_CHANGED';
-export const TOOL_CHANGED = 'TOOL_CHANGED';
-export const COLOR_CHANGED = 'COLOR_CHANGED';
-export const DRAW_MODE_CHANGED = 'DRAW_MODE_CHANGED';
-export const FILL_SHAPE_CHANGED = 'FILL_SHAPE_CHANGED';
-export const SELECT_FN_CHECKBOX_CHANGED = 'SELECT_FN_CHECKBOX_CHANGED';
-export const VIEWPORT_REFRESH = 'VIEWPORT_REFRESH';
-export const VIEWPORT_CLEANUP = 'VIEWPORT_CLEANUP';
-export const VIEWPORT_ZOOM = 'VIEWPORT_ZOOM';
-export const VIEWPORT_PAN = 'VIEWPORT_PAN';
-export const SHOW_TOAST = 'SHOW_TOAST';
-export const LOAD_FILE = 'LOAD_FILE';
-export const SAVE_FILE = 'SAVE_FILE';
+export interface EditorReducerAction {
+	type: EditorAction;
+	payload?: any;
+}
+
+export interface EditorReducerStoreProps {
+	dispatch: Dispatch;
+	getState: () => EditorReducerState;
+}
 
 //---------------------------------------------------------------------------------------
-export const actionInitEditorInstance = (opt: EditorOptions) => ({
-	type: INIT_EDITOR_INSTANCE,
+export const actionInitEditorInstance = (opt: EditorOptions): EditorReducerAction => ({
+	type: EditorAction.InitEditorInstance,
 	payload: ColorAceEditor(opt)
 });
 
-export const actionSelectionChanged = (nonEmpty: boolean) => ({
-	type: SELECTION_CHANGED,
+export const actionSelectionChanged = (nonEmpty: boolean): EditorReducerAction => ({
+	type: EditorAction.SelectionChanged,
 	payload: { nonEmpty }
 });
 
-export const actionToolChanged = (editTool: EditorTool) => ({
-	type: TOOL_CHANGED,
+export const actionToolChanged = (editTool: EditorTool): EditorReducerAction => ({
+	type: EditorAction.ToolChanged,
 	payload: { editTool }
 });
 
-export const actionColorChanged = (editColor: number) => ({
-	type: COLOR_CHANGED,
+export const actionColorChanged = (editColor: number): EditorReducerAction => ({
+	type: EditorAction.ColorChanged,
 	payload: { editColor }
 });
 
-export const actionDrawModeChanged = (editMode: EditorDrawMode) => ({
-	type: DRAW_MODE_CHANGED,
+export const actionDrawModeChanged = (editMode: EditorDrawMode): EditorReducerAction => ({
+	type: EditorAction.DrawModeChanged,
 	payload: { editMode }
 });
 
-export const actionFillShapeChanged = (editFilled: boolean) => ({
-	type: FILL_SHAPE_CHANGED,
+export const actionFillShapeChanged = (editFilled: boolean): EditorReducerAction => ({
+	type: EditorAction.FillShapeChanged,
 	payload: { editFilled }
 });
 
-export const actionSelectFnCheckboxChanged = (checkboxProperty: string) => ({
-	type: SELECT_FN_CHECKBOX_CHANGED,
+export const actionSelectFnCheckboxChanged = (checkboxProperty: string): EditorReducerAction => ({
+	type: EditorAction.SelectFnCheckboxChanged,
 	payload: { checkboxProperty }
 });
 
-export const actionZoomViewport = (zoomDelta: number) => ({
-	type: VIEWPORT_ZOOM,
+export const actionSelectAll = (): EditorReducerAction => ({
+	type: EditorAction.SelectAll,
+});
+
+export const actionSelectNone = (): EditorReducerAction => ({
+	type: EditorAction.SelectNone,
+});
+
+export const actionViewportZoom = (zoomDelta: number): EditorReducerAction => ({
+	type: EditorAction.ViewportZoom,
 	payload: { zoomDelta }
 });
 
-export const actionPanViewport = (position: WebKitPoint) => ({
-	type: VIEWPORT_PAN,
+export const actionViewportPan = (position: WebKitPoint): EditorReducerAction => ({
+	type: EditorAction.ViewportPan,
 	payload: { position }
 });
 
-export const actionRefresh = () => ({
-	type: VIEWPORT_REFRESH
+export const actionRefresh = (): EditorReducerAction => ({
+	type: EditorAction.ViewportRefresh,
 });
 
-export const actionCleanup = () => ({
-	type: VIEWPORT_CLEANUP
+export const actionCleanup = (): EditorReducerAction => ({
+	type: EditorAction.ViewportCleanup,
 });
 
-export const actionToast = (toastParams: IToastProps) => ({
-	type: SHOW_TOAST,
+export const actionCancel = (): EditorReducerAction => ({
+	type: EditorAction.Cancel,
+});
+
+export const actionUndo = (): EditorReducerAction => ({
+	type: EditorAction.Undo,
+});
+
+export const actionToast = (toastParams: IToastProps): EditorReducerAction => ({
+	type: EditorAction.Toast,
 	payload: {
 		intent: 'warning',
 		icon: 'warning-sign',
@@ -83,24 +114,25 @@ export const actionToast = (toastParams: IToastProps) => ({
 	}
 });
 
-export const actionLoadFile = () => ({
-	type: LOAD_FILE
+export const actionLoadFile = (): EditorReducerAction => ({
+	type: EditorAction.LoadFile,
 });
 
-export const actionSaveFile = (fileName?: string) => ({
-	type: SAVE_FILE,
+export const actionSaveFile = (fileName?: string): EditorReducerAction => ({
+	type: EditorAction.SaveFile,
 	payload: { fileName }
 });
 
-export const actionUploadFile = (file: File) => (dispatch: Dispatch, getState: () => EditorReducerState) => {
-	const state = getState();
-	if (!(file && state.editor)) {
-		return;
-	}
+export const actionUploadFile = (file: File) =>
+	(dispatch: Dispatch, getState: () => EditorReducerState) => {
+		const state = getState();
+		if (!(file && state.editor)) {
+			return;
+		}
 
-	state.editor.upload(file)
-		.then(() => dispatch(actionRefresh()))
-		.catch((error: string) => dispatch(actionToast({
-			message: error
-		})));
-};
+		state.editor.upload(file)
+			.then(() => dispatch(actionRefresh()))
+			.catch((error: string) => dispatch(actionToast({
+				message: error
+			})));
+	};

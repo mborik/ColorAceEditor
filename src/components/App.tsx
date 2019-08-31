@@ -6,21 +6,15 @@
  */
 
 import React from 'react';
-import { Dispatch } from 'redux';
 import { Hotkey, Hotkeys, HotkeysTarget } from "@blueprintjs/core";
 import Navigation from './Navigation';
 import Main from './Main';
 
 import { HotkeyItems } from '../params/Hotkeys';
-import { EditorReducerState, EditorRootAction } from '../reducers/editor';
+import { EditorReducerAction, EditorReducerStoreProps } from '../actions/editor';
 
 
-interface ReducerStoreProps {
-	dispatch: Dispatch;
-	getState: () => EditorReducerState;
-}
-
-class App extends React.PureComponent<ReducerStoreProps, {}> {
+class App extends React.PureComponent<EditorReducerStoreProps, {}> {
 	render() {
 		return <>
 			<Navigation />
@@ -34,7 +28,7 @@ class App extends React.PureComponent<ReducerStoreProps, {}> {
 				return <Hotkey {...hk} onKeyDown={(event: KeyboardEvent) => {
 					const editor = this.props.getState()['editor'];
 					if (editor) {
-						const action: EditorRootAction = hk.handler(editor, event);
+						const action: EditorReducerAction = hk.handler(editor, event);
 						if (action) {
 							this.props.dispatch(action);
 						}

@@ -35,26 +35,23 @@ export class ActionHandler {
 			switch (editor.editTool) {
 				case EditorTool.Selection: {
 					editor.selection.reset(x, y);
-					editor.scroller.zoomTo(editor.zoomFactor);
+					editor.refresh();
 					break;
 				}
 				case EditorTool.GridSelect: {
 					editor.selection.reset(Math.floor(x / 6) * 6, y);
-					editor.scroller.zoomTo(editor.zoomFactor);
+					editor.refresh();
 					break;
 				}
-				case EditorTool.Pencil: {
-					editor.draw.dot(x, y);
-					break;
-				}
+				case EditorTool.Pencil:
 				case EditorTool.Lines: {
-					this.actionSnapshot = editor.pixel.doSnapshot(true);
+					this.actionSnapshot = editor.pixel.doSnapshot();
 					editor.draw.dot(x, y);
 					break;
 				}
 				case EditorTool.Ellipse:
 				case EditorTool.Rectangle:
-					this.actionSnapshot = editor.pixel.doSnapshot(true);
+					this.actionSnapshot = editor.pixel.doSnapshot();
 					break;
 
 				case EditorTool.Recorder: {
@@ -76,7 +73,9 @@ export class ActionHandler {
 	}
 
 	mouseMove(e: React.MouseEvent) {
-		editor.redrawStatusBar(e.pageX, e.pageY);
+		const { x, y, column } = editor.translateCoords(e.pageX, e.pageY);
+
+		editor.redrawStatusBar(x, y, column);
 
 		if (this.mouseBtnFlag === 0) {
 			return;
@@ -88,8 +87,6 @@ export class ActionHandler {
 			}], e.timeStamp);
 		}
 		else {
-			const { x, y } = editor.translateCoords(e.pageX, e.pageY);
-
 			switch (editor.editTool) {
 				case EditorTool.Selection: {
 					if (!this.mouseNotMoved) {
@@ -252,7 +249,7 @@ export class ActionHandler {
 		}
 	}
 
-	zoomViewport(delta: number, x: number = this.lastPixelX, y: number = this.lastPixelY) {
+	zoomViewport(delta: number = 0, x: number = this.lastPixelX, y: number = this.lastPixelY) {
 		const zoom = editor.zoomFactor + delta;
 
 		if (zoom > 0 && zoom <= 16) {
@@ -268,6 +265,24 @@ export class ActionHandler {
 			);
 
 			editor.redrawStatusBar(x, y);
+		}
+	}
+
+	cancel() {
+		if (this.mouseBtnFlag === 1) {
+			switch (editor.editTool) {
+				case EditorTool.Pencil:
+				case EditorTool.Lines:
+				case EditorTool.Ellipse:
+				case EditorTool.Rectangle:
+					editor.pixel.undo(this.actionSnapshot);
+					break;
+			}
+
+			this.mouseNotMoved = true;
+			this.mouseBtnFlag = 0;
+
+			editor.refresh();
 		}
 	}
 

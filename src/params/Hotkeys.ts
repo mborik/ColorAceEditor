@@ -7,14 +7,18 @@
 
 import { IHotkeyProps } from "@blueprintjs/core";
 import { Editor, EditorTool, EditorDrawMode } from "../editor/Editor";
-import { EditorRootAction } from "../reducers/editor";
+import { EditorReducerAction } from "../actions/editor";
 import {
 	actionToolChanged,
 	actionDrawModeChanged,
 	actionColorChanged,
 	actionFillShapeChanged,
-	actionZoomViewport,
-	actionPanViewport,
+	actionSelectAll,
+	actionSelectNone,
+	actionViewportZoom,
+	actionViewportPan,
+	actionCancel,
+	actionUndo,
 	actionLoadFile,
 	actionSaveFile
 } from "../actions/editor";
@@ -25,8 +29,7 @@ const isSelection = (editor: Editor) => (
 	editor.editTool === EditorTool.GridSelect
 );
 
-export type HotkeyItemAction =
-	(editor: Editor, e: KeyboardEvent) => EditorRootAction;
+export type HotkeyItemAction = (editor: Editor, e: KeyboardEvent) => EditorReducerAction;
 
 export class HotkeyItem implements IHotkeyProps {
 	/** Unique identifier */
@@ -51,43 +54,43 @@ export const HotkeyItems: HotkeyItem[] = [
 		'1. Viewport',
 		'Zoom In',
 		'mod+=',
-		() => actionZoomViewport(1)
+		() => actionViewportZoom(1)
 	),
 	new HotkeyItem(
 		'1. Viewport',
 		'Zoom Out',
 		'mod+-',
-		() => actionZoomViewport(-1)
+		() => actionViewportZoom(-1)
 	),
 	new HotkeyItem(
 		'1. Viewport',
 		'Zoom to 100%',
 		'mod+0',
-		editor => actionZoomViewport(~editor.zoomFactor + 2)
+		editor => actionViewportZoom(~editor.zoomFactor + 2)
 	),
 	new HotkeyItem(
 		'1. Viewport',
 		'Scroll Up',
 		'up',
-		editor => editor.zoomFactor > 2 ? actionPanViewport({ x: 0, y: -editor.zoomFactor * 2 }) : null
+		editor => editor.zoomFactor > 2 ? actionViewportPan({ x: 0, y: -editor.zoomFactor * 2 }) : null
 	),
 	new HotkeyItem(
 		'1. Viewport',
 		'Scroll Left',
 		'left',
-		editor => editor.zoomFactor > 2 ? actionPanViewport({ x: -editor.zoomFactor * 6, y: 0 }) : null
+		editor => editor.zoomFactor > 2 ? actionViewportPan({ x: -editor.zoomFactor * 6, y: 0 }) : null
 	),
 	new HotkeyItem(
 		'1. Viewport',
 		'Scroll Right',
 		'right',
-		editor => editor.zoomFactor > 2 ? actionPanViewport({ x: editor.zoomFactor * 6, y: 0 }) : null
+		editor => editor.zoomFactor > 2 ? actionViewportPan({ x: editor.zoomFactor * 6, y: 0 }) : null
 	),
 	new HotkeyItem(
 		'1. Viewport',
 		'Scroll Down',
 		'down',
-		editor => editor.zoomFactor > 2 ? actionPanViewport({ x: 0, y: editor.zoomFactor * 2 }) : null
+		editor => editor.zoomFactor > 2 ? actionViewportPan({ x: 0, y: editor.zoomFactor * 2 }) : null
 	),
 	new HotkeyItem(
 		'2. Tools',
@@ -220,13 +223,13 @@ export const HotkeyItems: HotkeyItem[] = [
 		'5. Selection',
 		'Select all',
 		'mod+A',
-		() => null
+		() => actionSelectAll()
 	),
 	new HotkeyItem(
 		'5. Selection',
 		'Deselect',
 		'mod+D',
-		() => null
+		() => actionSelectNone()
 	),
 	new HotkeyItem(
 		'5. Selection',
@@ -277,15 +280,27 @@ export const HotkeyItems: HotkeyItem[] = [
 		() => null
 	),
 	new HotkeyItem(
-		'6. File',
+		'6. Operations',
+		'Undo',
+		'mod+Z',
+		() => actionUndo()
+	),
+	new HotkeyItem(
+		'6. Operations',
 		'Convert bitmap image or Load screen-dump',
 		'mod+O',
 		() => actionLoadFile()
 	),
 	new HotkeyItem(
-		'6. File',
+		'6. Operations',
 		'Save screen-dump',
 		'mod+S',
 		() => actionSaveFile()
+	),
+	new HotkeyItem(
+		'6. Operations',
+		'Cancel current operation',
+		'escape',
+		() => actionCancel()
 	)
 ];

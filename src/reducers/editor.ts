@@ -5,30 +5,11 @@
 
 import { Toaster } from "@blueprintjs/core";
 import { Editor } from "../editor/Editor";
-import {
-	INIT_EDITOR_INSTANCE,
-	TOOL_CHANGED,
-	COLOR_CHANGED,
-	DRAW_MODE_CHANGED,
-	FILL_SHAPE_CHANGED,
-	SELECT_FN_CHECKBOX_CHANGED,
-	VIEWPORT_REFRESH,
-	VIEWPORT_CLEANUP,
-	VIEWPORT_ZOOM,
-	VIEWPORT_PAN,
-	SHOW_TOAST,
-	LOAD_FILE,
-	SAVE_FILE
-} from "../actions/editor";
+import { EditorAction } from "../actions/editor";
 
 
 export interface EditorReducerState {
 	editor: Editor;
-}
-
-export interface EditorRootAction {
-	type: string;
-	payload?: any;
 }
 
 
@@ -41,63 +22,90 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 	const editor: Editor = state.editor;
 
 	switch (action.type) {
-		case INIT_EDITOR_INSTANCE:
+		case EditorAction.InitEditorInstance:
 			return {
 				...state,
 				editor: action.payload
 			};
 
-		case TOOL_CHANGED:
+		case EditorAction.ToolChanged:
 			editor.editTool = action.payload.editTool;
 			break;
 
-		case COLOR_CHANGED:
+		case EditorAction.ColorChanged:
 			editor.editColor = action.payload.editColor;
 			break;
 
-		case DRAW_MODE_CHANGED:
+		case EditorAction.DrawModeChanged:
 			editor.editMode = action.payload.editMode;
 			break;
 
-		case FILL_SHAPE_CHANGED:
+		case EditorAction.FillShapeChanged:
 			editor.editFilled = action.payload.editFilled;
 			break;
 
-		case SELECT_FN_CHECKBOX_CHANGED: {
+		case EditorAction.SelectFnCheckboxChanged: {
 			const prop = action.payload.checkboxProperty;
 			editor[prop] = !editor[prop];
 			break;
 		}
 
-		case VIEWPORT_REFRESH:
-			editor.scroller.zoomTo(editor.zoomFactor);
+		case EditorAction.SelectAll: {
+			editor.selection.set(0, 0, 287, 255);
+			editor.refresh();
+			break;
+		}
+
+		case EditorAction.SelectNone: {
+			if (editor.selection.nonEmpty()) {
+				editor.selection.reset();
+				editor.refresh();
+			}
+			break;
+		}
+
+		case EditorAction.ViewportRefresh:
+			editor.refresh();
 			break;
 
-		case VIEWPORT_CLEANUP:
+		case EditorAction.ViewportCleanup: {
 			editor.pixel.clearViewport();
-			editor.scroller.zoomTo(editor.zoomFactor);
+			editor.refresh();
 			break;
+		}
 
-		case VIEWPORT_ZOOM:
+		case EditorAction.ViewportZoom:
 			editor.action.zoomViewport(action.payload.zoomDelta);
 			break;
 
-		case VIEWPORT_PAN:
+		case EditorAction.ViewportPan: {
 			editor.scroller.scrollBy(
 				action.payload.position.x,
 				action.payload.position.y
 			);
 			break;
+		}
 
-		case SHOW_TOAST:
+		case EditorAction.Cancel:
+			editor.action.cancel();
+			break;
+
+		case EditorAction.Undo: {
+			if (editor.pixel.undo()) {
+				editor.refresh();
+			}
+			break;
+		}
+
+		case EditorAction.Toast:
 			toast.show(action.payload);
 			break;
 
-		case LOAD_FILE:
+		case EditorAction.LoadFile:
 			(document.getElementById('uploadFile') as HTMLInputElement).click();
 			break;
 
-		case SAVE_FILE:
+		case EditorAction.SaveFile:
 			editor.download(action.payload.fileName);
 			break;
 	}

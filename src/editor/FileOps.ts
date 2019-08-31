@@ -63,6 +63,7 @@ export class FileOps {
 								reject('invalid image dimensions');
 							}
 
+							editor.pixel.doSnapshot();
 							editor.pixel.clearViewport();
 
 							const cols = Math.ceil(img.width / 6);
@@ -101,7 +102,7 @@ export class FileOps {
 								}
 							}
 
-							editor.scroller.zoomTo(editor.zoomFactor);
+							editor.refresh();
 							resolve();
 						};
 
@@ -114,8 +115,9 @@ export class FileOps {
 					fr.onload = () => {
 						const b = new Uint8Array(fr.result as ArrayBuffer);
 
+						editor.pixel.doSnapshot();
 						editor.pixel.readPMD85vram(b);
-						editor.scroller.zoomTo(editor.zoomFactor);
+						editor.refresh();
 
 						resolve();
 					};

@@ -150,19 +150,18 @@ export class Editor extends FileOps {
 
 	/**
 	* Generate new status bar message string with coordinates.
-	* @param {number} sx - real mouse cursor X position
-	* @param {number} sy - real mouse cursor X position
+	* @param {number} x - viewport cursor X position
+	* @param {number} y - viewport cursor X position
+	* @param {number} column (optional) - viewport cursor attribute column by X
 	*/
-	redrawStatusBar(sx: number, sy: number) {
+	redrawStatusBar(vx: number, vy: number, column: number = Math.floor(vx / 6)) {
 		if (!this.statusBar) {
 			return;
 		}
 
-		const coords = this.translateCoords(sx, sy);
-
-		const x = Math.max(0, Math.min(coords.x, 287));
-		const y = Math.max(0, Math.min(coords.y, 255));
-		const c = Math.max(0, Math.min(coords.column, 47));
+		const x = Math.max(0, Math.min(vx, 287));
+		const y = Math.max(0, Math.min(vy, 255));
+		const c = Math.max(0, Math.min(column, 47));
 		const a = `${(49152 + (y * 64) + c).toString(16).toUpperCase()}h`;
 		const z = this.zoomFactor * 100;
 
@@ -172,6 +171,8 @@ export class Editor extends FileOps {
 			`${pad(z, 4)}%   X:${pad(x, 3)} Y:${pad(y, 3)}  C:${pad(c, 2)}   ${a}`
 				.replace(/\s/g, '\u00A0');
 	}
+
+	refresh = () => this.scroller.zoomTo(this.zoomFactor);
 }
 
 /**
