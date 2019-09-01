@@ -16,6 +16,7 @@ import {
 	actionSelectAll,
 	actionSelectNone,
 	actionSelectClear,
+	actionSelectInvert,
 	actionViewportZoom,
 	actionViewportPan,
 	actionCancel,
@@ -260,7 +261,7 @@ export const HotkeyItems: HotkeyItem[] = [
 		'5. Selection',
 		'Invert',
 		'mod+I',
-		() => null
+		() => actionSelectInvert()
 	),
 	new HotkeyItem(
 		'5. Selection',

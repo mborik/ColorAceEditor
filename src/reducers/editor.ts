@@ -65,7 +65,11 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 		}
 
 		case EditorAction.SelectClear:
-			editor.action.clearSelection(action.payload.resetAttrs);
+			editor.action.fillSelection(action.payload.resetAttrs);
+			break;
+
+		case EditorAction.SelectInvert:
+			editor.action.fillSelection(false, true);
 			break;
 
 		case EditorAction.ViewportRefresh:

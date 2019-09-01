@@ -17,6 +17,7 @@ import { actionSelectFnCheckboxChanged } from '../actions/editor';
 
 const SelectTools: React.FunctionComponent = () => {
 	const dispatch = useDispatch();
+	const dispatchChange = useCallback((action) => dispatch(action), [ dispatch ]);
 	const dispatchCheckboxChange = useCallback((checkboxProperty: string) =>
 		dispatch(actionSelectFnCheckboxChanged(checkboxProperty)),
 		[ dispatch ]
@@ -66,18 +67,18 @@ const SelectTools: React.FunctionComponent = () => {
 					}
 					else {
 						return {
-							...item,
 							key: item.id,
-							hotkey: undefined,
-							labelElement: item.hotkey ? <KeyCombo combo={item.hotkey} /> : undefined
+							id: item.id,
+							icon: item.icon,
+							text: item.text,
+							labelElement: item.hotkey ? <KeyCombo combo={item.hotkey} /> : undefined,
+							onClick: () => item.action ? dispatchChange(item.action) : null
 						};
 					}
 				}
 			) : []
 		};
 	});
-
-	const dispatchChange = useCallback((action) => dispatch(action), [ dispatch ]);
 
 	return selection ? (
 		<Navbar.Group align="center">

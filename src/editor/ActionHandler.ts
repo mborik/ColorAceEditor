@@ -269,20 +269,18 @@ export class ActionHandler {
 		}
 	}
 
-	clearSelection(resetAttrs: boolean = false) {
+	fillSelection(resetAttrs: boolean = false, invert: boolean = false) {
 		if (editor.selection.nonEmpty()) {
 			const { x1, y1, x2, y2 } = editor.selection;
 
 			editor.pixel.doSnapshot();
 
+			const c = resetAttrs ? 4 : 0;
+			const mode = invert ? EditorDrawMode.Over : EditorDrawMode.Reset;
+
 			for (let y = y1; y <= y2; y++) {
 				for (let x = x1; x <= x2; x++) {
-					editor.pixel.putPixel(
-						x, y,
-						EditorDrawMode.Reset,
-						resetAttrs ? 4 : 0,
-						false
-					);
+					editor.pixel.putPixel(x, y, mode, c, false);
 				}
 			}
 

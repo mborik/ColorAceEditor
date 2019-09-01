@@ -6,7 +6,13 @@
  */
 
 import { IconName } from "@blueprintjs/core";
-import { EditorReducerAction, actionSelectAll, actionSelectNone, actionSelectClear } from "../actions/editor";
+import {
+	EditorReducerAction,
+	actionSelectAll,
+	actionSelectNone,
+	actionSelectClear,
+	actionSelectInvert
+} from "../actions/editor";
 
 
 export interface SelectToolItem {
@@ -100,7 +106,8 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 	id: 'TBSM_INVERT',
 	icon: 'right-join',
 	text: 'Invert',
-	hotkey: 'mod+I'
+	hotkey: 'mod+I',
+	action: actionSelectInvert()
 }, {
 	divider: true
 }, {
