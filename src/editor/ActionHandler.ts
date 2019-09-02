@@ -27,21 +27,19 @@ export class ActionHandler {
 	 * @param {React.MouseEvent} e
 	 */
 	mouseDown(e: React.MouseEvent) {
+		const { x, y } = editor.translateCoords(e.pageX, e.pageY);
+
 		if (e.button > 0) {
 			editor.scroller.doTouchStart([{
 				pageX: e.pageX,
 				pageY: e.pageY
 			}], e.timeStamp);
 
+			this.mouseNotMoved = true;
 			this.mouseBtnFlag = 2;
-
-		} else if (this.activeSnippet != null) {
-			this.mouseBtnFlag = 1;
 			return;
 
-		} else {
-			const { x, y } = editor.translateCoords(e.pageX, e.pageY);
-
+		} else if (this.activeSnippet == null) {
 			switch (editor.editTool) {
 				case EditorTool.Selection: {
 					editor.selection.reset(x, y);
@@ -74,12 +72,14 @@ export class ActionHandler {
 				}
 			}
 
-			this.startPixelX = this.lastPixelX = x;
-			this.startPixelY = this.lastPixelY = y;
-			this.mouseBtnFlag = 1;
+			this.startPixelX = x;
+			this.startPixelY = y;
 		}
 
 		this.mouseNotMoved = true;
+		this.mouseBtnFlag = 1;
+		this.lastPixelX = x;
+		this.lastPixelY = y;
 	}
 
 	/**
@@ -93,20 +93,20 @@ export class ActionHandler {
 		editor.redrawStatusBar(x, y, column);
 
 		if (this.activeSnippet != null) {
-			this.placeSnippetTo(x, y);
+			this.placeSnippetTo(x, y, editor.editSelectFnBlockAttr);
 
 		} else if (this.mouseBtnFlag === 0) {
 			return;
 
 		} else if (this.mouseBtnFlag === 2) {
+			this.mouseNotMoved = false;
+
 			editor.scroller.doTouchMove([{
 				pageX: e.pageX,
 				pageY: e.pageY
 			}], e.timeStamp);
 
-			if (e.button === 0) {
-				editor.scroller.doTouchEnd(e.timeStamp);
-			}
+			return;
 
 		} else {
 			switch (editor.editTool) {
@@ -115,7 +115,7 @@ export class ActionHandler {
 						const { x0, y0 } = editor.selection;
 						editor.selection.set(x0, y0, x - 1, y - 1);
 
-						this.redrawRect(x, y, false);
+						this.redrawMouseActionRect(x, y, false);
 					}
 					break;
 				}
@@ -124,7 +124,7 @@ export class ActionHandler {
 						const { x0, y0 } = editor.selection;
 						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
 
-						this.redrawRect(x, y, false);
+						this.redrawMouseActionRect(x, y, false);
 					}
 					break;
 				}
@@ -147,7 +147,7 @@ export class ActionHandler {
 						x, y, true, false
 					);
 
-					this.redrawRect(x, y);
+					this.redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Ellipse: {
@@ -158,7 +158,7 @@ export class ActionHandler {
 						x, y, editor.editFilled
 					);
 
-					this.redrawRect(x, y);
+					this.redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Rectangle: {
@@ -169,15 +169,14 @@ export class ActionHandler {
 						x, y, editor.editFilled
 					);
 
-					this.redrawRect(x, y);
+					this.redrawMouseActionRect(x, y);
 					break;
 				}
 			}
-
-			this.lastPixelX = x;
-			this.lastPixelY = y;
 		}
 
+		this.lastPixelX = x;
+		this.lastPixelY = y;
 		this.mouseNotMoved = false;
 	}
 
@@ -205,7 +204,7 @@ export class ActionHandler {
 						const { x0, y0 } = editor.selection;
 						editor.selection.set(x0, y0, x - 1, y - 1);
 
-						this.redrawRect(x, y, false);
+						this.redrawMouseActionRect(x, y, false);
 					}
 
 					editor.selectionActionCallback(editor.selection.nonEmpty());
@@ -216,7 +215,7 @@ export class ActionHandler {
 						const { x0, y0 } = editor.selection;
 						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
 
-						this.redrawRect(x, y, false);
+						this.redrawMouseActionRect(x, y, false);
 					}
 
 					editor.selectionActionCallback(editor.selection.nonEmpty());
@@ -238,7 +237,7 @@ export class ActionHandler {
 						x, y, true, false
 					);
 
-					this.redrawRect(x, y);
+					this.redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Ellipse: {
@@ -249,7 +248,7 @@ export class ActionHandler {
 						x, y, editor.editFilled
 					);
 
-					this.redrawRect(x, y);
+					this.redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Rectangle: {
@@ -260,7 +259,7 @@ export class ActionHandler {
 						x, y, editor.editFilled
 					);
 
-					this.redrawRect(x, y);
+					this.redrawMouseActionRect(x, y);
 					break;
 				}
 			}
@@ -341,7 +340,7 @@ export class ActionHandler {
 
 			this.startPixelX = x1;
 			this.startPixelY = y1;
-			this.redrawRect(x2, y2);
+			this.redrawMouseActionRect(x2, y2);
 		}
 	}
 
@@ -359,13 +358,26 @@ export class ActionHandler {
 					break;
 			}
 
-			this.actionSnapshot = null;
-			this.mouseNotMoved = true;
-			this.mouseBtnFlag = 0;
+		} else if (this.activeSnippet != null) {
+			editor.pixel.undo(this.actionSnapshot);
+			editor.selection.set(
+				this.startPixelX, this.startPixelY,
+				this.startPixelX + this.activeSnippet.width - 1,
+				this.startPixelY + this.activeSnippet.height - 1
+			);
 
-			editor.refresh();
+			this.activeSnippet = null;
+
+		} else {
+			return;
 		}
-	}
+
+		this.actionSnapshot = null;
+		this.mouseNotMoved = true;
+		this.mouseBtnFlag = 0;
+
+		editor.refresh();
+}
 
 	/**
 	 * Create snippet with all pixel color data of given selection.
@@ -377,6 +389,9 @@ export class ActionHandler {
 			const { x1, y1, x2, y2, w, h } = editor.selection;
 			this.activeSnippet = new EditorSnippet(w, h);
 
+			this.startPixelX = x1;
+			this.startPixelY = y1;
+
 			for (let y = y1, i = 0, x: number; y <= y2; y++) {
 				for (x = x1; x <= x2; x++) {
 					this.activeSnippet.data[i++] = editor.pixel.getPixel(x, y);
@@ -387,14 +402,11 @@ export class ActionHandler {
 				}
 			}
 
-			if (cut) {
-				this.startPixelX = x1;
-				this.startPixelY = y1;
-				this.redrawRect(x2, y2, false);
-			}
-
 			this.actionSnapshot = editor.pixel.doSnapshot(true);
-			editor.selection.reset();
+
+			if (cut) {
+				this.redrawOuterRect(x1, y1, x2, y2, false);
+			}
 		}
 	}
 
@@ -406,10 +418,13 @@ export class ActionHandler {
 	 * @param {boolean} (optional) attrs - flag if attributes will be modified
 	 */
 	private placeSnippetTo(sx: number, sy: number, attrs: boolean = false) {
+		editor.pixel.undo(this.actionSnapshot);
+
+		sx -= (this.activeSnippet.width >> 1);
+		sy -= (this.activeSnippet.height >> 1);
+
 		const sx2 = sx + this.activeSnippet.width - 1;
 		const sy2 = sy + this.activeSnippet.height - 1;
-
-		editor.pixel.undo(this.actionSnapshot);
 
 		let i = 0, c: number, x: number;
 		for (let y = sy; y <= sy2; y++) {
@@ -425,20 +440,20 @@ export class ActionHandler {
 			}
 		}
 
-		this.startPixelX = sx;
-		this.startPixelY = sy;
-		this.redrawRect(sx2, sy2, false);
+		editor.selection.set(sx, sy, sx2, sy2);
+		this.redrawOuterRect(sx, sy, sx2, sy2, attrs);
+		editor.refresh();
 	}
 
 	/**
-	 * Helper method to redraw "outer rectangle", so it takes into account start,
-	 * current and last mouse coordinates and adjust to include whole attributes.
+	 * Method which takes into account ongoing action start, current and last
+	 * known mouse coordinates and calls `redrawOuterRect` to adjust to "outer" rect.
 	 *
 	 * @param {number} x2 current X coordinate
 	 * @param {number} y2 current Y coordinate
 	 * @param {boolean} attrs redraw also attributes
 	 */
-	private redrawRect(x2: number, y2: number, attrs: boolean = true) {
+	private redrawMouseActionRect(x2: number, y2: number, attrs: boolean = true) {
 		let x1: number, y1: number;
 
 		if (this.startPixelX > x2) {
@@ -466,6 +481,19 @@ export class ActionHandler {
 			y1 = this.lastPixelY;
 		}
 
+		this.redrawOuterRect(x1, y1, x2, y2, attrs);
+	}
+
+	/**
+	 * Helper method to redraw "outer rectangle" (grown to whole attributes).
+	 *
+	 * @param {number} x1 current X coordinate
+	 * @param {number} y1 current Y coordinate
+	 * @param {number} x2 current X coordinate
+	 * @param {number} y2 current Y coordinate
+	 * @param {boolean} attrs redraw also attributes
+	 */
+	private redrawOuterRect(x1: number, y1: number, x2: number, y2: number, attrs: boolean = true) {
 		x1 = Math.max(0, Math.floor(--x1 / 6) * 6);
 		x2 = Math.min(288, Math.ceil(++x2 / 6) * 6);
 		y1 = Math.max(0, (y1 & ~1) - 2);

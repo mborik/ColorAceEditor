@@ -48,8 +48,8 @@ export class Selection implements SelectionObject {
 		this.x2 = Math.max(0, Math.min(287, x2));
 		this.y2 = Math.max(0, Math.min(255, y2));
 
-		this.w = (x2 - x1) + 1;
-		this.h = (y2 - y1) + 1;
+		this.w = (this.x2 - this.x1) + 1;
+		this.h = (this.y2 - this.y1) + 1;
 
 		return this;
 	}
