@@ -17,6 +17,7 @@ import {
 	actionSelectNone,
 	actionSelectClear,
 	actionSelectInvert,
+	actionSelectCopy,
 	actionViewportZoom,
 	actionViewportPan,
 	actionCancel,
@@ -237,13 +238,13 @@ export const HotkeyItems: HotkeyItem[] = [
 		'5. Selection',
 		'Cut & Place',
 		'mod+X',
-		() => null
+		() => actionSelectCopy(true)
 	),
 	new HotkeyItem(
 		'5. Selection',
 		'Clone',
 		'mod+C',
-		() => null
+		() => actionSelectCopy(false)
 	),
 	new HotkeyItem(
 		'5. Selection',

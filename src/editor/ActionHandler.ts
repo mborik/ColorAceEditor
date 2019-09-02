@@ -8,7 +8,7 @@
 import React from 'react';
 import { debounce } from "typescript-debounce-decorator";
 import { editor, EditorTool, EditorDrawMode } from "./Editor";
-import { EditorSnapshot } from './Pixelator';
+import { EditorSnapshot, EditorSnippet } from './Pixelator';
 
 
 export class ActionHandler {
@@ -18,8 +18,14 @@ export class ActionHandler {
 	private lastPixelY: number = 0;
 	private startPixelX: number = 0;
 	private startPixelY: number = 0;
+	private activeSnippet: EditorSnippet = null;
 	private actionSnapshot: EditorSnapshot = null;
 
+	/**
+	 * Handler of `mousedown` event.
+	 *
+	 * @param {React.MouseEvent} e
+	 */
 	mouseDown(e: React.MouseEvent) {
 		if (e.button > 0) {
 			editor.scroller.doTouchStart([{
@@ -28,8 +34,12 @@ export class ActionHandler {
 			}], e.timeStamp);
 
 			this.mouseBtnFlag = 2;
-		}
-		else {
+
+		} else if (this.activeSnippet != null) {
+			this.mouseBtnFlag = 1;
+			return;
+
+		} else {
 			const { x, y } = editor.translateCoords(e.pageX, e.pageY);
 
 			switch (editor.editTool) {
@@ -72,35 +82,49 @@ export class ActionHandler {
 		this.mouseNotMoved = true;
 	}
 
+	/**
+	 * Handler of `mousemove` event.
+	 *
+	 * @param {React.MouseEvent} e
+	 */
 	mouseMove(e: React.MouseEvent) {
 		const { x, y, column } = editor.translateCoords(e.pageX, e.pageY);
 
 		editor.redrawStatusBar(x, y, column);
 
-		if (this.mouseBtnFlag === 0) {
+		if (this.activeSnippet != null) {
+			this.placeSnippetTo(x, y);
+
+		} else if (this.mouseBtnFlag === 0) {
 			return;
-		}
-		else if (this.mouseBtnFlag === 2) {
+
+		} else if (this.mouseBtnFlag === 2) {
 			editor.scroller.doTouchMove([{
 				pageX: e.pageX,
 				pageY: e.pageY
 			}], e.timeStamp);
-		}
-		else {
+
+			if (e.button === 0) {
+				editor.scroller.doTouchEnd(e.timeStamp);
+			}
+
+		} else {
 			switch (editor.editTool) {
 				case EditorTool.Selection: {
 					if (!this.mouseNotMoved) {
-						editor.pixel.redrawSelection(s => {
-							s.set(s.x0, s.y0, x - 1, y - 1);
-						});
+						const { x0, y0 } = editor.selection;
+						editor.selection.set(x0, y0, x - 1, y - 1);
+
+						this.redrawRect(x, y, false);
 					}
 					break;
 				}
 				case EditorTool.GridSelect: {
 					if (!this.mouseNotMoved) {
-						editor.pixel.redrawSelection(s => {
-							s.set(s.x0, s.y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
-						});
+						const { x0, y0 } = editor.selection;
+						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
+
+						this.redrawRect(x, y, false);
 					}
 					break;
 				}
@@ -157,20 +181,31 @@ export class ActionHandler {
 		this.mouseNotMoved = false;
 	}
 
+	/**
+	 * Handler of `mouseup` event.
+	 *
+	 * @param {React.MouseEvent} e
+	 */
 	mouseUp(e: React.MouseEvent) {
 		if (this.mouseBtnFlag === 0) {
 			return;
+
+		} else if (this.activeSnippet != null) {
+			this.activeSnippet = null;
+
 		} else if (e.button > 0) {
 			editor.scroller.doTouchEnd(e.timeStamp);
+
 		} else {
 			const { x, y } = editor.translateCoords(e.pageX, e.pageY);
 
 			switch (editor.editTool) {
 				case EditorTool.Selection: {
 					if (!this.mouseNotMoved) {
-						editor.pixel.redrawSelection(s => {
-							s.set(s.x0, s.y0, x - 1, y - 1);
-						});
+						const { x0, y0 } = editor.selection;
+						editor.selection.set(x0, y0, x - 1, y - 1);
+
+						this.redrawRect(x, y, false);
 					}
 
 					editor.selectionActionCallback(editor.selection.nonEmpty());
@@ -178,9 +213,10 @@ export class ActionHandler {
 				}
 				case EditorTool.GridSelect: {
 					if (!this.mouseNotMoved) {
-						editor.pixel.redrawSelection(s => {
-							s.set(s.x0, s.y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
-						});
+						const { x0, y0 } = editor.selection;
+						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
+
+						this.redrawRect(x, y, false);
 					}
 
 					editor.selectionActionCallback(editor.selection.nonEmpty());
@@ -235,6 +271,11 @@ export class ActionHandler {
 		this.mouseBtnFlag = 0;
 	}
 
+	/**
+	 * Debounced handler of `mousewheel` event.
+	 *
+	 * @param {React.MouseEvent} e
+	 */
 	@debounce(16, { leading: true })
 	mouseWheel(e: React.WheelEvent) {
 		let delta = 0;
@@ -250,6 +291,13 @@ export class ActionHandler {
 		}
 	}
 
+	/**
+	 * Helper method to zoom viewport by given delta zoom factor and redraw statusbar.
+	 *
+	 * @param {number} (optional) delta signed integer which modified zoom factor
+	 * @param {number} (optional) x coordinate to zoom in
+	 * @param {number} (optional) y coordinate to zoom in
+	 */
 	zoomViewport(delta: number = 0, x: number = this.lastPixelX, y: number = this.lastPixelY) {
 		const zoom = editor.zoomFactor + delta;
 
@@ -269,6 +317,13 @@ export class ActionHandler {
 		}
 	}
 
+	/**
+	 * Clear to black or invert current selection.
+	 * Optionally reset attributes to green { 0, 0 }.
+	 *
+	 * @param {boolean} resetAttrs (optional)
+	 * @param {boolean} invert (optional)
+	 */
 	fillSelection(resetAttrs: boolean = false, invert: boolean = false) {
 		if (editor.selection.nonEmpty()) {
 			const { x1, y1, x2, y2 } = editor.selection;
@@ -290,6 +345,9 @@ export class ActionHandler {
 		}
 	}
 
+	/**
+	 * Cancel current operation and restore to snapshot.
+	 */
 	cancel() {
 		if (this.mouseBtnFlag === 1) {
 			switch (editor.editTool) {
@@ -309,7 +367,78 @@ export class ActionHandler {
 		}
 	}
 
-	private redrawRect(x2: number, y2: number) {
+	/**
+	 * Create snippet with all pixel color data of given selection.
+	 */
+	createSnippet(cut: boolean = false) {
+		if (editor.selection.nonEmpty()) {
+			editor.pixel.doSnapshot();
+
+			const { x1, y1, x2, y2, w, h } = editor.selection;
+			this.activeSnippet = new EditorSnippet(w, h);
+
+			for (let y = y1, i = 0, x: number; y <= y2; y++) {
+				for (x = x1; x <= x2; x++) {
+					this.activeSnippet.data[i++] = editor.pixel.getPixel(x, y);
+
+					if (cut) {
+						editor.pixel.putPixel(x, y, EditorDrawMode.Reset, 0, false);
+					}
+				}
+			}
+
+			if (cut) {
+				this.startPixelX = x1;
+				this.startPixelY = y1;
+				this.redrawRect(x2, y2, false);
+			}
+
+			this.actionSnapshot = editor.pixel.doSnapshot(true);
+			editor.selection.reset();
+		}
+	}
+
+	/**
+	 * Place active snippet into given position.
+	 *
+	 * @param {number} sx
+	 * @param {number} sy
+	 * @param {boolean} (optional) attrs - flag if attributes will be modified
+	 */
+	private placeSnippetTo(sx: number, sy: number, attrs: boolean = false) {
+		const sx2 = sx + this.activeSnippet.width - 1;
+		const sy2 = sy + this.activeSnippet.height - 1;
+
+		editor.pixel.undo(this.actionSnapshot);
+
+		let i = 0, c: number, x: number;
+		for (let y = sy; y <= sy2; y++) {
+			for (x = sx; x <= sx2; x++) {
+				c = this.activeSnippet.data[i++];
+
+				editor.pixel.putPixel(
+					x, y,
+					c ? EditorDrawMode.Set : EditorDrawMode.Reset,
+					attrs ? c : 0,
+					false
+				);
+			}
+		}
+
+		this.startPixelX = sx;
+		this.startPixelY = sy;
+		this.redrawRect(sx2, sy2, false);
+	}
+
+	/**
+	 * Helper method to redraw "outer rectangle", so it takes into account start,
+	 * current and last mouse coordinates and adjust to include whole attributes.
+	 *
+	 * @param {number} x2 current X coordinate
+	 * @param {number} y2 current Y coordinate
+	 * @param {boolean} attrs redraw also attributes
+	 */
+	private redrawRect(x2: number, y2: number, attrs: boolean = true) {
 		let x1: number, y1: number;
 
 		if (this.startPixelX > x2) {
@@ -337,11 +466,11 @@ export class ActionHandler {
 			y1 = this.lastPixelY;
 		}
 
-		x1 = Math.floor(x1 / 6) * 6;
+		x1 = Math.max(0, Math.floor(--x1 / 6) * 6);
 		x2 = Math.min(288, Math.ceil(++x2 / 6) * 6);
-		y1 = (y1 & ~1);
+		y1 = Math.max(0, (y1 & ~1) - 2);
 		y2 = Math.min(256, (y2 & ~1) + 2);
 
-		editor.pixel.redrawRect(x1, y1, (x2 - x1), (y2 - y1), true);
+		editor.pixel.redrawRect(x1, y1, (x2 - x1), (y2 - y1), attrs);
 	}
 }

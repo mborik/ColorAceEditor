@@ -11,7 +11,8 @@ import {
 	actionSelectAll,
 	actionSelectNone,
 	actionSelectClear,
-	actionSelectInvert
+	actionSelectInvert,
+	actionSelectCopy
 } from "../actions/editor";
 
 
@@ -88,12 +89,14 @@ export const SelectToolItems: SelectToolItem[] = [{
 	id: 'TBST_CUT',
 	icon: 'cut',
 	title: 'cut',
-	hotkey: 'mod+X'
+	hotkey: 'mod+X',
+	action: actionSelectCopy(true)
 }, {
 	id: 'TBST_CLONE',
 	icon: 'duplicate',
 	title: 'clone',
-	hotkey: 'mod+C'
+	hotkey: 'mod+C',
+	action: actionSelectCopy(false)
 }, {
 	id: 'TBST_CLEAR',
 	icon: 'eraser',
@@ -155,4 +158,10 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 	text: 'Shift by attributes',
 	checkbox: true,
 	checkboxProperty: 'editSelectFnShiftAttr'
+}, {
+	id: 'TBSM_CHECKBOX_BLOCK',
+	icon: 'th-derived',
+	text: 'Cut or clone with attributes',
+	checkbox: true,
+	checkboxProperty: 'editSelectFnBlockAttr'
 }];

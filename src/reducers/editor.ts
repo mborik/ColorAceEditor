@@ -72,6 +72,10 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			editor.action.fillSelection(false, true);
 			break;
 
+		case EditorAction.SelectCopy:
+			editor.action.createSnippet(action.payload.cut);
+			break;
+
 		case EditorAction.ViewportRefresh:
 			editor.refresh();
 			break;

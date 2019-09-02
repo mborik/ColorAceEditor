@@ -15,6 +15,7 @@ export enum EditorAction {
 	SelectNone = 'SELECT_NONE',
 	SelectClear = 'SELECT_CLEAR',
 	SelectInvert = 'SELECT_INVERT',
+	SelectCopy = 'SELECT_COPY',
 	ViewportRefresh = 'VIEWPORT_REFRESH',
 	ViewportCleanup = 'VIEWPORT_CLEANUP',
 	ViewportZoom = 'VIEWPORT_ZOOM',
@@ -87,6 +88,11 @@ export const actionSelectClear = (resetAttrs: boolean = false): EditorReducerAct
 
 export const actionSelectInvert = (): EditorReducerAction => ({
 	type: EditorAction.SelectInvert
+});
+
+export const actionSelectCopy = (cut: boolean = false): EditorReducerAction => ({
+	type: EditorAction.SelectCopy,
+	payload: { cut }
 });
 
 export const actionViewportZoom = (zoomDelta: number): EditorReducerAction => ({

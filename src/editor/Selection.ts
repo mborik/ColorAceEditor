@@ -24,6 +24,7 @@ export class Selection implements SelectionObject {
 
 	/**
 	 * Set exact rectangle.
+	 *
 	 * @param {number} x1 coordinate in surface (0-287)
 	 * @param {number} y1 coordinate in surface (0-255)
 	 * @param {number} x2 coordinate in surface (0-287)
@@ -55,6 +56,7 @@ export class Selection implements SelectionObject {
 
 	/**
 	 * Reset rectangle to empty, optionally offset to entry point.
+	 *
 	 * @param {number} x (optional) coordinate in surface (0-287)
 	 * @param {number} y (optional) coordinate in surface (0-255)
 	 * @return {Selection}
@@ -75,6 +77,7 @@ export class Selection implements SelectionObject {
 
 	/**
 	 * Offset rectangle by x,y coordinates.
+	 *
 	 * @param  {number} x offset
 	 * @param  {number} y offset
 	 * @return {Selection}
@@ -103,6 +106,7 @@ export class Selection implements SelectionObject {
 
 	/**
 	 * Union a expand rectangle with another one.
+	 *
 	 * @param  {SelectionObject} obj
 	 * @return {Selection}
 	 */
@@ -120,6 +124,7 @@ export class Selection implements SelectionObject {
 
 	/**
 	 * Test empty rectangle.
+	 *
 	 * @return {boolean}
 	 */
 	nonEmpty(): boolean {
@@ -128,6 +133,7 @@ export class Selection implements SelectionObject {
 
 	/**
 	 * Test if given coordinate lie on X-bounds of rectangle.
+	 *
 	 * @param {number} [x] coordinate in surface (0-287)
 	 * @param {number} [y] coordinate in surface (0-255)
 	 * @return {number} 1-left, 2-right, 0-not match bounds
@@ -145,6 +151,7 @@ export class Selection implements SelectionObject {
 
 	/**
 	 * Test if given coordinate lie on Y-bounds of rectangle.
+	 *
 	 * @param {number} [x] coordinate in surface (0-287)
 	 * @param {number} [y] coordinate in surface (0-255)
 	 * @return {number} 1-left, 2-right, 0-not match bounds

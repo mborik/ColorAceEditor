@@ -45,6 +45,15 @@ export class FileOps {
 		return result;
 	}
 
+	/**
+	 * Read the selected file with `FileReader`. Binary file of length 16384 will be
+	 * processed as standard screen-dump. In case of standard images with dimensions
+	 * 288x256 (or lower) it will be converted by complex algorithm with proper
+	 * color attribute matching.
+	 *
+	 * @param {File} file
+	 * @returns {Promise}
+	 */
 	upload(file: File): Promise<void> {
 		return new Promise((resolve, reject) => {
 			if (file == null) {
@@ -135,7 +144,7 @@ export class FileOps {
 	}
 
 	/**
-	 * Download PMD 85 VRAM dump to binary file.
+	 * Create VRAM dump in PMD 85 format and provide download of the binary file.
 	 */
 	download(filename: string = 'screen.bin'): void {
 		const type = 'application/octet-stream';

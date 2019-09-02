@@ -108,7 +108,7 @@ export class Drawing {
 	 * @param {number} y1 coordinate in surface (0-255)
 	 * @param {number} x2 coordinate in surface (0-287)
 	 * @param {number} y2 coordinate in surface (0-255)
-	 * @param {boolean} filled flag if we filling the rectangle
+	 * @param {boolean} filled flag if we filling the ellipse
 	 */
 	ellipse(x1: number, y1: number, x2: number, y2: number, filled: boolean) {
 		if (x1 === x2 || y1 === y2) {

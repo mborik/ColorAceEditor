@@ -6,7 +6,6 @@
  */
 
 import { editor, EditorDrawMode } from "./Editor";
-import { Selection } from "./Selection";
 
 
 const FULL_ALPHA = 0xFFFFFFFF;
@@ -16,6 +15,14 @@ const MARQUEE_COLOR = 0x302010;
 export interface EditorSnapshot {
 	surface: Uint8ClampedArray;
 	attrs: Uint8ClampedArray;
+}
+
+export class EditorSnippet {
+	data: Uint8ClampedArray;
+
+	constructor(public width: number, public height: number) {
+		this.data = new Uint8ClampedArray(width * height);
+	}
 }
 
 export class Pixelator {
@@ -86,32 +93,8 @@ export class Pixelator {
 	}
 
 	/**
-	 * Clear current selection to black (optionally reset attributes to green { 0, 0 }.
-	 * @param {boolean} resetAttrs (optional)
-	 */
-	clearSelection(resetAttrs: boolean = false) {
-		if (editor.selection.nonEmpty()) {
-			const { x1, y1, x2, y2 } = editor.selection;
-
-			this.doSnapshot();
-
-			for (let y = y1; y <= y2; y++) {
-				for (let x = x1; x < x2; x++) {
-					this.putPixel(
-						x, y,
-						EditorDrawMode.Reset,
-						resetAttrs ? 4 : 0,
-						false
-					);
-				}
-			}
-
-			return true;
-		}
-	}
-
-	/**
 	 * Binary decoding of PMD 85 screen.
+	 *
 	 * @param {(Uint8Array|number[])} videoRam with dump of PMD 85 VRAM (0xC000-0xFFFF)
 	 */
 	readPMD85vram(videoRam: Uint8Array | number[]) {
@@ -152,12 +135,14 @@ export class Pixelator {
 
 	/**
 	 * Returns nonzero if we need to show grid for exact X coordinate.
+	 *
 	 * @param {number} x coordinate in surface (0-287)
 	 */
 	isGrid = (x: number) => (editor.showGrid && ((x % 6) === 5)) ? 3 : 0;
 
 	/**
 	 * Main render callback of Scroller.
+	 *
 	 * @param {number} left Absolute X Scroller position
 	 * @param {number} top Absolute Y Scroller position
 	 * @param {number} zoom Scroller internal zoom factor
@@ -221,6 +206,7 @@ export class Pixelator {
 
 	/**
 	 * Redraws a selected rectangle region of the surface.
+	 *
 	 * @param {number} x coordinate in surface (0-287)
 	 * @param {number} y coordinate in surface (0-255)
 	 * @param {number} w width of redraw window
@@ -285,15 +271,9 @@ export class Pixelator {
 		}
 	}
 
-	redrawSelection(doBefore: (s: Selection) => void) {
-		const { x1, y1, x2, y2 } = editor.selection;
-
-		doBefore(editor.selection);
-		this.redrawRect(x1, y1, x2 + 1, y2 + 1, false);
-	}
-
 	/**
 	 * Putting pixel onto surface in specified color and mode.
+	 *
 	 * @param {number} x coordinate in surface (0-287)
 	 * @param {number} y coordinate in surface (0-255)
 	 * @param {EditorDrawMode} mode of drawing
@@ -365,6 +345,35 @@ export class Pixelator {
 	}
 
 	/**
+	 * Getting pixel color and mode from surface.
+	 *
+	 * @param {number} x coordinate in surface (0-287)
+	 * @param {number} y coordinate in surface (0-255)
+	 * @returns {number} color value (1-7) of set pixel or 0 if pixel not set
+	 */
+	getPixel(x: number, y: number): number {
+		if (x < 0 || x >= 288 || y < 0 || y >= 256) {
+			return 0;
+		}
+
+		let a1 = Math.floor((y * 48) + Math.floor(x / 6));
+		let a2 = a1 + ((y & 1) ? -48 : 48);
+
+		if (a1 > a2) {
+			const flip = a2;
+			a2 = a1;
+			a1 = flip;
+		}
+
+		const c = this.attrs[a2];
+		const d = this.attrs[a1];
+		const color = (d | c | ((d * c) ? 0 : 4));
+
+		const ptr = ((y * 288) + x);
+		return this.surface[ptr] ? color : 0;
+	}
+
+	/**
 	 * Do snapshot of current screen to undo buffer.
 	 *
 	 * @param {boolean} justGet (optional) just return snapshot, not put into undo-buffer
@@ -405,6 +414,7 @@ export class Pixelator {
 
 	/**
 	 * Draw marquee for X coordinate.
+	 *
 	 * @param  {number} p pointer to bitmap
 	 * @param  {number} z zoom factor
 	 * @param  {number} y coordinate
@@ -418,6 +428,7 @@ export class Pixelator {
 
 	/**
 	 * Draw marquee for Y coordinate.
+	 *
 	 * @param  {number} p pointer to bitmap
 	 * @param  {number} z zoom factor
 	 * @param  {number} x coordinate
@@ -430,12 +441,11 @@ export class Pixelator {
 
 	/**
 	 * Scaler functions for each zoom factor separately.
-	 * @type {Array} scaler functions
 	 */
-	scalers: Function[] = [
+	scalers: ((ptr: number, palEntry: any[], grid: number) => void)[] = [
 		null,
 	// 1x1
-		(p: string | number, c: any[]) => {
+		(p: number, c: any[]) => {
 			this.bmpDWORD[p] = c[0];
 		},
 	// 2x2
@@ -449,7 +459,7 @@ export class Pixelator {
 			this.bmpDWORD[p] = a;
 		},
 	// 3x3
-		(p: number, c: any[], g: string | number) => {
+		(p: number, c: any[], g: number) => {
 			var a = c[0], o = this.bmpW - 2;
 
 			this.bmpDWORD[p++] = a;

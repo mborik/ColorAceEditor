@@ -68,8 +68,10 @@ export class Editor extends FileOps {
 	editTool: EditorTool = EditorTool.Pencil;
 	editMode: EditorDrawMode = EditorDrawMode.Over;
 	editFilled: boolean = false;
+
 	editSelectFnShiftWrap: boolean = true;
 	editSelectFnShiftAttr: boolean = false;
+	editSelectFnBlockAttr: boolean = false;
 
 	selectionActionCallback: EditorSelectionActionFn = (() => null);
 
@@ -112,10 +114,11 @@ export class Editor extends FileOps {
 	}
 
 	/**
-	* Set editor and scroller dimensions.
-	* @param {number} w - webpage workspace width
-	* @param {number} h - webpage workspace height
-	*/
+	 * Set editor and scroller dimensions.
+	 *
+	 * @param {number} w - webpage workspace width
+	 * @param {number} h - webpage workspace height
+	 */
 	setDimensions(w: number, h: number) {
 		this.contentWidth = w;
 		this.contentHeight = h;
@@ -126,11 +129,12 @@ export class Editor extends FileOps {
 	}
 
 	/**
-	* Translation of "real world" coordinates on page to our pixel space.
-	* @param {number} sx - real mouse cursor X position
-	* @param {number} sy - real mouse cursor X position
-	* @return {CanvasCoordinates} object with properties 'x', 'y' and 'column'
-	*/
+	 * Translation of "real world" coordinates on page to our pixel space.
+	 *
+	 * @param {number} sx - real mouse cursor X position
+	 * @param {number} sy - real mouse cursor X position
+	 * @return {CanvasCoordinates} object with properties 'x', 'y' and 'column'
+	 */
 	translateCoords(sx: number, sy: number): CanvasCoordinates {
 		const rect = this.canvas.getBoundingClientRect();
 		const s = this.scroller.getValues();
@@ -149,11 +153,12 @@ export class Editor extends FileOps {
 	}
 
 	/**
-	* Generate new status bar message string with coordinates.
-	* @param {number} x - viewport cursor X position
-	* @param {number} y - viewport cursor X position
-	* @param {number} column (optional) - viewport cursor attribute column by X
-	*/
+	 * Generate new status bar message string with coordinates.
+	 *
+	 * @param {number} x - viewport cursor X position
+	 * @param {number} y - viewport cursor X position
+	 * @param {number} column (optional) - viewport cursor attribute column by X
+	 */
 	redrawStatusBar(vx: number, vy: number, column: number = Math.floor(vx / 6)) {
 		if (!this.statusBar) {
 			return;
@@ -172,6 +177,10 @@ export class Editor extends FileOps {
 				.replace(/\s/g, '\u00A0');
 	}
 
+	/**
+	 * Wrapper of `Pixelator.render` through the `Scroller.zoomTo`
+	 * with current zoom factor.
+	 */
 	refresh = () => this.scroller.zoomTo(this.zoomFactor);
 }
 
