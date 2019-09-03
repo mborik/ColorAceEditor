@@ -95,9 +95,6 @@ export class ActionHandler {
 		if (this.activeSnippet != null) {
 			this.placeSnippetTo(x, y, editor.editSelectFnBlockAttr);
 
-		} else if (this.mouseBtnFlag === 0) {
-			return;
-
 		} else if (this.mouseBtnFlag === 2) {
 			this.mouseNotMoved = false;
 
@@ -106,9 +103,9 @@ export class ActionHandler {
 				pageY: e.pageY
 			}], e.timeStamp);
 
-			return;
+		} else if (this.mouseBtnFlag !== 0) {
+			this.mouseNotMoved = false;
 
-		} else {
 			switch (editor.editTool) {
 				case EditorTool.Selection: {
 					if (!this.mouseNotMoved) {
@@ -177,7 +174,6 @@ export class ActionHandler {
 
 		this.lastPixelX = x;
 		this.lastPixelY = y;
-		this.mouseNotMoved = false;
 	}
 
 	/**
@@ -359,7 +355,7 @@ export class ActionHandler {
 			}
 
 		} else if (this.activeSnippet != null) {
-			editor.pixel.undo(this.actionSnapshot);
+			editor.pixel.undo();
 			editor.selection.set(
 				this.startPixelX, this.startPixelY,
 				this.startPixelX + this.activeSnippet.width - 1,
@@ -377,7 +373,7 @@ export class ActionHandler {
 		this.mouseBtnFlag = 0;
 
 		editor.refresh();
-}
+	}
 
 	/**
 	 * Create snippet with all pixel color data of given selection.
@@ -407,11 +403,16 @@ export class ActionHandler {
 			if (cut) {
 				this.redrawOuterRect(x1, y1, x2, y2, false);
 			}
+
+			this.placeSnippetTo(
+				this.lastPixelX, this.lastPixelY,
+				editor.editSelectFnBlockAttr
+			);
 		}
 	}
 
 	/**
-	 * Place active snippet into given position.
+	 * Place active snippet in the center of given position.
 	 *
 	 * @param {number} sx
 	 * @param {number} sy

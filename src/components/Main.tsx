@@ -64,7 +64,7 @@ const Main: React.FunctionComponent = () => {
 			upload: document.getElementById('uploadCanvas') as HTMLCanvasElement,
 			status: document.getElementById('statusBar') as HTMLDivElement,
 			grid: true,
-			undo: 25
+			undo: 50
 		}));
 	},
 	[ dispatch ]);

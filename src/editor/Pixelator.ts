@@ -10,6 +10,23 @@ import { editor, EditorDrawMode } from "./Editor";
 
 const FULL_ALPHA = 0xFFFFFFFF;
 const MARQUEE_COLOR = 0x302010;
+const DEFAULT_BRUSH = `
+	...............
+	...............
+	...............
+	...............
+	...............
+	......OOO......
+	.....OOOOO.....
+	.....OOOOO.....
+	.....OOOOO.....
+	......OOO......
+	...............
+	...............
+	...............
+	...............
+	...............
+`;
 
 
 export interface EditorSnapshot {
@@ -51,9 +68,10 @@ export class Pixelator {
 
 	surface: Uint8ClampedArray = new Uint8ClampedArray(288 * 256);
 	attrs: Uint8ClampedArray  = new Uint8ClampedArray((288 * 256) / 6);
+	brush: Uint8ClampedArray = new Uint8ClampedArray(15 * 15);
 
 	/**
-	 * Initialization of palette color table.
+	 * Initialization of palette color table and brush.
 	 */
 	constructor() {
 		const a: number = (255 << 24);
@@ -79,6 +97,13 @@ export class Pixelator {
 			this.pal[i][2] = a | (b << 16) | (g << 8) | r;
 			this.pal[i][3] = a | (y << 16) | (y << 8) | y;
 		}
+
+		this.brush.set(
+			DEFAULT_BRUSH
+			.replace(/\s/g, '')
+			.split('')
+			.map(v => v !== '.' ? 1 : 0)
+		);
 
 		this.bmpBgColor = getComputedStyle(document.body)
 			.getPropertyValue('background-color');
