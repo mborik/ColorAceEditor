@@ -57,6 +57,11 @@ export class ActionHandler {
 					editor.draw.dot(x, y);
 					break;
 				}
+				case EditorTool.Brush: {
+					this.actionSnapshot = editor.pixel.doSnapshot();
+					editor.draw.brush(x, y);
+					break;
+				}
 				case EditorTool.Ellipse:
 				case EditorTool.Rectangle:
 					this.actionSnapshot = editor.pixel.doSnapshot();
@@ -133,6 +138,12 @@ export class ActionHandler {
 							x, y,
 							this.mouseNotMoved
 						);
+					}
+					break;
+				}
+				case EditorTool.Brush: {
+					if (this.lastPixelX !== x || this.lastPixelY !== y) {
+						editor.draw.brush(x, y);
 					}
 					break;
 				}
@@ -222,6 +233,14 @@ export class ActionHandler {
 						(this.lastPixelX !== x || this.lastPixelY !== y)) {
 
 						editor.draw.line(this.lastPixelX, this.lastPixelY, x, y, true);
+					}
+					break;
+				}
+				case EditorTool.Brush: {
+					if (!this.mouseNotMoved &&
+						(this.lastPixelX !== x || this.lastPixelY !== y)) {
+
+						editor.draw.brush(x, y);
 					}
 					break;
 				}
@@ -377,6 +396,8 @@ export class ActionHandler {
 
 	/**
 	 * Create snippet with all pixel color data of given selection.
+	 *
+	 * @param {boolean} cut (optional) clear selection after copy
 	 */
 	createSnippet(cut: boolean = false) {
 		if (editor.selection.nonEmpty()) {
@@ -401,7 +422,7 @@ export class ActionHandler {
 			this.actionSnapshot = editor.pixel.doSnapshot(true);
 
 			if (cut) {
-				this.redrawOuterRect(x1, y1, x2, y2, false);
+				editor.pixel.redrawOuterRect(x1, y1, x2, y2);
 			}
 
 			this.placeSnippetTo(
@@ -416,7 +437,7 @@ export class ActionHandler {
 	 *
 	 * @param {number} sx
 	 * @param {number} sy
-	 * @param {boolean} (optional) attrs - flag if attributes will be modified
+	 * @param {boolean} attrs (optional) - flag if attributes will be modified
 	 */
 	private placeSnippetTo(sx: number, sy: number, attrs: boolean = false) {
 		editor.pixel.undo(this.actionSnapshot);
@@ -442,7 +463,7 @@ export class ActionHandler {
 		}
 
 		editor.selection.set(sx, sy, sx2, sy2);
-		this.redrawOuterRect(sx, sy, sx2, sy2, attrs);
+		editor.pixel.redrawOuterRect(sx, sy, sx2, sy2, attrs);
 		editor.refresh();
 	}
 
@@ -482,24 +503,6 @@ export class ActionHandler {
 			y1 = this.lastPixelY;
 		}
 
-		this.redrawOuterRect(x1, y1, x2, y2, attrs);
-	}
-
-	/**
-	 * Helper method to redraw "outer rectangle" (grown to whole attributes).
-	 *
-	 * @param {number} x1 current X coordinate
-	 * @param {number} y1 current Y coordinate
-	 * @param {number} x2 current X coordinate
-	 * @param {number} y2 current Y coordinate
-	 * @param {boolean} attrs redraw also attributes
-	 */
-	private redrawOuterRect(x1: number, y1: number, x2: number, y2: number, attrs: boolean = true) {
-		x1 = Math.max(0, Math.floor(--x1 / 6) * 6);
-		x2 = Math.min(288, Math.ceil(++x2 / 6) * 6);
-		y1 = Math.max(0, (y1 & ~1) - 2);
-		y2 = Math.min(256, (y2 & ~1) + 2);
-
-		editor.pixel.redrawRect(x1, y1, (x2 - x1), (y2 - y1), attrs);
+		editor.pixel.redrawOuterRect(x1, y1, x2, y2, attrs);
 	}
 }

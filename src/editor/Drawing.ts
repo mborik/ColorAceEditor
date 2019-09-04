@@ -14,7 +14,7 @@ export class Drawing {
 	 *
 	 * @param {number} x coordinate in surface (0-287)
 	 * @param {number} y coordinate in surface (0-255)
-	 * @param {boolean} shouldRedraw (optional)
+	 * @param {boolean} shouldRedraw (optional) default true
 	 */
 	dot(x: number, y: number, shouldRedraw: boolean = true) {
 		editor.pixel.putPixel(x, y, editor.editMode, editor.editColor, shouldRedraw);
@@ -28,6 +28,7 @@ export class Drawing {
 	 * @param {number} x2 coordinate in surface (0-287)
 	 * @param {number} y2 coordinate in surface (0-255)
 	 * @param {boolean} drawFirst flag if it's needed to draw first point of line
+	 * @param {boolean} shouldRedraw (optional) default true
 	 */
 	line(x1: number, y1: number, x2: number, y2: number, drawFirst: boolean, shouldRedraw: boolean = true) {
 		const dx = Math.abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
@@ -54,6 +55,32 @@ export class Drawing {
 				y1 += sy;
 			}
 		}
+	}
+
+	/**
+	 * Brush drawing algorithm.
+	 *
+	 * @param {number} x coordinate in surface (0-287)
+	 * @param {number} y coordinate in surface (0-255)
+	 */
+	brush(x: number, y: number) {
+		const brushSize = Math.sqrt(editor.pixel.brush.length);
+
+		const cx1 = x - (brushSize >> 1);
+		const cy1 = y - (brushSize >> 1);
+		const cx2 = cx1 + brushSize - 1;
+		const cy2 = cy1 + brushSize - 1;
+
+		let i = 0;
+		for (y = cy1; y <= cy2; y++) {
+			for (x = cx1; x <= cx2; x++) {
+				if (editor.pixel.brush[i++]) {
+					this.dot(x, y, false);
+				}
+			}
+		}
+
+		editor.pixel.redrawOuterRect(cx1, cy1, cx2, cy2, !!editor.editColor);
 	}
 
 	/**

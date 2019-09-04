@@ -86,7 +86,7 @@ const SelectTools: React.FunctionComponent = () => {
 				{tools.map(t => (
 					<Tooltip
 						key={`${t.id}_TT`}
-						content={t.content}
+						content={t.enabled ? t.content : undefined}
 						disabled={!t.enabled}
 						position={Position.BOTTOM_RIGHT}
 						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>

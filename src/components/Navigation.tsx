@@ -10,6 +10,7 @@ import { Navbar, Icon } from "@blueprintjs/core";
 import Toolbar from './Toolbar';
 import DrawMode from './DrawMode';
 import FillShape from './FillShape';
+import BrushShape from './BrushShape';
 import SelectTools from './SelectTools';
 import Palette from './Palette';
 import FileMenu from './FileMenu';
@@ -26,6 +27,7 @@ const Navigation: React.FunctionComponent = () => {
 				<Toolbar />
 				<DrawMode />
 				<FillShape />
+				<BrushShape />
 				<SelectTools />
 			</fieldset>
 

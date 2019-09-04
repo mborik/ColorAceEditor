@@ -102,7 +102,7 @@ export class Pixelator {
 			DEFAULT_BRUSH
 			.replace(/\s/g, '')
 			.split('')
-			.map(v => v !== '.' ? 1 : 0)
+			.map(v => v !== '.' ? 255 : 0)
 		);
 
 		this.bmpBgColor = getComputedStyle(document.body)
@@ -230,6 +230,24 @@ export class Pixelator {
 	}
 
 	/**
+	 * Helper method to redraw "outer rectangle" (grown to whole attributes).
+	 *
+	 * @param {number} x1 top-left X coordinate in surface (0-287)
+	 * @param {number} y1 top-left Y coordinate in surface (0-255)
+	 * @param {number} x2 bottom-right X coordinate in surface (0-287)
+	 * @param {number} y2 bottom-right Y coordinate in surface (0-255)
+	 * @param {boolean} attrs (optional) Refresh color from attributes.
+	 */
+	redrawOuterRect(x1: number, y1: number, x2: number, y2: number, refreshAttributes?: boolean) {
+		x1 = Math.max(0, Math.floor(--x1 / 6) * 6);
+		x2 = Math.min(288, Math.ceil(++x2 / 6) * 6);
+		y1 = Math.max(0, (y1 & ~1) - 2);
+		y2 = Math.min(256, (y2 & ~1) + 2);
+
+		this.redrawRect(x1, y1, (x2 - x1), (y2 - y1), refreshAttributes);
+	}
+
+	/**
 	 * Redraws a selected rectangle region of the surface.
 	 *
 	 * @param {number} x coordinate in surface (0-287)
@@ -303,6 +321,7 @@ export class Pixelator {
 	 * @param {number} y coordinate in surface (0-255)
 	 * @param {EditorDrawMode} mode of drawing
 	 * @param {number} color 0 = no color change, 1 - 7 change to palette color
+	 * @param {boolean} shouldRedraw (optional) default true
 	 */
 	putPixel(x: number, y: number,
 		mode: EditorDrawMode = editor.editMode, color: number = editor.editColor,
