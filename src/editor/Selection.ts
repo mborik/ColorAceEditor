@@ -76,53 +76,6 @@ export class Selection implements SelectionObject {
 	};
 
 	/**
-	 * Offset rectangle by x,y coordinates.
-	 *
-	 * @param  {number} x offset
-	 * @param  {number} y offset
-	 * @return {Selection}
-	 */
-	offsetBy(x: number, y: number): Selection {
-		this.x1 += x;
-		this.y1 += y;
-		this.x2 += x;
-		this.y2 += y;
-
-		if (this.x1 > 287 || this.y1 > 255) {
-			return this.reset();
-		}
-		else if (this.x2 > 287 || this.y2 > 255) {
-			this.x2 = 287;
-			this.y2 = 255;
-			this.w = (this.x2 - this.x1) + 1;
-			this.h = (this.y2 - this.y1) + 1;
-		}
-
-		this.x0 = this.x1;
-		this.y0 = this.y1;
-
-		return this;
-	};
-
-	/**
-	 * Union a expand rectangle with another one.
-	 *
-	 * @param  {SelectionObject} obj
-	 * @return {Selection}
-	 */
-	unionWith(obj: SelectionObject): Selection {
-		this.x1 = Math.min(this.x1, obj.x1);
-		this.y1 = Math.min(this.y1, obj.y1);
-		this.x2 = Math.min(this.x2, obj.x2);
-		this.y2 = Math.min(this.y2, obj.y2);
-
-		this.w = (obj.x2 - obj.x1) + 1;
-		this.h = (obj.y2 - obj.y1) + 1;
-
-		return this;
-	}
-
-	/**
 	 * Test empty rectangle.
 	 *
 	 * @return {boolean}
@@ -165,5 +118,13 @@ export class Selection implements SelectionObject {
 		}
 
 		return 0;
+	}
+
+	testAttrBounds(): boolean {
+		return (
+			(Math.floor(this.x1 / 6) * 6) === this.x1 &&
+			(Math.ceil(this.x2 / 6) * 6) === (this.x2 + 1) &&
+			(this.y1 & 1) === 0 && (this.y2 & 1) === 1
+		);
 	}
 }

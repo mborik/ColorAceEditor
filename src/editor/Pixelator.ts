@@ -32,6 +32,7 @@ const DEFAULT_BRUSH = `
 export interface EditorSnapshot {
 	surface: Uint8ClampedArray;
 	attrs: Uint8ClampedArray;
+	type?: string;
 }
 
 export class EditorSnippet {
@@ -457,6 +458,22 @@ export class Pixelator {
 	}
 
 	/**
+	 * Return true if last snapshot was in given type.
+	 *
+	 * @param {string} type
+	 * @returns {boolean} operation result
+	 */
+	lastSnapshotOfType(type: string): boolean {
+		const len = this.snapshots.length;
+
+		if (len > 0 && this.snapshots[len - 1]['type'] === type) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Draw marquee for X coordinate.
 	 *
 	 * @param  {number} p pointer to bitmap
@@ -465,7 +482,7 @@ export class Pixelator {
 	 */
 	marqueeX(p: number, z: number, y: number) {
 		for (let i = 0; i < z; i++, y++) {
-			this.bmpDWORD[p] = (y & 4) ? FULL_ALPHA : (this.bmpDWORD[p] | MARQUEE_COLOR);
+			this.bmpDWORD[p] = (y & 4) ? FULL_ALPHA : (this.bmpDWORD[p] ^ MARQUEE_COLOR);
 			p += this.bmpW;
 		}
 	}
@@ -479,7 +496,7 @@ export class Pixelator {
 	 */
 	marqueeY(p: number, z: number, x: number) {
 		for (let i = 0; i < z; i++, x++, p++) {
-			this.bmpDWORD[p] = (x & 4) ? FULL_ALPHA : (this.bmpDWORD[p] | MARQUEE_COLOR);
+			this.bmpDWORD[p] = (x & 4) ? FULL_ALPHA : (this.bmpDWORD[p] ^ MARQUEE_COLOR);
 		}
 	}
 

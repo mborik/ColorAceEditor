@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
 import { IToastProps } from "@blueprintjs/core";
-import { getInstance as ColorAceEditor, EditorOptions, EditorTool, EditorDrawMode } from "../editor/Editor";
+import { getInstance as ColorAceEditor,
+	EditorOptions, EditorTool, EditorDrawMode, EditorShiftDir } from "../editor/Editor";
 import { EditorReducerState } from "../reducers/editor";
 
 export enum EditorAction {
@@ -16,6 +17,7 @@ export enum EditorAction {
 	SelectClear = 'SELECT_CLEAR',
 	SelectInvert = 'SELECT_INVERT',
 	SelectCopy = 'SELECT_COPY',
+	SelectShift = 'SELECT_SHIFT',
 	ViewportRefresh = 'VIEWPORT_REFRESH',
 	ViewportCleanup = 'VIEWPORT_CLEANUP',
 	ViewportZoom = 'VIEWPORT_ZOOM',
@@ -95,6 +97,26 @@ export const actionSelectCopy = (cut: boolean = false): EditorReducerAction => (
 	payload: { cut }
 });
 
+export const actionSelectShift = (direction: EditorShiftDir) =>
+	(dispatch: Dispatch, getState: () => EditorReducerState) => {
+		const editor = getState().editor;
+		if (!editor) {
+			return;
+		}
+
+		if (editor.editSelectFnShiftAttr && !editor.selection.testAttrBounds()) {
+			return dispatch(actionToast({
+				icon: 'new-grid-item',
+				message: 'Selection not fit to attributes!'
+			}));
+		}
+
+		return dispatch({
+			type: EditorAction.SelectShift,
+			payload: { direction }
+		});
+	};
+
 export const actionViewportZoom = (zoomDelta: number): EditorReducerAction => ({
 	type: EditorAction.ViewportZoom,
 	payload: { zoomDelta }
@@ -150,6 +172,7 @@ export const actionUploadFile = (file: File) =>
 		state.editor.upload(file)
 			.then(() => dispatch(actionRefresh()))
 			.catch((error: string) => dispatch(actionToast({
+				intent: 'danger',
 				message: error
 			})));
 	};

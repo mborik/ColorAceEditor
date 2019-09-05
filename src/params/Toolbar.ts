@@ -35,7 +35,7 @@ export const ToolbarItems: ToolbarItem[] = [{
 	title: 'selection',
 	hotkey: 'S'
 }, {
-	id: EditorTool.GridSelect,
+	id: EditorTool.AttrSelect,
 	icon: 'new-grid-item',
 	title: 'attr.selection',
 	hotkey: 'A'

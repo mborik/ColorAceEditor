@@ -6,13 +6,15 @@
  */
 
 import { IconName } from "@blueprintjs/core";
+import { EditorShiftDir } from "../editor/Editor";
 import {
 	EditorReducerAction,
 	actionSelectAll,
 	actionSelectNone,
 	actionSelectClear,
 	actionSelectInvert,
-	actionSelectCopy
+	actionSelectCopy,
+	actionSelectShift
 } from "../actions/editor";
 
 
@@ -127,22 +129,26 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 	id: 'TBSM_MOVE_UP',
 	icon: 'double-chevron-up',
 	text: 'Shift Up',
-	hotkey: 'mod+up'
+	hotkey: 'mod+up',
+	action: actionSelectShift(EditorShiftDir.UP) as any
 }, {
 	id: 'TBSM_MOVE_LEFT',
 	icon: 'double-chevron-left',
 	text: 'Shift Left',
-	hotkey: 'mod+left'
+	hotkey: 'mod+left',
+	action: actionSelectShift(EditorShiftDir.LT) as any
 }, {
 	id: 'TBSM_MOVE_RIGHT',
 	icon: 'double-chevron-right',
 	text: 'Shift Right',
-	hotkey: 'mod+right'
+	hotkey: 'mod+right',
+	action: actionSelectShift(EditorShiftDir.RT) as any
 }, {
 	id: 'TBSM_MOVE_DOWN',
 	icon: 'double-chevron-down',
 	text: 'Shift Down',
-	hotkey: 'mod+down'
+	hotkey: 'mod+down',
+	action: actionSelectShift(EditorShiftDir.DN) as any
 }, {
 	divider: true
 }, {

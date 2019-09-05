@@ -15,7 +15,7 @@ import { Scroller } from "scroller";
 
 export enum EditorTool {
 	Selection  = 'TBFN_SELECT',
-	GridSelect = 'TBFN_GRID',
+	AttrSelect = 'TBFN_ATTRSEL',
 	Pencil     = 'TBFN_PENCIL',
 	Brush      = 'TBFN_BRUSH',
 	Fill       = 'TBFN_FILL',
@@ -33,6 +33,13 @@ export enum EditorDrawMode {
 	Set   = 'TBDM_SET',
 	Over  = 'TBDM_OVER',
 	Color = 'TBDM_COLOR'
+}
+
+export enum EditorShiftDir {
+	UP = 'DIR_UP',
+	LT = 'DIR_LT',
+	RT = 'DIR_RT',
+	DN = 'DIR_DN'
 }
 
 type EditorSelectionActionFn = (nonEmpty: boolean) => {};

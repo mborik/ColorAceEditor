@@ -6,7 +6,7 @@
  */
 
 import { IHotkeyProps } from "@blueprintjs/core";
-import { Editor, EditorTool, EditorDrawMode } from "../editor/Editor";
+import { Editor, EditorTool, EditorDrawMode, EditorShiftDir } from "../editor/Editor";
 import { EditorReducerAction } from "../actions/editor";
 import {
 	actionToolChanged,
@@ -18,6 +18,7 @@ import {
 	actionSelectClear,
 	actionSelectInvert,
 	actionSelectCopy,
+	actionSelectShift,
 	actionViewportZoom,
 	actionViewportPan,
 	actionCancel,
@@ -29,7 +30,7 @@ import {
 
 const isSelection = (editor: Editor) => (
 	editor.editTool === EditorTool.Selection ||
-	editor.editTool === EditorTool.GridSelect
+	editor.editTool === EditorTool.AttrSelect
 );
 
 export type HotkeyItemAction = (editor: Editor, e: KeyboardEvent) => EditorReducerAction;
@@ -75,7 +76,7 @@ export const HotkeyItems: HotkeyItem[] = [
 		'1. Viewport',
 		'Scroll Up',
 		'up',
-		editor => editor.zoomFactor > 2 ? actionViewportPan({ x: 0, y: -editor.zoomFactor * 2 }) : null
+		editor => editor.zoomFactor > 2 ? actionViewportPan({ x: 0, y: -editor.zoomFactor * 6 }) : null
 	),
 	new HotkeyItem(
 		'1. Viewport',
@@ -93,7 +94,7 @@ export const HotkeyItems: HotkeyItem[] = [
 		'1. Viewport',
 		'Scroll Down',
 		'down',
-		editor => editor.zoomFactor > 2 ? actionViewportPan({ x: 0, y: editor.zoomFactor * 2 }) : null
+		editor => editor.zoomFactor > 2 ? actionViewportPan({ x: 0, y: editor.zoomFactor * 6 }) : null
 	),
 	new HotkeyItem(
 		'2. Tools',
@@ -105,7 +106,7 @@ export const HotkeyItems: HotkeyItem[] = [
 		'2. Tools',
 		'Attribute selection',
 		'A',
-		() => actionToolChanged(EditorTool.GridSelect)
+		() => actionToolChanged(EditorTool.AttrSelect)
 	),
 	new HotkeyItem(
 		'2. Tools',
@@ -274,25 +275,25 @@ export const HotkeyItems: HotkeyItem[] = [
 		'5. Selection',
 		'Shift Up',
 		'mod+up',
-		() => null
+		() => actionSelectShift(EditorShiftDir.UP) as any
 	),
 	new HotkeyItem(
 		'5. Selection',
 		'Shift Left',
 		'mod+left',
-		() => null
+		() => actionSelectShift(EditorShiftDir.LT) as any
 	),
 	new HotkeyItem(
 		'5. Selection',
 		'Shift Right',
 		'mod+right',
-		() => null
+		() => actionSelectShift(EditorShiftDir.RT) as any
 	),
 	new HotkeyItem(
 		'5. Selection',
 		'Shift Down',
 		'mod+down',
-		() => null
+		() => actionSelectShift(EditorShiftDir.DN) as any
 	),
 	new HotkeyItem(
 		'6. Operations',

@@ -37,7 +37,7 @@ const SelectTools: React.FunctionComponent = () => {
 		return {
 			selection: (
 				editor.editTool === EditorTool.Selection ||
-				editor.editTool === EditorTool.GridSelect
+				editor.editTool === EditorTool.AttrSelect
 			),
 			tools: SelectToolItems.map(tool => ({
 				...tool,

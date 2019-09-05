@@ -1,6 +1,6 @@
 /*
  * PMD 85 ColorAce picture editor
- * ColorAceEditor.Handler - translate mouse handlers to function by selected function
+ * ColorAceEditor.ActionHandler - mouse and action handlers
  *
  * Copyright (c) 2014-2019 Martin Bórik
  */
@@ -9,9 +9,10 @@ import React from 'react';
 import { debounce } from "typescript-debounce-decorator";
 import { editor, EditorTool, EditorDrawMode } from "./Editor";
 import { EditorSnapshot, EditorSnippet } from './Pixelator';
+import { ActionShifts } from './ActionShifts';
 
 
-export class ActionHandler {
+export class ActionHandler extends ActionShifts {
 	private mouseNotMoved: boolean = true;
 	private mouseBtnFlag: number = 0;
 	private lastPixelX: number = 0;
@@ -46,8 +47,8 @@ export class ActionHandler {
 					editor.refresh();
 					break;
 				}
-				case EditorTool.GridSelect: {
-					editor.selection.reset(Math.floor(x / 6) * 6, y);
+				case EditorTool.AttrSelect: {
+					editor.selection.reset(Math.floor(x / 6) * 6, y & ~1);
 					editor.refresh();
 					break;
 				}
@@ -118,16 +119,16 @@ export class ActionHandler {
 						const { x0, y0 } = editor.selection;
 						editor.selection.set(x0, y0, x - 1, y - 1);
 
-						this.redrawMouseActionRect(x, y, false);
+						this._redrawMouseActionRect(x, y, false);
 					}
 					break;
 				}
-				case EditorTool.GridSelect: {
+				case EditorTool.AttrSelect: {
 					if (!this.mouseNotMoved) {
 						const { x0, y0 } = editor.selection;
-						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
+						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y | 1);
 
-						this.redrawMouseActionRect(x, y, false);
+						this._redrawMouseActionRect(x, y, false);
 					}
 					break;
 				}
@@ -156,7 +157,7 @@ export class ActionHandler {
 						x, y, true, false
 					);
 
-					this.redrawMouseActionRect(x, y);
+					this._redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Ellipse: {
@@ -167,7 +168,7 @@ export class ActionHandler {
 						x, y, editor.editFilled
 					);
 
-					this.redrawMouseActionRect(x, y);
+					this._redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Rectangle: {
@@ -178,7 +179,7 @@ export class ActionHandler {
 						x, y, editor.editFilled
 					);
 
-					this.redrawMouseActionRect(x, y);
+					this._redrawMouseActionRect(x, y);
 					break;
 				}
 			}
@@ -212,18 +213,18 @@ export class ActionHandler {
 						const { x0, y0 } = editor.selection;
 						editor.selection.set(x0, y0, x - 1, y - 1);
 
-						this.redrawMouseActionRect(x, y, false);
+						this._redrawMouseActionRect(x, y, false);
 					}
 
 					editor.selectionActionCallback(editor.selection.nonEmpty());
 					break;
 				}
-				case EditorTool.GridSelect: {
+				case EditorTool.AttrSelect: {
 					if (!this.mouseNotMoved) {
 						const { x0, y0 } = editor.selection;
-						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y - 1);
+						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y | 1);
 
-						this.redrawMouseActionRect(x, y, false);
+						this._redrawMouseActionRect(x, y, false);
 					}
 
 					editor.selectionActionCallback(editor.selection.nonEmpty());
@@ -260,7 +261,7 @@ export class ActionHandler {
 						x, y, true, false
 					);
 
-					this.redrawMouseActionRect(x, y);
+					this._redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Ellipse: {
@@ -271,7 +272,7 @@ export class ActionHandler {
 						x, y, editor.editFilled
 					);
 
-					this.redrawMouseActionRect(x, y);
+					this._redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Rectangle: {
@@ -282,7 +283,7 @@ export class ActionHandler {
 						x, y, editor.editFilled
 					);
 
-					this.redrawMouseActionRect(x, y);
+					this._redrawMouseActionRect(x, y);
 					break;
 				}
 			}
@@ -363,7 +364,7 @@ export class ActionHandler {
 
 			this.startPixelX = x1;
 			this.startPixelY = y1;
-			this.redrawMouseActionRect(x2, y2);
+			this._redrawMouseActionRect(x2, y2);
 		}
 	}
 
@@ -483,7 +484,7 @@ export class ActionHandler {
 	 * @param {number} y2 current Y coordinate
 	 * @param {boolean} attrs redraw also attributes
 	 */
-	private redrawMouseActionRect(x2: number, y2: number, attrs: boolean = true) {
+	private _redrawMouseActionRect(x2: number, y2: number, attrs: boolean = true) {
 		let x1: number, y1: number;
 
 		if (this.startPixelX > x2) {

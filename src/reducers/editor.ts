@@ -76,6 +76,10 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			editor.action.createSnippet(action.payload.cut);
 			break;
 
+		case EditorAction.SelectShift:
+			editor.action.shiftSelection(action.payload.direction);
+			break;
+
 		case EditorAction.ViewportRefresh:
 			editor.refresh();
 			break;

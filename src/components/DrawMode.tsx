@@ -29,7 +29,7 @@ const DrawMode: React.FunctionComponent = () => {
 		return {
 			noSelection: (
 				editor.editTool !== EditorTool.Selection &&
-				editor.editTool !== EditorTool.GridSelect
+				editor.editTool !== EditorTool.AttrSelect
 			),
 			modes: DrawModeItems.map(mode => ({
 				...mode,

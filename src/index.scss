@@ -14,7 +14,7 @@ body {
 	overflow: hidden;
 
 	&.#{$ns}-dark {
-		background-color: $black;
+		background-color: $dark-gray1;
 	}
 
 	.#{$ns}-disabled {
