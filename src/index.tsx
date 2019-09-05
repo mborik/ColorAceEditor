@@ -14,7 +14,6 @@ import thunkMiddleware from 'redux-thunk';
 
 import App from './components/App';
 import { editorReducer } from './reducers/editor';
-import * as serviceWorker from './serviceWorker';
 import './index.scss';
 
 
@@ -22,10 +21,8 @@ const dev: boolean = (!process.env.NODE_ENV || process.env.NODE_ENV === 'develop
 
 const store = createStore(
 	editorReducer,
-	applyMiddleware(
-		thunkMiddleware,
-		...(dev ? [ createLogger() ] : [])
-	)
+	dev ? applyMiddleware(thunkMiddleware, createLogger()) :
+		applyMiddleware(thunkMiddleware)
 );
 
 ReactDOM.render(
@@ -34,10 +31,3 @@ ReactDOM.render(
 	</Provider>,
 	document.getElementById('wrapper')
 );
-
-// in production we want to work offline and load faster...
-if (dev) {
-	serviceWorker.unregister();
-} else {
-	serviceWorker.register();
-}

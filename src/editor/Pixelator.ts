@@ -397,7 +397,7 @@ export class Pixelator {
 	 */
 	getPixel(x: number, y: number): number {
 		if (x < 0 || x >= 288 || y < 0 || y >= 256) {
-			return 0;
+			return -1;
 		}
 
 		let a1 = Math.floor((y * 48) + Math.floor(x / 6));

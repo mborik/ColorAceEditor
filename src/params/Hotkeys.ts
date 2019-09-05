@@ -127,6 +127,12 @@ export const HotkeyItems: HotkeyItem[] = [
 	),
 	new HotkeyItem(
 		'2. Tools',
+		'Fill',
+		'F',
+		() => actionToolChanged(EditorTool.Fill)
+	),
+	new HotkeyItem(
+		'2. Tools',
 		'Ellipse',
 		'E',
 		() => actionToolChanged(EditorTool.Ellipse)

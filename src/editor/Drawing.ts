@@ -5,7 +5,7 @@
  * Copyright (c) 2012-2019 Martin Bórik
  */
 
-import { editor } from "./Editor";
+import { editor, EditorDrawMode } from "./Editor";
 
 
 export class Drawing {
@@ -79,6 +79,78 @@ export class Drawing {
 				}
 			}
 		}
+
+		editor.pixel.redrawOuterRect(cx1, cy1, cx2, cy2, !!editor.editColor);
+	}
+
+	/**
+	 * Flood-fill algorithm inspired by http://rosettacode.org/wiki/Bitmap/Flood_fill.
+	 *
+	 * @param {number} x coordinate in surface (0-287)
+	 * @param {number} y coordinate in surface (0-255)
+	 */
+	floodFill(sx: number, sy: number) {
+		let cx1 = sx, cy1 = sy, cx2 = sx, cy2 = sy;
+
+		let mode = editor.editMode;
+		let set: boolean = !!editor.pixel.getPixel(sx, sy);
+
+		if (mode === EditorDrawMode.Over) {
+			mode = set ? EditorDrawMode.Reset : EditorDrawMode.Set;
+		}
+
+		const test = (x: number, y: number) => (!editor.pixel.getPixel(x, y) === set);
+		const visited = new Set<number>();
+		const queue: WebKitPoint[] = [];
+		let point: WebKitPoint = { x: sx, y: sy };
+
+		do {
+			let x = point.x;
+			let y = point.y;
+
+			while (x > 0 && !test(x - 1, y)) {
+				x--;
+			}
+
+			let spanUp = false;
+			let spanDown = false;
+
+			while (visited.size < visited.add(y | (x << 8)).size && x < 288 && !test(x, y)) {
+				editor.pixel.putPixel(x, y, mode, editor.editColor, false);
+
+				if (x < cx1) {
+					cx1 = x;
+				} else if (x > cx2) {
+					cx2 = x;
+				}
+				if (y < cy1) {
+					cy1 = y;
+				} else if (y > cy2) {
+					cy2 = y;
+				}
+
+				if (!spanUp && y > 0 && !test(x, y - 1)) {
+					queue.push({ x, y: y - 1 });
+					spanUp = true;
+				}
+				else if (spanUp && y > 0 && !!test(x, y - 1)) {
+					spanUp = false;
+				}
+
+				if (!spanDown && y < 255 && !test(x, y + 1)) {
+					queue.push({ x, y: y + 1 });
+					spanDown = true;
+				}
+				else if (spanDown && y < 255 && !!test(x, y + 1)) {
+					spanDown = false;
+				}
+
+				x++;
+			}
+
+			point = queue.shift();
+
+		} while (point != null);
 
 		editor.pixel.redrawOuterRect(cx1, cy1, cx2, cy2, !!editor.editColor);
 	}

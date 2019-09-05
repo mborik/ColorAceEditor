@@ -62,6 +62,7 @@ export class ActionHandler {
 					editor.draw.brush(x, y);
 					break;
 				}
+				case EditorTool.Fill:
 				case EditorTool.Ellipse:
 				case EditorTool.Rectangle:
 					this.actionSnapshot = editor.pixel.doSnapshot();
@@ -241,6 +242,13 @@ export class ActionHandler {
 						(this.lastPixelX !== x || this.lastPixelY !== y)) {
 
 						editor.draw.brush(x, y);
+					}
+					break;
+				}
+				case EditorTool.Fill: {
+					if (this.startPixelX === x || this.startPixelY === y) {
+						editor.draw.floodFill(x, y);
+						editor.refresh();
 					}
 					break;
 				}
