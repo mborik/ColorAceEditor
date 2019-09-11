@@ -114,6 +114,7 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 		}
 
 		case EditorAction.Toast:
+			toast.clear();
 			toast.show(action.payload);
 			break;
 

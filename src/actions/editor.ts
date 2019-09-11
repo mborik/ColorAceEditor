@@ -174,5 +174,9 @@ export const actionUploadFile = (file: File) =>
 			.catch((error: string) => dispatch(actionToast({
 				intent: 'danger',
 				message: error
-			})));
+			})))
+			.finally(() => {
+				// wipe the last loaded file to allow reopen of same file again...
+				(document.getElementById('uploadFile') as any).value = null;
+			});
 	};
