@@ -100,7 +100,7 @@ export class ActionHandler extends ActionShifts {
 		editor.redrawStatusBar(x, y, column);
 
 		if (this.activeSnippet != null) {
-			this.placeSnippetTo(x, y, editor.editSelectFnBlockAttr);
+			this._placeSnippetTo(x, y);
 
 		} else if (this.mouseBtnFlag === 2) {
 			this.mouseNotMoved = false;
@@ -348,7 +348,7 @@ export class ActionHandler extends ActionShifts {
 	 * @param {boolean} invert (optional)
 	 */
 	fillSelection(resetAttrs: boolean = false, invert: boolean = false) {
-		if (editor.selection.nonEmpty()) {
+		if (!this.isActionInProgress() && editor.selection.nonEmpty()) {
 			const { x1, y1, x2, y2 } = editor.selection;
 
 			editor.pixel.doSnapshot();
@@ -404,12 +404,19 @@ export class ActionHandler extends ActionShifts {
 	}
 
 	/**
+	 * Return true if some operation is in progress.
+	 */
+	isActionInProgress(): boolean {
+		return (this.mouseBtnFlag === 1 || this.activeSnippet != null);
+	}
+
+	/**
 	 * Create snippet with all pixel color data of given selection.
 	 *
 	 * @param {boolean} cut (optional) clear selection after copy
 	 */
 	createSnippet(cut: boolean = false) {
-		if (editor.selection.nonEmpty()) {
+		if (!this.isActionInProgress() && editor.selection.nonEmpty()) {
 			editor.pixel.doSnapshot();
 
 			const { x1, y1, x2, y2, w, h } = editor.selection;
@@ -434,10 +441,13 @@ export class ActionHandler extends ActionShifts {
 				editor.pixel.redrawOuterRect(x1, y1, x2, y2);
 			}
 
-			this.placeSnippetTo(
-				this.lastPixelX, this.lastPixelY,
-				editor.editSelectFnBlockAttr
-			);
+			this._placeSnippetTo(this.lastPixelX, this.lastPixelY);
+		}
+	}
+
+	doAfterModeChanged() {
+		if (this.activeSnippet != null && editor.selection.nonEmpty()) {
+			this._placeSnippetTo(this.lastPixelX, this.lastPixelY);
 		}
 	}
 
@@ -446,13 +456,22 @@ export class ActionHandler extends ActionShifts {
 	 *
 	 * @param {number} sx
 	 * @param {number} sy
-	 * @param {boolean} attrs (optional) - flag if attributes will be modified
 	 */
-	private placeSnippetTo(sx: number, sy: number, attrs: boolean = false) {
+	private _placeSnippetTo(sx: number, sy: number) {
 		editor.pixel.undo(this.actionSnapshot);
 
 		sx -= (this.activeSnippet.width >> 1);
 		sy -= (this.activeSnippet.height >> 1);
+
+		// flag if attributes will be modified
+		const attrs = editor.editSelectFnBlockAttr;
+		const mode = editor.editMode;
+
+		const cSet = EditorDrawMode.Set;
+		const cRes = EditorDrawMode.Reset;
+		const isSet = (mode === cSet);
+		const isRes = (mode === cRes);
+		const isCol = (mode === EditorDrawMode.Color);
 
 		const sx2 = sx + this.activeSnippet.width - 1;
 		const sy2 = sy + this.activeSnippet.height - 1;
@@ -462,12 +481,24 @@ export class ActionHandler extends ActionShifts {
 			for (x = sx; x <= sx2; x++) {
 				c = this.activeSnippet.data[i++];
 
-				editor.pixel.putPixel(
-					x, y,
-					c ? EditorDrawMode.Set : EditorDrawMode.Reset,
-					attrs ? c : 0,
-					false
-				);
+				if (isCol && attrs) {
+					editor.pixel.putPixel(x, y, mode, c, false);
+
+				} else if (isSet) {
+					editor.pixel.putPixel(
+						x, y,
+						(c ? cSet : cRes),
+						(attrs ? c : 0),
+						false
+					);
+				} else if (c) {
+					editor.pixel.putPixel(
+						x, y,
+						isRes ? cRes : cSet,
+						attrs ? c : 0,
+						false
+					);
+				}
 			}
 		}
 

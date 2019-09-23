@@ -20,6 +20,7 @@ const defaultState: EditorReducerState = {
 
 export const editorReducer = (state = defaultState, action: any): EditorReducerState => {
 	const editor: Editor = state.editor;
+	const noActionInProgress = !(editor && editor.action.isActionInProgress());
 
 	switch (action.type) {
 		case EditorAction.InitEditorInstance:
@@ -29,15 +30,20 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			};
 
 		case EditorAction.ToolChanged:
-			editor.editTool = action.payload.editTool;
+			if (noActionInProgress) {
+				editor.editTool = action.payload.editTool;
+			}
 			break;
 
 		case EditorAction.ColorChanged:
-			editor.editColor = action.payload.editColor;
+			if (noActionInProgress) {
+				editor.editColor = action.payload.editColor;
+			}
 			break;
 
 		case EditorAction.DrawModeChanged:
 			editor.editMode = action.payload.editMode;
+			editor.action.doAfterModeChanged();
 			break;
 
 		case EditorAction.FillShapeChanged:
@@ -51,13 +57,15 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 		}
 
 		case EditorAction.SelectAll: {
-			editor.selection.set(0, 0, 287, 255);
-			editor.refresh();
+			if (noActionInProgress) {
+				editor.selection.set(0, 0, 287, 255);
+				editor.refresh();
+			}
 			break;
 		}
 
 		case EditorAction.SelectNone: {
-			if (editor.selection.nonEmpty()) {
+			if (noActionInProgress && editor.selection.nonEmpty()) {
 				editor.selection.reset();
 				editor.refresh();
 			}
@@ -77,7 +85,9 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			break;
 
 		case EditorAction.SelectShift:
-			editor.action.shiftSelection(action.payload.direction);
+			if (noActionInProgress) {
+				editor.action.shiftSelection(action.payload.direction);
+			}
 			break;
 
 		case EditorAction.ViewportRefresh:
@@ -107,7 +117,7 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			break;
 
 		case EditorAction.Undo: {
-			if (editor.pixel.undo()) {
+			if (noActionInProgress && editor.pixel.undo()) {
 				editor.refresh();
 			}
 			break;

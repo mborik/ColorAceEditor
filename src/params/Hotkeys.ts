@@ -28,11 +28,6 @@ import {
 } from "../actions/editor";
 
 
-const isSelection = (editor: Editor) => (
-	editor.editTool === EditorTool.Selection ||
-	editor.editTool === EditorTool.AttrSelect
-);
-
 export type HotkeyItemAction = (editor: Editor, e: KeyboardEvent) => EditorReducerAction;
 
 export class HotkeyItem implements IHotkeyProps {
@@ -154,23 +149,22 @@ export const HotkeyItems: HotkeyItem[] = [
 		'3. Draw mode',
 		'Over',
 		'Z',
-		editor => isSelection(editor) ? null :
-			actionDrawModeChanged(EditorDrawMode.Over)
+		editor => actionDrawModeChanged(EditorDrawMode.Over)
 	),
 	new HotkeyItem(
 		'3. Draw mode',
 		'Set / Reset',
 		'X',
-		editor => isSelection(editor) ? null :
-			actionDrawModeChanged((editor.editMode === EditorDrawMode.Set ?
-				EditorDrawMode.Reset : EditorDrawMode.Set))
+		editor => actionDrawModeChanged(
+			(editor.editMode === EditorDrawMode.Set) ?
+				EditorDrawMode.Reset : EditorDrawMode.Set
+		)
 	),
 	new HotkeyItem(
 		'3. Draw mode',
 		'Colorize',
 		'C',
-		editor => isSelection(editor) ? null :
-			actionDrawModeChanged(EditorDrawMode.Color)
+		editor => actionDrawModeChanged(EditorDrawMode.Color)
 	),
 	new HotkeyItem(
 		'3. Draw mode',

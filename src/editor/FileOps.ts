@@ -69,7 +69,7 @@ export class FileOps {
 
 						img.onload = () => {
 							if (img.width > 288 || img.height > 256) {
-								reject('invalid image dimensions');
+								return reject('invalid image dimensions');
 							}
 
 							editor.pixel.doSnapshot();
