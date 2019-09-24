@@ -7,12 +7,12 @@
 
 import React from 'react';
 import { debounce } from "typescript-debounce-decorator";
+import { ActionShiftFlip } from './ActionShiftFlip';
 import { editor, EditorTool, EditorDrawMode } from "./Editor";
 import { EditorSnapshot, EditorSnippet } from './Pixelator';
-import { ActionShifts } from './ActionShifts';
 
 
-export class ActionHandler extends ActionShifts {
+export class ActionHandler extends ActionShiftFlip {
 	private mouseNotMoved: boolean = true;
 	private mouseBtnFlag: number = 0;
 	private lastPixelX: number = 0;

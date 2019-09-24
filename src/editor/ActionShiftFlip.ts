@@ -1,36 +1,122 @@
 /*
  * PMD 85 ColorAce picture editor
- * ColorAceEditor.ActionShifts - selection shift functions
+ * ColorAceEditor.ActionShiftFlip - selection shift functions
  *
  * Copyright (c) 2019 Martin Bórik
  */
 
-import { editor, EditorShiftDir } from "./Editor";
+import { editor, EditorDirection } from "./Editor";
 import { Selection } from "./Selection";
 
 
-export class ActionShifts {
+export class ActionShiftFlip {
 	/**
-	 * Shift direction and settings are transformed to specific shift method.
+	 * Transform shift or flip direction (and settings) to specific handler method.
 	 *
-	 * @param {EditorShiftDir} dir - shift direction
+	 * @param {EditorDirection} dir - shift direction
 	 */
-	shiftSelection(dir: EditorShiftDir) {
+	shiftFlipSelection(dir: EditorDirection) {
 		const s = editor.selection;
 
 		if (s.nonEmpty()) {
-			const type = `SHIFT_${dir}_${
-				editor.editSelectFnShiftAttr ? 'ATTR' : 'PIXS'
-			}_${editor.editSelectFnShiftWrap ? 'WRAP' : 'ROLL'}`;
-
-			if (!editor.pixel.lastSnapshotOfType(type)) {
-				const snap = editor.pixel.doSnapshot();
-				snap.type = type;
+			if (dir === EditorDirection.FH) {
+				this._flipHorizontal();
+			} else if (dir === EditorDirection.FV) {
+				this._flipVertical();
+			} else {
+				this._shiftSelection(dir);
 			}
 
-			this._shifters[type.substr(0, 16)](s);
 			editor.pixel.redrawRect(s.x1, s.y1, s.x2, s.y2, true);
 		}
+	}
+
+//- flip functions ----------------------------------------------------------------------
+	private _flipHorizontal() {
+		const { x1, y1, x2, y2 } = editor.selection;
+		let fl: number;
+
+		let pixPtr = y1 * 288;
+		for (let y = y1; y < y2; y++, pixPtr += 288) {
+			let lb = x1, rb = x2;
+
+			while (lb < rb) {
+				fl = editor.pixel.surface[pixPtr + rb];
+				editor.pixel.surface[pixPtr + rb] = editor.pixel.surface[pixPtr + lb];
+				editor.pixel.surface[pixPtr + lb] = fl;
+
+				++lb;
+				--rb;
+			}
+
+			if (editor.editSelectFnShiftAttr) {
+				const atrPtr = pixPtr / 6;
+
+				lb = x1 / 6;
+				rb = Math.floor((x2 - 5) / 6);
+
+				while (lb < rb) {
+					fl = editor.pixel.attrs[atrPtr + rb];
+					editor.pixel.attrs[atrPtr + rb] = editor.pixel.attrs[atrPtr + lb];
+					editor.pixel.attrs[atrPtr + lb] = fl;
+
+					++lb;
+					--rb;
+				}
+			}
+		}
+	}
+
+	private _flipVertical() {
+		const { x1, y1, x2, y2 } = editor.selection;
+		let fl: number;
+
+		for (let x = x1; x < x2; x++) {
+			let tPtr = y1 * 288, bPtr = y2 * 288;
+
+			while (tPtr < bPtr) {
+				fl = editor.pixel.surface[bPtr + x];
+				editor.pixel.surface[bPtr + x] = editor.pixel.surface[tPtr + x];
+				editor.pixel.surface[tPtr + x] = fl;
+
+				tPtr += 288;
+				bPtr -= 288;
+			}
+
+			if (editor.editSelectFnShiftAttr && !(x % 6)) {
+				const c = Math.floor(x / 6);
+
+				tPtr = y1 * 48;
+				bPtr = y2 * 48;
+
+				while (tPtr < bPtr) {
+					fl = editor.pixel.attrs[bPtr + c - 48];
+					editor.pixel.attrs[bPtr + c - 48] = editor.pixel.attrs[tPtr + c];
+					editor.pixel.attrs[tPtr + c] = fl;
+
+					fl = editor.pixel.attrs[bPtr + c];
+					editor.pixel.attrs[bPtr + c] = editor.pixel.attrs[tPtr + c + 48];
+					editor.pixel.attrs[tPtr + c + 48] = fl;
+
+					tPtr += 96;
+					bPtr -= 96;
+				}
+			}
+		}
+	}
+
+//- shift functions ---------------------------------------------------------------------
+	private _shiftSelection(dir: EditorDirection) {
+		const type = `SHIFT_${dir}_${
+			editor.editSelectFnShiftAttr ? 'ATTR' : 'PIXS'
+		}_${editor.editSelectFnShiftWrap ? 'WRAP' : 'ROLL'}`;
+
+		if (!editor.pixel.lastSnapshotOfType(type)) {
+			const snap = editor.pixel.doSnapshot();
+			snap.type = type;
+		}
+
+		this._shifters[type.substr(0, 16)](editor.selection);
 	}
 
 	private _shifters: { [key: string]: (s: Selection) => void } = {

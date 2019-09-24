@@ -6,7 +6,7 @@
  */
 
 import { IconName } from "@blueprintjs/core";
-import { EditorShiftDir } from "../editor/Editor";
+import { EditorDirection } from "../editor/Editor";
 import {
 	EditorReducerAction,
 	actionSelectAll,
@@ -118,11 +118,13 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 }, {
 	id: 'TBSM_FLIP_H',
 	icon: 'double-caret-horizontal',
-	text: 'Flip Horizontal'
+	text: 'Flip Horizontal',
+	action: actionSelectShift(EditorDirection.FH) as any
 }, {
 	id: 'TBSM_FLIP_V',
 	icon: 'double-caret-vertical',
-	text: 'Flip Hertical'
+	text: 'Flip Vertical',
+	action: actionSelectShift(EditorDirection.FV) as any
 }, {
 	divider: true
 }, {
@@ -130,25 +132,25 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 	icon: 'double-chevron-up',
 	text: 'Shift Up',
 	hotkey: 'mod+up',
-	action: actionSelectShift(EditorShiftDir.UP) as any
+	action: actionSelectShift(EditorDirection.UP) as any
 }, {
 	id: 'TBSM_MOVE_LEFT',
 	icon: 'double-chevron-left',
 	text: 'Shift Left',
 	hotkey: 'mod+left',
-	action: actionSelectShift(EditorShiftDir.LT) as any
+	action: actionSelectShift(EditorDirection.LT) as any
 }, {
 	id: 'TBSM_MOVE_RIGHT',
 	icon: 'double-chevron-right',
 	text: 'Shift Right',
 	hotkey: 'mod+right',
-	action: actionSelectShift(EditorShiftDir.RT) as any
+	action: actionSelectShift(EditorDirection.RT) as any
 }, {
 	id: 'TBSM_MOVE_DOWN',
 	icon: 'double-chevron-down',
 	text: 'Shift Down',
 	hotkey: 'mod+down',
-	action: actionSelectShift(EditorShiftDir.DN) as any
+	action: actionSelectShift(EditorDirection.DN) as any
 }, {
 	divider: true
 }, {
@@ -161,7 +163,7 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 }, {
 	id: 'TBSM_CHECKBOX_ATTRS',
 	icon: 'split-columns',
-	text: 'Shift by attributes',
+	text: 'Shift / flip by attributes',
 	checkbox: true,
 	checkboxProperty: 'editSelectFnShiftAttr'
 }, {

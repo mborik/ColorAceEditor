@@ -6,7 +6,7 @@
  */
 
 import { IHotkeyProps } from "@blueprintjs/core";
-import { Editor, EditorTool, EditorDrawMode, EditorShiftDir } from "../editor/Editor";
+import { Editor, EditorTool, EditorDrawMode, EditorDirection } from "../editor/Editor";
 import { EditorReducerAction } from "../actions/editor";
 import {
 	actionToolChanged,
@@ -269,25 +269,25 @@ export const HotkeyItems: HotkeyItem[] = [
 		'5. Selection',
 		'Shift Up',
 		'mod+up',
-		() => actionSelectShift(EditorShiftDir.UP) as any
+		() => actionSelectShift(EditorDirection.UP) as any
 	),
 	new HotkeyItem(
 		'5. Selection',
 		'Shift Left',
 		'mod+left',
-		() => actionSelectShift(EditorShiftDir.LT) as any
+		() => actionSelectShift(EditorDirection.LT) as any
 	),
 	new HotkeyItem(
 		'5. Selection',
 		'Shift Right',
 		'mod+right',
-		() => actionSelectShift(EditorShiftDir.RT) as any
+		() => actionSelectShift(EditorDirection.RT) as any
 	),
 	new HotkeyItem(
 		'5. Selection',
 		'Shift Down',
 		'mod+down',
-		() => actionSelectShift(EditorShiftDir.DN) as any
+		() => actionSelectShift(EditorDirection.DN) as any
 	),
 	new HotkeyItem(
 		'6. Operations',

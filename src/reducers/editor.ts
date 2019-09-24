@@ -84,9 +84,9 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			editor.action.createSnippet(action.payload.cut);
 			break;
 
-		case EditorAction.SelectShift:
+		case EditorAction.SelectShiftFlip:
 			if (noActionInProgress) {
-				editor.action.shiftSelection(action.payload.direction);
+				editor.action.shiftFlipSelection(action.payload.direction);
 			}
 			break;
 

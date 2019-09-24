@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import { IToastProps } from "@blueprintjs/core";
 import { getInstance as ColorAceEditor,
-	EditorOptions, EditorTool, EditorDrawMode, EditorShiftDir } from "../editor/Editor";
+	EditorOptions, EditorTool, EditorDrawMode, EditorDirection } from "../editor/Editor";
 import { EditorReducerState } from "../reducers/editor";
 
 export enum EditorAction {
@@ -17,7 +17,7 @@ export enum EditorAction {
 	SelectClear = 'SELECT_CLEAR',
 	SelectInvert = 'SELECT_INVERT',
 	SelectCopy = 'SELECT_COPY',
-	SelectShift = 'SELECT_SHIFT',
+	SelectShiftFlip = 'SELECT_SHIFTFLIP',
 	ViewportRefresh = 'VIEWPORT_REFRESH',
 	ViewportCleanup = 'VIEWPORT_CLEANUP',
 	ViewportZoom = 'VIEWPORT_ZOOM',
@@ -97,7 +97,7 @@ export const actionSelectCopy = (cut: boolean = false): EditorReducerAction => (
 	payload: { cut }
 });
 
-export const actionSelectShift = (direction: EditorShiftDir) =>
+export const actionSelectShift = (direction: EditorDirection) =>
 	(dispatch: Dispatch, getState: () => EditorReducerState) => {
 		const editor = getState().editor;
 		if (!editor) {
@@ -112,7 +112,7 @@ export const actionSelectShift = (direction: EditorShiftDir) =>
 		}
 
 		return dispatch({
-			type: EditorAction.SelectShift,
+			type: EditorAction.SelectShiftFlip,
 			payload: { direction }
 		});
 	};

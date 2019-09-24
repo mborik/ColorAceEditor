@@ -35,11 +35,15 @@ export enum EditorDrawMode {
 	Color = 'TBDM_COLOR'
 }
 
-export enum EditorShiftDir {
+export enum EditorDirection {
+	// shifts
 	UP = 'DIR_UP',
 	LT = 'DIR_LT',
 	RT = 'DIR_RT',
-	DN = 'DIR_DN'
+	DN = 'DIR_DN',
+	// flips
+	FH = 'FLIP_H',
+	FV = 'FLIP_V'
 }
 
 type EditorSelectionActionFn = (nonEmpty: boolean) => {};
