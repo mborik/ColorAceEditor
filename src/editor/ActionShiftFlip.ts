@@ -20,9 +20,13 @@ export class ActionShiftFlip {
 
 		if (s.nonEmpty()) {
 			if (dir === EditorDirection.FH) {
+				editor.pixel.doSnapshot();
 				this._flipHorizontal();
+
 			} else if (dir === EditorDirection.FV) {
+				editor.pixel.doSnapshot();
 				this._flipVertical();
+
 			} else {
 				this._shiftSelection(dir);
 			}
@@ -37,7 +41,7 @@ export class ActionShiftFlip {
 		let fl: number;
 
 		let pixPtr = y1 * 288;
-		for (let y = y1; y < y2; y++, pixPtr += 288) {
+		for (let y = y1; y <= y2; y++, pixPtr += 288) {
 			let lb = x1, rb = x2;
 
 			while (lb < rb) {
@@ -52,7 +56,7 @@ export class ActionShiftFlip {
 			if (editor.editSelectFnShiftAttr) {
 				const atrPtr = pixPtr / 6;
 
-				lb = x1 / 6;
+				lb = Math.floor(x1 / 6);
 				rb = Math.floor((x2 - 5) / 6);
 
 				while (lb < rb) {
@@ -68,39 +72,42 @@ export class ActionShiftFlip {
 	}
 
 	private _flipVertical() {
-		const { x1, y1, x2, y2 } = editor.selection;
-		let fl: number;
+		const { x1, y1, y2, w } = editor.selection;
 
-		for (let x = x1; x < x2; x++) {
-			let tPtr = y1 * 288, bPtr = y2 * 288;
+		let fl: Uint8ClampedArray;
+		let tPtr = (y1 * 288) + x1;
+		let bPtr = (y2 * 288) + x1;
+
+		while (tPtr < bPtr) {
+			fl = editor.pixel.surface.slice(bPtr, bPtr + w);
+			editor.pixel.surface.copyWithin(bPtr, tPtr, tPtr + w);
+			editor.pixel.surface.set(fl, tPtr);
+
+			tPtr += 288;
+			bPtr -= 288;
+		}
+
+		if (editor.editSelectFnShiftAttr) {
+			const cw = Math.floor(w / 6);
+			const cx = Math.floor(x1 / 6);
+
+			tPtr = (y1 * 48) + cx;
+			bPtr = ((y2 & ~1) * 48) + cx;
 
 			while (tPtr < bPtr) {
-				fl = editor.pixel.surface[bPtr + x];
-				editor.pixel.surface[bPtr + x] = editor.pixel.surface[tPtr + x];
-				editor.pixel.surface[tPtr + x] = fl;
+				fl = editor.pixel.attrs.slice(bPtr, bPtr + cw);
+				editor.pixel.attrs.copyWithin(bPtr, tPtr, tPtr + cw);
+				editor.pixel.attrs.set(fl, tPtr);
 
-				tPtr += 288;
-				bPtr -= 288;
-			}
+				tPtr += 48;
+				bPtr += 48;
 
-			if (editor.editSelectFnShiftAttr && !(x % 6)) {
-				const c = Math.floor(x / 6);
+				fl = editor.pixel.attrs.slice(bPtr, bPtr + cw);
+				editor.pixel.attrs.copyWithin(bPtr, tPtr, tPtr + cw);
+				editor.pixel.attrs.set(fl, tPtr);
 
-				tPtr = y1 * 48;
-				bPtr = y2 * 48;
-
-				while (tPtr < bPtr) {
-					fl = editor.pixel.attrs[bPtr + c - 48];
-					editor.pixel.attrs[bPtr + c - 48] = editor.pixel.attrs[tPtr + c];
-					editor.pixel.attrs[tPtr + c] = fl;
-
-					fl = editor.pixel.attrs[bPtr + c];
-					editor.pixel.attrs[bPtr + c] = editor.pixel.attrs[tPtr + c + 48];
-					editor.pixel.attrs[tPtr + c + 48] = fl;
-
-					tPtr += 96;
-					bPtr -= 96;
-				}
+				tPtr += 48;
+				bPtr -= 144;
 			}
 		}
 	}
@@ -121,49 +128,33 @@ export class ActionShiftFlip {
 
 	private _shifters: { [key: string]: (s: Selection) => void } = {
 		'SHIFT_DIR_UP_PIX': (s: Selection) => {
-			const tail = new Uint8ClampedArray(s.w);
-			let ptr: number, i: number;
-			let x: number, y: number;
+			let tail = new Uint8ClampedArray(s.w);
+			let ptr = (s.y1 * 288) + s.x1;
 
-			ptr = s.y1 * 288;
 			if (editor.editSelectFnShiftWrap) {
-				for (i = 0, x = s.x1; x <= s.x2; i++, x++) {
-					tail[i] = editor.pixel.surface[ptr + x];
-				}
+				tail = editor.pixel.surface.slice(ptr, ptr + s.w);
 			}
 
-			for (y = s.y1; y < s.y2; y++, ptr += 288) {
-				for (x = s.x1; x <= s.x2; x++) {
-					editor.pixel.surface[ptr + x] = editor.pixel.surface[ptr + 288 + x];
-				}
+			for (let y = s.y1; y < s.y2; y++, ptr += 288) {
+				editor.pixel.surface.copyWithin(ptr, ptr + 288, ptr + 288 + s.w);
 			}
 
-			for (i = 0, x = s.x1; x <= s.x2; i++, x++) {
-				editor.pixel.surface[ptr + x] = tail[i];
-			}
+			editor.pixel.surface.set(tail, ptr);
 		},
 
 		'SHIFT_DIR_DN_PIX': (s: Selection) => {
-			const tail = new Uint8ClampedArray(s.w);
-			let ptr: number, i: number;
-			let x: number, y: number;
+			let tail = new Uint8ClampedArray(s.w);
+			let ptr = (s.y2 * 288) + s.x1;
 
-			ptr = s.y2 * 288;
 			if (editor.editSelectFnShiftWrap) {
-				for (i = 0, x = s.x1; x <= s.x2; i++, x++) {
-					tail[i] = editor.pixel.surface[ptr + x];
-				}
+				tail = editor.pixel.surface.slice(ptr, ptr + s.w);
 			}
 
-			for (y = s.y2; y > s.y1; y--, ptr -= 288) {
-				for (x = s.x1; x <= s.x2; x++) {
-					editor.pixel.surface[ptr + x] = editor.pixel.surface[ptr - 288 + x];
-				}
+			for (let y = s.y2; y > s.y1; y--, ptr -= 288) {
+				editor.pixel.surface.copyWithin(ptr, ptr - 288, ptr - 288 + s.w);
 			}
 
-			for (i = 0, x = s.x1; x <= s.x2; i++, x++) {
-				editor.pixel.surface[ptr + x] = tail[i];
-			}
+			editor.pixel.surface.set(tail, ptr);
 		},
 
 		'SHIFT_DIR_LT_PIX': (s: Selection) => {
@@ -205,102 +196,66 @@ export class ActionShiftFlip {
 		'SHIFT_DIR_UP_ATT': (s: Selection) => {
 			const pixTail = new Uint8ClampedArray(s.w * 2);
 			const atrTail = new Uint8ClampedArray(s.w / 3);
+			const cw = Math.floor(s.w / 6);
 			let pixPtr: number, atrPtr: number;
-			let x: number, y: number, i: number, j: number, k: number;
 
-			pixPtr = s.y1 * 288;
-			atrPtr = s.y1 * 48;
+			pixPtr = (s.y1 * 288) + s.x1;
+			atrPtr = (s.y1 * 48) + Math.floor(s.x1 / 6);
 
 			if (editor.editSelectFnShiftWrap) {
-				for (i = 0, j = 0, x = s.x1, k = x / 6; x <= s.x2; x++) {
-					pixTail[i++] = editor.pixel.surface[pixPtr + x];
-					pixTail[i++] = editor.pixel.surface[pixPtr + 288 + x];
+				pixTail.set(editor.pixel.surface.slice(pixPtr, pixPtr + s.w), 0);
+				pixTail.set(editor.pixel.surface.slice(pixPtr + 288, pixPtr + 288 + s.w), s.w);
 
-					if (!(x % 6)) {
-						atrTail[j++] = editor.pixel.attrs[atrPtr + k];
-						atrTail[j++] = editor.pixel.attrs[atrPtr + 48 + k];
-
-						k++;
-					}
-				}
+				atrTail.set(editor.pixel.attrs.slice(atrPtr, atrPtr + cw), 0);
+				atrTail.set(editor.pixel.attrs.slice(atrPtr + 48, atrPtr + 48 + cw), cw);
 			}
 
-			for (y = s.y1; y <= (s.y2 - 2); y++, pixPtr += 288, atrPtr += 48) {
-				for (x = s.x1, k = x / 6; x <= s.x2; x++) {
-					editor.pixel.surface[pixPtr + x] = editor.pixel.surface[pixPtr + 576 + x];
-
-					if (!(x % 6)) {
-						editor.pixel.attrs[atrPtr + k] = editor.pixel.attrs[atrPtr + 96 + k];
-						k++;
-					}
-				}
+			for (let y = s.y1; y <= (s.y2 - 2); y++, pixPtr += 288, atrPtr += 48) {
+				editor.pixel.surface.copyWithin(pixPtr, pixPtr + 576, pixPtr + 576 + s.w);
+				editor.pixel.attrs.copyWithin(atrPtr, atrPtr + 96, atrPtr + 96 + cw);
 			}
 
-			for (i = 0, j = 0, x = s.x1, k = x / 6; x <= s.x2; x++) {
-				editor.pixel.surface[pixPtr + x] = pixTail[i++];
-				editor.pixel.surface[pixPtr + 288 + x] = pixTail[i++];
+			editor.pixel.surface.set(pixTail.slice(0, s.w), pixPtr);
+			editor.pixel.surface.set(pixTail.slice(s.w), pixPtr + 288);
 
-				if (!(x % 6)) {
-					editor.pixel.attrs[atrPtr + k] = atrTail[j++];
-					editor.pixel.attrs[atrPtr + 48 + k] = atrTail[j++];
-
-					k++;
-				}
-			}
+			editor.pixel.attrs.set(atrTail.slice(0, cw), atrPtr);
+			editor.pixel.attrs.set(atrTail.slice(cw), atrPtr + 48);
 		},
 
 		'SHIFT_DIR_DN_ATT': (s: Selection) => {
 			const pixTail = new Uint8ClampedArray(s.w * 2);
 			const atrTail = new Uint8ClampedArray(s.w / 3);
+			const cw = Math.floor(s.w / 6);
 			let pixPtr: number, atrPtr: number;
-			let x: number, y: number, i: number, j: number, k: number;
 
-			pixPtr = s.y2 * 288;
-			atrPtr = s.y2 * 48;
+			pixPtr = (s.y2 * 288) + s.x1;
+			atrPtr = (s.y2 * 48) + Math.floor(s.x1 / 6);
 
 			if (editor.editSelectFnShiftWrap) {
-				for (i = 0, j = 0, x = s.x1, k = x / 6; x <= s.x2; x++) {
-					pixTail[i++] = editor.pixel.surface[pixPtr - 288 + x];
-					pixTail[i++] = editor.pixel.surface[pixPtr + x];
+				pixTail.set(editor.pixel.surface.slice(pixPtr - 288, pixPtr - 288 + s.w), 0);
+				pixTail.set(editor.pixel.surface.slice(pixPtr, pixPtr + s.w), s.w);
 
-					if (!(x % 6)) {
-						atrTail[j++] = editor.pixel.attrs[atrPtr - 48 + k];
-						atrTail[j++] = editor.pixel.attrs[atrPtr + k];
-
-						k++;
-					}
-				}
+				atrTail.set(editor.pixel.attrs.slice(atrPtr - 48, atrPtr - 48 + cw), 0);
+				atrTail.set(editor.pixel.attrs.slice(atrPtr, atrPtr + cw), cw);
 			}
 
-			for (y = s.y2; y >= (s.y1 + 2); y--, pixPtr -= 288, atrPtr -= 48) {
-				for (x = s.x1, k = x / 6; x <= s.x2; x++) {
-					editor.pixel.surface[pixPtr + x] = editor.pixel.surface[pixPtr - 576 + x];
-
-					if (!(x % 6)) {
-						editor.pixel.attrs[atrPtr + k] = editor.pixel.attrs[atrPtr - 96 + k];
-						k++;
-					}
-				}
+			for (let y = s.y2; y >= (s.y1 + 2); y--, pixPtr -= 288, atrPtr -= 48) {
+				editor.pixel.surface.copyWithin(pixPtr, pixPtr - 576, pixPtr - 576 + s.w);
+				editor.pixel.attrs.copyWithin(atrPtr, atrPtr - 96, atrPtr - 96 + cw);
 			}
 
-			for (i = 0, j = 0, x = s.x1, k = x / 6; x <= s.x2; x++) {
-				editor.pixel.surface[pixPtr - 288 + x] = pixTail[i++];
-				editor.pixel.surface[pixPtr + x] = pixTail[i++];
+			editor.pixel.surface.set(pixTail.slice(0, s.w), pixPtr - 288);
+			editor.pixel.surface.set(pixTail.slice(s.w), pixPtr);
 
-				if (!(x % 6)) {
-					editor.pixel.attrs[atrPtr - 48 + k] = atrTail[j++];
-					editor.pixel.attrs[atrPtr + k] = atrTail[j++];
-
-					k++;
-				}
-			}
+			editor.pixel.attrs.set(atrTail.slice(0, cw), atrPtr - 48);
+			editor.pixel.attrs.set(atrTail.slice(cw), atrPtr);
 		},
 
 		'SHIFT_DIR_LT_ATT': (s: Selection) => {
-			const pixTail = new Uint8ClampedArray(6);
+			let pixTail = new Uint8ClampedArray(6);
 			let atrTail: number;
 			let pixPtr: number, atrPtr: number;
-			let x: number, y: number, i: number, k: number;
+			let x: number, y: number, k: number;
 
 			pixPtr = s.y1 * 288;
 			atrPtr = s.y1 * 48;
@@ -312,67 +267,47 @@ export class ActionShiftFlip {
 				atrTail = 0;
 				pixTail.fill(0);
 				if (editor.editSelectFnShiftWrap) {
+					pixTail = editor.pixel.surface.slice(pixPtr + x, pixPtr + x + 6);
 					atrTail = editor.pixel.attrs[atrPtr + k];
-
-					for (i = 0; i < 6; i++) {
-						pixTail[i] = editor.pixel.surface[pixPtr + x + i];
-					}
 				}
 
-				for (; x <= s.x2 - 6; x++) {
-					editor.pixel.surface[pixPtr + x] = editor.pixel.surface[pixPtr + x + 6];
-
-					if (!(x % 6)) {
-						editor.pixel.attrs[atrPtr + k] = editor.pixel.attrs[atrPtr + k + 1];
-						k++;
-					}
+				for (; x <= s.x2 - 6; x += 6, k++) {
+					editor.pixel.surface.copyWithin(pixPtr + x, pixPtr + x + 6, pixPtr + x + 12);
+					editor.pixel.attrs[atrPtr + k] = editor.pixel.attrs[atrPtr + k + 1];
 				}
 
+				editor.pixel.surface.set(pixTail, pixPtr + x);
 				editor.pixel.attrs[atrPtr + k] = atrTail;
-
-				for (i = 0; i < 6; i++, x++) {
-					editor.pixel.surface[pixPtr + x] = pixTail[i];
-				}
 			}
 		},
 
 		'SHIFT_DIR_RT_ATT': (s: Selection) => {
-			const pixTail = new Uint8ClampedArray(6);
+			let pixTail = new Uint8ClampedArray(6);
 			let atrTail: number;
 			let pixPtr: number, atrPtr: number;
-			let x: number, y: number, i: number, k: number;
+			let x: number, y: number, k: number;
 
 			pixPtr = s.y1 * 288;
 			atrPtr = s.y1 * 48;
 
 			for (y = s.y1; y <= s.y2; y++, pixPtr += 288, atrPtr += 48) {
-				x = s.x2;
+				x = s.x2 - 5;
 				k = Math.floor(x / 6);
 
 				atrTail = 0;
 				pixTail.fill(0);
 				if (editor.editSelectFnShiftWrap) {
+					pixTail = editor.pixel.surface.slice(pixPtr + x, pixPtr + x + 6);
 					atrTail = editor.pixel.attrs[atrPtr + k];
-
-					for (i = 0; i < 6; i++) {
-						pixTail[i] = editor.pixel.surface[pixPtr + x - i];
-					}
 				}
 
-				for (; x >= s.x1 + 6; x--) {
-					editor.pixel.surface[pixPtr + x] = editor.pixel.surface[pixPtr + x - 6];
-
-					if (!(x % 6)) {
-						editor.pixel.attrs[atrPtr + k] = editor.pixel.attrs[atrPtr + k - 1];
-						k--;
-					}
+				for (; x >= s.x1 + 6; x -= 6, k--) {
+					editor.pixel.surface.copyWithin(pixPtr + x, pixPtr + x - 6, pixPtr + x);
+					editor.pixel.attrs[atrPtr + k] = editor.pixel.attrs[atrPtr + k - 1];
 				}
 
+				editor.pixel.surface.set(pixTail, pixPtr + x);
 				editor.pixel.attrs[atrPtr + k] = atrTail;
-
-				for (i = 0; i < 6; i++, x--) {
-					editor.pixel.surface[pixPtr + x] = pixTail[i];
-				}
 			}
 		}
 	}
