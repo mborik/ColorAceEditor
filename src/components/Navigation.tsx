@@ -46,13 +46,9 @@ const Navigation: React.FunctionComponent = () => {
 				<Palette />
 			</fieldset>
 
-			<fieldset key="NAV_FILE">
-				<legend>file:</legend>
+			<fieldset key="NAV_OPS">
+				<legend>operations:</legend>
 				<FileMenu />
-			</fieldset>
-
-			<fieldset key="NAV_EXTRAS">
-				<legend>extras:</legend>
 				<Extras />
 			</fieldset>
 

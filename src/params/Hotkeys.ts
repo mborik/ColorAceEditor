@@ -293,12 +293,6 @@ export const HotkeyItems: HotkeyItem[] = [
 	),
 	new HotkeyItem(
 		'6. Operations',
-		'Undo',
-		'mod+Z',
-		() => actionUndo()
-	),
-	new HotkeyItem(
-		'6. Operations',
 		'Convert bitmap image or Load screen-dump',
 		'mod+O',
 		() => actionLoadFile()
@@ -308,6 +302,12 @@ export const HotkeyItems: HotkeyItem[] = [
 		'Save screen-dump',
 		'mod+S',
 		() => actionSaveFile()
+	),
+	new HotkeyItem(
+		'6. Operations',
+		'Undo',
+		'mod+Z',
+		() => actionUndo()
 	),
 	new HotkeyItem(
 		'6. Operations',
