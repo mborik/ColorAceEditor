@@ -7,16 +7,19 @@
 
 import React from 'react';
 import { Hotkey, Hotkeys, HotkeysTarget } from "@blueprintjs/core";
-import Navigation from './Navigation';
-import Main from './Main';
 
 import { HotkeyItems } from '../params/Hotkeys';
 import { EditorReducerAction, EditorReducerStoreProps } from '../actions/editor';
+
+import AboutDlg from './AboutDlg';
+import Main from './Main';
+import Navigation from './Navigation';
 
 
 class App extends React.PureComponent<EditorReducerStoreProps, {}> {
 	render() {
 		return <>
+			<AboutDlg />
 			<Navigation />
 			<Main />
 		</>;
