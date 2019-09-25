@@ -21,6 +21,7 @@ import {
 	actionSelectShift,
 	actionViewportZoom,
 	actionViewportPan,
+	actionToggleGuides,
 	actionCancel,
 	actionUndo,
 	actionAbout,
@@ -307,6 +308,12 @@ export const HotkeyItems: HotkeyItem[] = [
 		'Save screen-dump',
 		'mod+S',
 		() => actionSaveFile()
+	),
+	new HotkeyItem(
+		'6. Operations',
+		'Toggle grid',
+		'mod+G',
+		() => actionToggleGuides()
 	),
 	new HotkeyItem(
 		'6. Operations',

@@ -102,6 +102,12 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			break;
 		}
 
+		case EditorAction.ToggleGuides: {
+			editor.showGuides = !editor.showGuides;
+			editor.refresh();
+			break;
+		}
+
 		case EditorAction.ViewportZoom:
 			editor.action.zoomViewport(action.payload.zoomDelta);
 			break;

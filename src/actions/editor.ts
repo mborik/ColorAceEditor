@@ -22,6 +22,7 @@ export enum EditorAction {
 	ViewportCleanup = 'VIEWPORT_CLEANUP',
 	ViewportZoom = 'VIEWPORT_ZOOM',
 	ViewportPan = 'VIEWPORT_PAN',
+	ToggleGuides = 'VIEWPORT_GUIDES',
 	Cancel = 'CANCEL',
 	Undo = 'UNDO',
 	About = 'ABOUT_DIALOG',
@@ -134,6 +135,10 @@ export const actionRefresh = (): EditorReducerAction => ({
 
 export const actionCleanup = (): EditorReducerAction => ({
 	type: EditorAction.ViewportCleanup
+});
+
+export const actionToggleGuides = (): EditorReducerAction => ({
+	type: EditorAction.ToggleGuides
 });
 
 export const actionCancel = (): EditorReducerAction => ({

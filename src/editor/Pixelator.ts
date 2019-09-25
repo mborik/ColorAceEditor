@@ -160,11 +160,11 @@ export class Pixelator {
 	}
 
 	/**
-	 * Returns nonzero if we need to show grid for exact X coordinate.
+	 * Returns nonzero if we need to show guideline for exact X coordinate.
 	 *
 	 * @param {number} x coordinate in surface (0-287)
 	 */
-	isGrid = (x: number) => (editor.showGrid && ((x % 6) === 5)) ? 3 : 0;
+	isGuide = (x: number) => (editor.showGuides && ((x % 6) === 5)) ? 3 : 0;
 
 	/**
 	 * Main render callback of Scroller.
@@ -198,7 +198,7 @@ export class Pixelator {
 			x = 0;
 
 			for (let j = l, k = ((i * 288) + j); j < 288; j++, k++) {
-				this.scalers[zoom](z + x, this.pal[this.surface[k]], this.isGrid(j));
+				this.scalers[zoom](z + x, this.pal[this.surface[k]], this.isGuide(j));
 
 				if ((s = editor.selection.testBoundsX(j, i)))
 					this.marqueeX(z + x + (--s * (zoom - 1)), zoom, y);
@@ -283,7 +283,7 @@ export class Pixelator {
 				}
 
 				if (sx >= 0 && sy >= 0) {
-					this.scalers[zoom](sz + sx, this.pal[c], this.isGrid(j));
+					this.scalers[zoom](sz + sx, this.pal[c], this.isGuide(j));
 
 					if ((bound = editor.selection.testBoundsX(j, i)))
 						this.marqueeX(sz + sx + (--bound * (zoom - 1)), zoom, sy);
@@ -382,7 +382,7 @@ export class Pixelator {
 			y = (y * zoom) - this.scrollerY;
 			x = (x * zoom) - this.scrollerX;
 
-			this.scalers[zoom]((y * this.bmpW) + x, this.pal[c], this.isGrid(x));
+			this.scalers[zoom]((y * this.bmpW) + x, this.pal[c], this.isGuide(x));
 
 			this.bmp.data.set(this.bmpClamp);
 			editor.ctx.putImageData(this.bmp, 0, 0, x, y, zoom, zoom);

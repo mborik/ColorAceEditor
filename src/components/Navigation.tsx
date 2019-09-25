@@ -17,6 +17,7 @@ import BrushShape from './BrushShape';
 import SelectTools from './SelectTools';
 import Palette from './Palette';
 import FileMenu from './FileMenu';
+import Extras from './Extras';
 
 
 const Navigation: React.FunctionComponent = () => {
@@ -48,6 +49,11 @@ const Navigation: React.FunctionComponent = () => {
 			<fieldset key="NAV_FILE">
 				<legend>file:</legend>
 				<FileMenu />
+			</fieldset>
+
+			<fieldset key="NAV_EXTRAS">
+				<legend>extras:</legend>
+				<Extras />
 			</fieldset>
 
 			<fieldset key="NAV_HELP" className="help">

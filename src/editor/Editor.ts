@@ -52,8 +52,8 @@ export interface EditorOptions {
 	upload: HTMLCanvasElement;
 	status?: HTMLDivElement;
 	zoom?: number;
-	undo: number;
-	grid: boolean;
+	undo?: number;
+	guides?: boolean;
 
 	selectCB: EditorSelectionActionFn;
 }
@@ -73,7 +73,7 @@ export class Editor extends FileOps {
 	contentWidth: number = 0;
 	contentHeight: number = 0;
 	zoomFactor: number = 1;
-	showGrid: boolean = true;
+	showGuides: boolean = true;
 	undoLevels: number = 10;
 	editColor: number = 0;
 	editTool: EditorTool = EditorTool.Pencil;
@@ -117,8 +117,8 @@ export class Editor extends FileOps {
 		this.ctx = this.canvas.getContext("2d");
 
 		this.zoomFactor = opt.zoom || 1;
-		this.showGrid = opt.grid || true;
 		this.undoLevels = opt.undo || 10;
+		this.showGuides = opt.guides || true;
 		this.selectionActionCallback = opt.selectCB;
 
 		this.statusBar = opt.status || null;
