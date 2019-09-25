@@ -9,14 +9,19 @@ import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useEventListener from '@use-it/event-listener';
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core';
-import { actionInitEditorInstance, actionUploadFile, actionSelectionChanged } from '../actions/editor';
-import { Editor } from '../editor/Editor';
 import devLog from '../utils/logger';
+
+import { EditorReducerState } from '../reducers/editor';
+import {
+	actionInitEditorInstance,
+	actionSelectionChanged,
+	actionUploadFile
+} from '../actions/editor';
 
 
 const Main: React.FunctionComponent = () => {
 	const dispatch = useDispatch();
-	const editor = useSelector((state: any) => state.editor as Editor);
+	const editor = useSelector((state: EditorReducerState) => state.editor);
 
 	const handleResize = useCallback((entries: IResizeEntry[]) => {
 		const entry = entries.shift();

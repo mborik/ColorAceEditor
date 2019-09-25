@@ -9,12 +9,14 @@ import { EditorAction } from "../actions/editor";
 
 
 export interface EditorReducerState {
+	aboutDialogOpen: boolean;
 	editor: Editor;
 }
 
 
 const toast = Toaster.create();
 const defaultState: EditorReducerState = {
+	aboutDialogOpen: false,
 	editor: null
 };
 
@@ -122,6 +124,12 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			}
 			break;
 		}
+
+		case EditorAction.About:
+			return {
+				...state,
+				aboutDialogOpen: action.payload.open
+			};
 
 		case EditorAction.Toast:
 			toast.clear();

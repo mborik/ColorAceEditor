@@ -7,6 +7,15 @@
 
 @import "~@blueprintjs/core/src/common/variables";
 
+@mixin pixelated() {
+	image-rendering: optimizeSpeed;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: optimize-contrast;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+	-ms-interpolation-mode: nearest-neighbor;
+}
 
 body {
 	font-family: "Lato", $pt-font-family;
@@ -180,13 +189,51 @@ body {
 				width: 100%;
 				height: 100%;
 
-				image-rendering: optimizeSpeed;
-				image-rendering: -moz-crisp-edges;
-				image-rendering: -webkit-optimize-contrast;
-				image-rendering: optimize-contrast;
-				image-rendering: crisp-edges;
-				image-rendering: pixelated;
-				-ms-interpolation-mode: nearest-neighbor;
+				@include pixelated();
+			}
+		}
+	}
+}
+
+.about-dlg {
+	&.#{$ns}-dialog {
+		background: black;
+
+		.#{$ns}-dialog-body {
+			margin: 16px;
+
+			img {
+				float: left;
+				width: 144px;
+				height: 144px;
+				margin: 0 1rem 0 0;
+
+				@include pixelated();
+			}
+
+			h2 > .app-version {
+				font-size: $pt-font-size;
+				font-weight: normal;
+				vertical-align: super;
+			}
+
+			hr {
+				border: .5px solid $dark-gray4;
+				margin: 1rem 0;
+			}
+		}
+
+		.#{$ns}-dialog-footer {
+			p {
+				text-align: right;
+			}
+
+			&-actions {
+				margin: 1.5rem 0 -.5rem;
+
+				a {
+					text-decoration: none;
+				}
 			}
 		}
 	}

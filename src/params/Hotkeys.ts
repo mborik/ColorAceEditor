@@ -7,8 +7,8 @@
 
 import { IHotkeyProps } from "@blueprintjs/core";
 import { Editor, EditorTool, EditorDrawMode, EditorDirection } from "../editor/Editor";
-import { EditorReducerAction } from "../actions/editor";
 import {
+	EditorReducerAction,
 	actionToolChanged,
 	actionDrawModeChanged,
 	actionColorChanged,
@@ -23,6 +23,7 @@ import {
 	actionViewportPan,
 	actionCancel,
 	actionUndo,
+	actionAbout,
 	actionLoadFile,
 	actionSaveFile
 } from "../actions/editor";
@@ -312,5 +313,11 @@ export const HotkeyItems: HotkeyItem[] = [
 		'Cancel current operation',
 		'escape',
 		() => actionCancel()
+	),
+	new HotkeyItem(
+		'6. Operations',
+		'About application',
+		'F1',
+		() => actionAbout(true)
 	)
 ];

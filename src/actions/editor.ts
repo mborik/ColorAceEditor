@@ -24,6 +24,7 @@ export enum EditorAction {
 	ViewportPan = 'VIEWPORT_PAN',
 	Cancel = 'CANCEL',
 	Undo = 'UNDO',
+	About = 'ABOUT_DIALOG',
 	Toast = 'SHOW_TOAST',
 	LoadFile = 'LOAD_FILE',
 	SaveFile = 'SAVE_FILE'
@@ -141,6 +142,11 @@ export const actionCancel = (): EditorReducerAction => ({
 
 export const actionUndo = (): EditorReducerAction => ({
 	type: EditorAction.Undo
+});
+
+export const actionAbout = (open: boolean): EditorReducerAction => ({
+	type: EditorAction.About,
+	payload: { open }
 });
 
 export const actionToast = (toastParams: IToastProps): EditorReducerAction => ({
