@@ -7,10 +7,12 @@
 
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Navbar, Tooltip, KeyCombo, Position, ButtonGroup } from "@blueprintjs/core";
-import { actionUndo, actionToggleGuides } from '../actions/editor';
-import constants from '../params/constants';
+import { Button, Navbar, Tooltip, KeyCombo, Position, ButtonGroup, Popover, Menu, MenuItem } from "@blueprintjs/core";
+import { actionUndo, actionToggleGuides, actionImportScreen } from '../actions/editor';
 import { EditorReducerState } from '../reducers/editor';
+import constants from '../params/constants';
+import database from '../params/screen.db';
+
 
 const Extras: React.FunctionComponent = () => {
 	const dispatch = useDispatch();
@@ -19,25 +21,33 @@ const Extras: React.FunctionComponent = () => {
 		return editor && editor.showGuides;
 	});
 
-	const handleUndo = useCallback(
-		() => dispatch(actionUndo()
-	), [ dispatch ]);
-
-	const handleToggleGuides = useCallback(
-		() => dispatch(actionToggleGuides()
-	), [ dispatch ]);
+	const handleUndo = useCallback(() => dispatch(actionUndo()), [ dispatch ]);
+	const handleToggleGuides = useCallback(() => dispatch(actionToggleGuides()), [ dispatch ]);
 
 	return <>
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
-				<Button
-					id="TBEX_IMPORT"
-					key="TBEX_IMPORT"
-					icon="database"
-					rightIcon="caret-down"
-					text="IMPORT"
-					onClick={() => {}}
-				/>
+				<Popover position="bottom-left"
+					modifiers={{ arrow: { enabled: false }}}>
+
+					<Button
+						id="TBEX_IMPORT"
+						key="TBEX_IMPORT"
+						icon="database"
+						rightIcon="caret-down"
+						text="IMPORT"
+					/>
+					<Menu>
+						{database.map(item => (
+							<MenuItem text={item.name}
+								label={`[ ${item.author} ]`}
+								onClick={() => dispatch(
+									actionImportScreen(item.filename)
+								)}
+							/>
+						))}
+					</Menu>
+				</Popover>
 				<Tooltip
 					key="TBEX_UNDO_TT"
 					content={<>

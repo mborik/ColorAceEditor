@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import { IToastProps } from "@blueprintjs/core";
 import { getInstance as ColorAceEditor,
-	EditorOptions, EditorTool, EditorDrawMode, EditorDirection } from "../editor/Editor";
+	EditorOptions, EditorTool, EditorDrawMode, EditorDirection, editor } from "../editor/Editor";
 import { EditorReducerState } from "../reducers/editor";
 
 export enum EditorAction {
@@ -190,4 +190,23 @@ export const actionUploadFile = (file: File) =>
 				// wipe the last loaded file to allow reopen of same file again...
 				(document.getElementById('uploadFile') as any).value = null;
 			});
+	};
+
+export const actionImportScreen = (filename: string) =>
+	(dispatch: Dispatch, getState: () => EditorReducerState) => {
+		const state = getState();
+		if (!(filename && state.editor)) {
+			return;
+		}
+
+		fetch(filename)
+			.then(response => response.arrayBuffer())
+			.then(buffer => {
+				editor.pixel.readPMD85vram(new Uint8Array(buffer));
+				dispatch(actionRefresh());
+			})
+			.catch((error: string) => dispatch(actionToast({
+				intent: 'danger',
+				message: error
+			})));
 	};
