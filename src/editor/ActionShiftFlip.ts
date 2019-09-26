@@ -31,7 +31,7 @@ export class ActionShiftFlip {
 				this._shiftSelection(dir);
 			}
 
-			editor.pixel.redrawRect(s.x1, s.y1, s.x2, s.y2, true);
+			editor.pixel.redrawRect(s.x1, s.y1, s.w, s.h, true);
 		}
 	}
 
