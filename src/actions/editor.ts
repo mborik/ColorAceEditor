@@ -26,6 +26,7 @@ export enum EditorAction {
 	Cancel = 'CANCEL',
 	Undo = 'UNDO',
 	About = 'ABOUT_DIALOG',
+	Results = 'RESULTS_DIALOG',
 	Toast = 'SHOW_TOAST',
 	LoadFile = 'LOAD_FILE',
 	SaveFile = 'SAVE_FILE'
@@ -151,6 +152,11 @@ export const actionUndo = (): EditorReducerAction => ({
 
 export const actionAbout = (open: boolean): EditorReducerAction => ({
 	type: EditorAction.About,
+	payload: { open }
+});
+
+export const actionResults = (open: boolean): EditorReducerAction => ({
+	type: EditorAction.Results,
 	payload: { open }
 });
 

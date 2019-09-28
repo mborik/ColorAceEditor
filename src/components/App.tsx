@@ -14,12 +14,14 @@ import { EditorReducerAction, EditorReducerStoreProps } from '../actions/editor'
 import AboutDlg from './AboutDlg';
 import Main from './Main';
 import Navigation from './Navigation';
+import ResultsDlg from './ResultsDlg';
 
 
 class App extends React.PureComponent<EditorReducerStoreProps, {}> {
 	render() {
 		return <>
 			<AboutDlg />
+			<ResultsDlg />
 			<Navigation />
 			<Main />
 		</>;

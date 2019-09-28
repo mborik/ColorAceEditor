@@ -38,8 +38,10 @@ const Extras: React.FunctionComponent = () => {
 						text="IMPORT"
 					/>
 					<Menu>
-						{database.map(item => (
-							<MenuItem text={item.name}
+						{database.map((item, key) => (
+							<MenuItem
+								key={`MNXI_${key}`}
+								text={item.name}
 								label={`[ ${item.author} ]`}
 								onClick={() => dispatch(
 									actionImportScreen(item.filename)

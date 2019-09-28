@@ -25,6 +25,7 @@ import {
 	actionCancel,
 	actionUndo,
 	actionAbout,
+	actionResults,
 	actionLoadFile,
 	actionSaveFile
 } from "../actions/editor";
@@ -326,5 +327,11 @@ export const HotkeyItems: HotkeyItem[] = [
 		'About application',
 		'F1',
 		() => actionAbout(true)
+	),
+	new HotkeyItem(
+		'6. Operations',
+		'Point Coords Results',
+		'F9',
+		() => actionResults(true)
 	)
 ];

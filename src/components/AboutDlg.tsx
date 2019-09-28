@@ -27,7 +27,8 @@ const AboutDlg: React.FunctionComponent = () => {
 		(state: EditorReducerState) => state.aboutDialogOpen
 	);
 
-	return <Dialog className="about-dlg"
+	return <Dialog
+		className="about-dlg"
 		isOpen={aboutDialogOpen}
 		onClose={() => dispatch(actionAbout(false))}>
 

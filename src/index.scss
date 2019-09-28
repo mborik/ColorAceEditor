@@ -238,3 +238,17 @@ body {
 		}
 	}
 }
+
+.results-dlg {
+	&.#{$ns}-dialog {
+		padding-bottom: 0;
+
+		.#{$ns}-dialog-footer-actions {
+			margin: 1rem 0 0;
+
+			> .#{$ns}-switch {
+				margin: auto 1rem auto 0;
+			}
+		}
+	}
+}

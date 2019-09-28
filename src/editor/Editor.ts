@@ -48,14 +48,11 @@ export enum EditorDirection {
 
 type EditorSelectionActionFn = (nonEmpty: boolean) => {};
 export interface EditorOptions {
+	selectCB: EditorSelectionActionFn;
 	canvas: HTMLCanvasElement;
 	upload: HTMLCanvasElement;
 	status?: HTMLDivElement;
-	zoom?: number;
 	undo?: number;
-	guides?: boolean;
-
-	selectCB: EditorSelectionActionFn;
 }
 
 interface CanvasCoordinates {
@@ -116,12 +113,9 @@ export class Editor extends FileOps {
 		this.canvas = opt.canvas;
 		this.ctx = this.canvas.getContext("2d");
 
-		this.zoomFactor = opt.zoom || 1;
 		this.undoLevels = opt.undo || 10;
-		this.showGuides = opt.guides || true;
-		this.selectionActionCallback = opt.selectCB;
-
 		this.statusBar = opt.status || null;
+		this.selectionActionCallback = opt.selectCB;
 	}
 
 	/**

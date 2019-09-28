@@ -10,13 +10,14 @@ import { EditorAction } from "../actions/editor";
 
 export interface EditorReducerState {
 	aboutDialogOpen: boolean;
+	coordsResultsDialogOpen: boolean;
 	editor: Editor;
 }
-
 
 const toast = Toaster.create();
 const defaultState: EditorReducerState = {
 	aboutDialogOpen: false,
+	coordsResultsDialogOpen: false,
 	editor: null
 };
 
@@ -135,6 +136,12 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			return {
 				...state,
 				aboutDialogOpen: action.payload.open
+			};
+
+		case EditorAction.Results:
+			return {
+				...state,
+				coordsResultsDialogOpen: action.payload.open
 			};
 
 		case EditorAction.Toast:
