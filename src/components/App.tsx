@@ -20,6 +20,7 @@ import ResultsDlg from './ResultsDlg';
 class App extends React.PureComponent<EditorReducerStoreProps, {}> {
 	render() {
 		return <>
+			<hr hidden id="progress" />
 			<AboutDlg />
 			<ResultsDlg />
 			<Navigation />

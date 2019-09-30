@@ -54,7 +54,7 @@ export class FileOps {
 	 * @param {File} file
 	 * @returns {Promise}
 	 */
-	upload(file: File): Promise<void> {
+	upload(file: File, updateProgress?: (amount: number) => void): Promise<void> {
 		return new Promise((resolve, reject) => {
 			if (file == null) {
 				return reject('not a file');
@@ -69,7 +69,7 @@ export class FileOps {
 
 						img.onload = () => {
 							if (img.width > 288 || img.height > 256) {
-								return reject('invalid image dimensions');
+								return reject('invalid image dimensions (supported up to 288x256)');
 							}
 
 							editor.pixel.doSnapshot();
@@ -87,18 +87,19 @@ export class FileOps {
 							ctx.fill();
 							ctx.drawImage(img, 0, 0);
 
-							const attr: number[] = new Array(12);
-							let i: number, c: number, x: number;
+							let y = 0;
+							const loopY = () => {
+								const attr: number[] = new Array(12);
+								let i: number, c: number, x: number;
 
-							for (let y = 0; y < rows; y += 2) {
 								for (let cx = 0; cx < cols; cx++) {
 									for (x = (cx * 6), i = 0; i < 6; i++, x++) {
 										attr[i]     = this.getPixelValue(ctx, x, y);
 										attr[i + 6] = this.getPixelValue(ctx, x, y + 1);
 									}
 
+									i = (y * 48) + cx;
 									c = this.countMostFrequent(attr);
-									i = Math.floor((y * 48) + cx);
 
 									editor.pixel.attrs[i]      = editor.pixel.pal[c][7];
 									editor.pixel.attrs[i + 48] = editor.pixel.pal[c][8];
@@ -109,10 +110,26 @@ export class FileOps {
 										editor.pixel.surface[x + 288] = attr[i + 6] ? c : 0;
 									}
 								}
-							}
 
-							editor.refresh();
-							resolve();
+								if (typeof updateProgress === 'function') {
+									updateProgress(y / rows);
+								}
+
+								y += 2;
+								if (y < rows) {
+									requestAnimationFrame(loopY);
+								} else {
+									editor.refresh();
+
+									if (typeof updateProgress === 'function') {
+										updateProgress(1);
+									}
+
+									resolve();
+								}
+							};
+
+							loopY();
 						};
 
 						img.src = fr.result as string;

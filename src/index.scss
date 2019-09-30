@@ -6,6 +6,7 @@
  */
 
 @import "~@blueprintjs/core/src/common/variables";
+@import "~@blueprintjs/core/src/components/progress-bar/progress-bar";
 
 @mixin pixelated() {
 	image-rendering: optimizeSpeed;
@@ -55,6 +56,22 @@ body {
 	> * {
 		user-select: none;
 		overflow: hidden;
+	}
+
+	> hr#progress {
+		z-index: 1000;
+		position: absolute;
+		top: 0;
+		left: 0;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		height: 3px;
+		background: $progress-bar-gradient;
+		background-color: $pt-intent-primary;
+		background-size: $progress-bar-stripes-size $progress-bar-stripes-size;
+		animation: linear-progress-bar-stripes ($pt-transition-duration * 3) linear infinite reverse;
+		box-shadow: 0 2px 3px $black;
 	}
 
 	> nav {

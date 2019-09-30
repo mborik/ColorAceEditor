@@ -186,7 +186,18 @@ export const actionUploadFile = (file: File) =>
 			return;
 		}
 
-		state.editor.upload(file)
+		const progressEl = document.getElementById('progress') as HTMLElement;
+		const updateProgress = (amount: number) => {
+			if (amount < 1) {
+				progressEl.style.display = 'block';
+				progressEl.style.width = Math.round(amount * 100) + 'vw';
+			} else {
+				progressEl.style.display = null;
+				progressEl.style.width = null;
+			}
+		}
+
+		state.editor.upload(file, updateProgress)
 			.then(() => dispatch(actionRefresh()))
 			.catch((error: string) => dispatch(actionToast({
 				intent: 'danger',
