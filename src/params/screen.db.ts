@@ -9,6 +9,10 @@ export default [
 		author: 'Chris Graham, Zdeněk Šesták',
 		filename: 'screen.db/magicland.bin'
 	}, {
+		name: 'R-Type',
+		author: 'MaK',
+		filename: 'screen.db/rtype.bin'
+	}, {
 		name: 'Owls',
 		author: 'mike/ZeroTeam',
 		filename: 'screen.db/owls.bin'
