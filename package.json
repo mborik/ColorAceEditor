@@ -2,7 +2,7 @@
   "name": "colorace-editor-react",
   "description": "Online pixelart screen editor for Tesla PMD 85 microcomputer.",
   "license": "MIT",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "homepage": "http://mborik.github.io/ColorAceEditor",
   "dependencies": {
     "@blueprintjs/core": "^3.18.0",

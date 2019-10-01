@@ -15,16 +15,14 @@ export class FileOps {
 		}
 	}
 
-	private getPixelValue(ctx: CanvasRenderingContext2D, x: number, y: number) {
-		const pix = ctx.getImageData(x, y, 1, 1).data;
+	private getPixelValue(bmpClamp: Uint8ClampedArray, ptr: number) {
+		const pix = bmpClamp.slice(ptr, ptr + 3).map(v => v < 128 ? 0 : 255);
 
-		const diff = editor.pixel.pal.map(base => Math.sqrt(
-			(pix[0] - base[4]) * (pix[0] - base[4]) +
-			(pix[1] - base[5]) * (pix[1] - base[5]) +
-			(pix[2] - base[6]) * (pix[2] - base[6])
-		));
-
-		return diff.indexOf(Math.min.apply(Math, diff));
+		return editor.pixel.pal.findIndex(base =>
+			pix[0] === base[4] &&
+			pix[1] === base[5] &&
+			pix[2] === base[6]
+		);
 	}
 
 	private countMostFrequent(arr: number[]) {
@@ -77,8 +75,10 @@ export class FileOps {
 
 							const cols = Math.ceil(img.width / 6);
 							const rows = Math.ceil(img.height / 2) * 2;
+							const width = cols * 6;
+							const rowlen = width * 4;
 
-							this.uploadCanvas.width = cols * 6;
+							this.uploadCanvas.width = width;
 							this.uploadCanvas.height = rows;
 
 							const ctx = this.uploadCanvas.getContext("2d");
@@ -87,15 +87,18 @@ export class FileOps {
 							ctx.fill();
 							ctx.drawImage(img, 0, 0);
 
+							const bmp = ctx.getImageData(0, 0, width, rows);
+							const bmpClamp = new Uint8ClampedArray(bmp.data);
+
 							let y = 0;
 							const loopY = () => {
 								const attr: number[] = new Array(12);
-								let i: number, c: number, x: number;
+								let i: number, c: number, x: number, ptr: number;
 
 								for (let cx = 0; cx < cols; cx++) {
-									for (x = (cx * 6), i = 0; i < 6; i++, x++) {
-										attr[i]     = this.getPixelValue(ctx, x, y);
-										attr[i + 6] = this.getPixelValue(ctx, x, y + 1);
+									for (ptr = (cx * 6 * 4) + (y * rowlen), i = 0; i < 12; ptr += 4) {
+										attr[i++] = this.getPixelValue(bmpClamp, ptr);
+										attr[i++] = this.getPixelValue(bmpClamp, ptr + rowlen);
 									}
 
 									i = (y * 48) + cx;
@@ -105,9 +108,9 @@ export class FileOps {
 									editor.pixel.attrs[i + 48] = editor.pixel.pal[c][8];
 
 									x = (y * 288) + (cx * 6);
-									for (i = 0; i < 6; i++, x++) {
-										editor.pixel.surface[x]       = attr[i] ? c : 0;
-										editor.pixel.surface[x + 288] = attr[i + 6] ? c : 0;
+									for (i = 0; i < 12; x++) {
+										editor.pixel.surface[x]       = attr[i++] ? c : 0;
+										editor.pixel.surface[x + 288] = attr[i++] ? c : 0;
 									}
 								}
 
