@@ -3,9 +3,9 @@
  * Copyright (c) 2019 Martin Bórik
  */
 
-import { Toaster } from "@blueprintjs/core";
 import { Editor } from "../editor/Editor";
 import { EditorAction } from "../actions/base";
+import { showToast } from "../actions/toast";
 
 
 export interface EditorReducerState {
@@ -14,7 +14,6 @@ export interface EditorReducerState {
 	editor: Editor;
 }
 
-const toast = Toaster.create();
 const defaultState: EditorReducerState = {
 	aboutDialogOpen: false,
 	coordsResultsDialogOpen: false,
@@ -145,8 +144,7 @@ export const editorReducer = (state = defaultState, action: any): EditorReducerS
 			};
 
 		case EditorAction.Toast:
-			toast.clear();
-			toast.show(action.payload);
+			showToast(action.payload);
 			break;
 
 		case EditorAction.LoadFile:

@@ -7,8 +7,8 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import useEventListener from '@use-it/event-listener';
 import { ResizeSensor, IResizeEntry } from '@blueprintjs/core';
+import useEventListener from '@use-it/event-listener';
 import devLog from '../utils/logger';
 
 import { EditorReducerState } from '../reducers/editor';
@@ -57,11 +57,7 @@ const Main: React.FunctionComponent = () => {
 	useEventListener('mouseup', handleMouseUp, document.documentElement);
 
 	//-----------------------------------------------------------------------------------
-	useEffect(() => {
-		devLog('initializing ColorAceEditor instance...');
-		actionInitEditorInstance(dispatch);
-	},
-	[ dispatch ]);
+	useEffect(() => actionInitEditorInstance(dispatch), [ dispatch ]);
 
 
 	return <>

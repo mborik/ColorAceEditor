@@ -14,30 +14,61 @@ import { EditorTool } from '../editor/Editor';
 import { Pixelator } from '../editor/Pixelator';
 
 
+interface HTMLCanvasExtended extends HTMLCanvasElement {
+	touched?: boolean;
+	refresh: () => void;
+	putPixel: (x: number, y: number, set: boolean) => void;
+}
+
 const BrushShape: React.FunctionComponent = () => {
 	const [ opened, setOpened ] = useState<boolean>(false);
+	const [ canvas, setCanvas ] = useState<HTMLCanvasExtended>(null);
 
-	const { editorPixelator, visible } = useSelector((state: any) => {
+	const { editorPixelator, brushSize, visible } = useSelector((state: any) => {
 		let editorPixelator: Pixelator = null;
+		let brushSize: number = 0;
 		let visible: boolean = false;
 
 		if (state.editor) {
 			const editor = state.editor;
 
 			editorPixelator = editor.pixel;
+			brushSize = Math.sqrt(editorPixelator.brush.length);
 			visible = (editor.editTool === EditorTool.Brush);
 		}
 
-		return { editorPixelator, visible };
-	})
+		return { editorPixelator, brushSize, visible };
+	});
 
-	const canvasRef = useCallback((canvas: HTMLCanvasElement) => {
-		if (canvas !== null) {
-			const canvasCtx = canvas.getContext('2d');
+	const resetShape = useCallback(() => {
+		editorPixelator.resetBrushShape();
+		canvas.refresh();
+	},
+	[ editorPixelator, canvas ]);
 
-			const brushSize = Math.sqrt(editorPixelator.brush.length);
-			const pixel = canvasCtx.createImageData(1, 1);
+	const canvasRef = useCallback((canvas: HTMLCanvasExtended) => {
+		if (!canvas || canvas.touched) {
+			return;
+		}
 
+		const canvasCtx = canvas.getContext('2d');
+		const pixel = canvasCtx.createImageData(1, 1);
+
+		canvas.putPixel = (x: number, y: number, set: boolean) => {
+			if (x < 0 || x > brushSize || y < 0 || y > brushSize) {
+				return;
+			}
+
+			const ptr = (y * brushSize) + x;
+			const c = set ? 255 : 0;
+
+			editorPixelator.brush[ptr] = c;
+			pixel.data.set([ c, c, c, 255 ]);
+
+			canvasCtx.putImageData(pixel, x, y);
+		}
+
+		canvas.refresh = () => {
 			for (let i = 0, y = 0; y < brushSize; y++) {
 				for (let x = 0; x < brushSize; x++) {
 					const c = editorPixelator.brush[i++];
@@ -46,92 +77,84 @@ const BrushShape: React.FunctionComponent = () => {
 					canvasCtx.putImageData(pixel, x, y);
 				}
 			}
+		}
 
-			const putPixel = (x: number, y: number, set: boolean) => {
-				if (x < 0 || x > 15 || y < 0 || y > 15) {
-					return;
-				}
+		const translateCoords = (sx: number, sy: number) => {
+			const brushSize = Math.sqrt(editorPixelator.brush.length);
+			const rect = canvas.getBoundingClientRect();
+			const zoomW = rect.width / brushSize;
+			const zoomH = rect.height / brushSize;
 
-				const brushSize = Math.sqrt(editorPixelator.brush.length);
-				const ptr = (y * brushSize) + x;
-				const c = set ? 255 : 0;
-
-				editorPixelator.brush[ptr] = c;
-				pixel.data.set([ c, c, c, 255 ]);
-
-				canvasCtx.putImageData(pixel, x, y);
+			return {
+				x: Math.floor((sx - (rect.left + document.body.scrollLeft)) / zoomW),
+				y: Math.floor((sy - (rect.top + document.body.scrollTop)) / zoomH)
 			};
+		};
 
-			const translateCoords = (sx: number, sy: number) => {
-				const brushSize = Math.sqrt(editorPixelator.brush.length);
-				const rect = canvas.getBoundingClientRect();
-				const zoomW = rect.width / brushSize;
-				const zoomH = rect.height / brushSize;
+		let mousePressed = 0;
+		let mouseMoved = false;
+		let lastX: number, lastY: number;
 
-				return {
-					x: Math.floor((sx - (rect.left + document.body.scrollLeft)) / zoomW),
-					y: Math.floor((sy - (rect.top + document.body.scrollTop)) / zoomH)
-				};
-			};
+		canvas.addEventListener('mousedown', (e: MouseEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
 
-			let mousePressed = 0;
-			let mouseMoved = false;
-			let lastX: number, lastY: number;
+			if (e.button === 0 || e.button === 2) {
+				const { x, y } = translateCoords(e.pageX, e.pageY);
 
-			canvas.addEventListener('mousedown', (e: MouseEvent) => {
-				e.preventDefault();
-				e.stopPropagation();
+				canvas.putPixel(x, y, (e.button === 0));
 
-				if (e.button === 0 || e.button === 2) {
-					const { x, y } = translateCoords(e.pageX, e.pageY);
+				mousePressed = (e.button === 0) ? 1 : 2;
+				mouseMoved = false;
+				lastX = x;
+				lastY = y;
 
-					putPixel(x, y, (e.button === 0));
+			} else {
+				mousePressed = 0;
+			}
+		});
 
-					mousePressed = (e.button === 0) ? 1 : 2;
-					mouseMoved = false;
+		canvas.addEventListener('mousemove', (e: MouseEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+
+			if (mousePressed) {
+				const { x, y } = translateCoords(e.pageX, e.pageY);
+
+				if (lastX !== x || lastY !== y) {
+					canvas.putPixel(x, y, (mousePressed === 1));
+
 					lastX = x;
 					lastY = y;
-
-				} else {
-					mousePressed = 0;
 				}
-			});
 
-			canvas.addEventListener('mousemove', (e: MouseEvent) => {
-				e.preventDefault();
-				e.stopPropagation();
+				mouseMoved = true;
+			}
+		});
 
-				if (mousePressed) {
-					const { x, y } = translateCoords(e.pageX, e.pageY);
+		canvas.addEventListener('mouseup', (e: MouseEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
 
-					if (lastX !== x || lastY !== y) {
-						putPixel(x, y, (mousePressed === 1));
+			if (mousePressed) {
+				const { x, y } = translateCoords(e.pageX, e.pageY);
 
-						lastX = x;
-						lastY = y;
-					}
-
-					mouseMoved = true;
+				if (mouseMoved && (lastX !== x || lastY !== y)) {
+					canvas.putPixel(x, y, (mousePressed === 1));
 				}
-			});
 
-			canvas.addEventListener('mouseup', (e: MouseEvent) => {
-				e.preventDefault();
-				e.stopPropagation();
+				mousePressed = 0;
+				mouseMoved = false;
+			}
+		});
 
-				if (mousePressed) {
-					const { x, y } = translateCoords(e.pageX, e.pageY);
+		canvas.touched = true;
+		canvas.refresh();
 
-					if (mouseMoved && (lastX !== x || lastY !== y)) {
-						putPixel(x, y, (mousePressed === 1));
-					}
+		setCanvas(canvas);
+	},
+	[ editorPixelator, brushSize ]);
 
-					mousePressed = 0;
-					mouseMoved = false;
-				}
-			});
-		}
-	}, [ editorPixelator ]);
 
 	return visible ? (
 		<Navbar.Group align="right">
@@ -155,10 +178,11 @@ const BrushShape: React.FunctionComponent = () => {
 				title="Brush Shape Editor">
 
 				<div className={Classes.DIALOG_BODY}>
-					<canvas ref={canvasRef} width="15" height="15" />
+					<canvas ref={canvasRef} width={brushSize} height={brushSize} />
 				</div>
 				<div className={Classes.DIALOG_FOOTER}>
 					<div className={Classes.DIALOG_FOOTER_ACTIONS}>
+						<Button onClick={() => resetShape()} intent="danger">Reset</Button>
 						<Button onClick={() => setOpened(false)}>Close</Button>
 					</div>
 				</div>

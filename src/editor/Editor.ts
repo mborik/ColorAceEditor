@@ -117,6 +117,24 @@ export class Editor extends FileOps {
 	}
 
 	/**
+	 * Brush shape getter/setter to convert between string and ArrayBuffer.
+	 * @type {string}
+	 */
+	get editBrushShape(): string {
+		return Array.from(this.pixel.brush)
+			.map(v => v ? 'O' : '.')
+			.join('');
+	}
+	set editBrushShape(dataString: string) {
+		this.pixel.brush.set(
+			dataString
+				.replace(/\s/g, '')
+				.split('')
+				.map(v => v !== '.' ? 255 : 0)
+		)
+	}
+
+	/**
 	 * Set editor and scroller dimensions.
 	 *
 	 * @param {number} w - webpage workspace width

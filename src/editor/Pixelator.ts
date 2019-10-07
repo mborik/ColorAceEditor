@@ -10,24 +10,6 @@ import { editor, EditorDrawMode } from "./Editor";
 
 const FULL_ALPHA = 0xFFFFFFFF;
 const MARQUEE_COLOR = 0x302010;
-const DEFAULT_BRUSH = `
-	...............
-	...............
-	...............
-	...............
-	...............
-	......OOO......
-	.....OOOOO.....
-	.....OOOOO.....
-	.....OOOOO.....
-	......OOO......
-	...............
-	...............
-	...............
-	...............
-	...............
-`;
-
 
 export interface EditorSnapshot {
 	surface: Uint8ClampedArray;
@@ -99,13 +81,7 @@ export class Pixelator {
 			this.pal[i][3] = a | (y << 16) | (y << 8) | y;
 		}
 
-		this.brush.set(
-			DEFAULT_BRUSH
-			.replace(/\s/g, '')
-			.split('')
-			.map(v => v !== '.' ? 255 : 0)
-		);
-
+		this.resetBrushShape();
 		this.bmpBgColor = getComputedStyle(document.body)
 			.getPropertyValue('background-color');
 	}
@@ -497,6 +473,26 @@ export class Pixelator {
 	marqueeY(p: number, z: number, x: number) {
 		for (let i = 0; i < z; i++, x++, p++) {
 			this.bmpDWORD[p] = (x & 4) ? FULL_ALPHA : (this.bmpDWORD[p] ^ MARQUEE_COLOR);
+		}
+	}
+
+	/**
+	 * Reset brush shape ArrayBuffer to default midpoint filled circle.
+	 */
+	resetBrushShape() {
+		this.brush.fill(0);
+
+		const brushSize = Math.sqrt(this.brush.length);
+		const radius = brushSize / 6;
+		const boundL = Math.floor((brushSize / 2) - radius);
+		const boundR = Math.ceil((brushSize / 2) + radius) - 1;
+
+		for (let y: number = boundL, x: number; y <= boundR; y++) {
+			for (x = boundL; x <= boundR; x++) {
+				if ((x !== boundL && x !== boundR) || (y !== boundL && y !== boundR)) {
+					this.brush[x + (y * brushSize)] = 255;
+				}
+			}
 		}
 	}
 

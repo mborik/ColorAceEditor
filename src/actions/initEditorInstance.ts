@@ -3,14 +3,18 @@
  * Copyright (c) 2019 Martin Bórik
  */
 
+import pick from "object.pick";
 import { Dispatch } from "redux";
 import { actionAbout, actionRefresh, actionSelectionChanged, EditorAction } from "./base";
 import * as Editor from "../editor/Editor";
+import devLog from '../utils/logger';
 
 
 const COLORACE_EDITOR_CONFIGURATION = 'colorace-editor-configuration';
 
 export const actionInitEditorInstance = (dispatch: Dispatch) => {
+	devLog('initializing ColorAceEditor instance...');
+
 	const editor = Editor.getInstance({
 		selectCB: (nonEmpty: boolean) => dispatch(actionSelectionChanged(nonEmpty)),
 		canvas: document.getElementById('drawingCanvas') as HTMLCanvasElement,
@@ -24,33 +28,35 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 	try {
 		configuration = JSON.parse(localStorage.getItem(COLORACE_EDITOR_CONFIGURATION));
 
-		doAfterConfig = () => {
-			for (let opt in configuration) {
-				editor[opt] = configuration[opt];
-			}
+		if (configuration) {
+			devLog('ColorAceEditor configuration:', configuration);
+			doAfterConfig = () => {
+				for (let opt in configuration) {
+					editor[opt] = configuration[opt];
+				}
 
-			dispatch(actionRefresh());
-		};
+				dispatch(actionRefresh());
+			};
+		}
 	} catch (e) {
 		console.error('invalid ColorAceEditor configuration!');
 	}
 
 	window.addEventListener('beforeunload', e => {
 		e.preventDefault();
-		delete e['returnValue'];
+		if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+			delete e['returnValue'];
+		} else {
+			e.returnValue = 'Unsaved changes will be lost. Are you sure?';
+		}
 
-		localStorage.setItem(COLORACE_EDITOR_CONFIGURATION, JSON.stringify({
-			undoLevels: editor.undoLevels,
-			zoomFactor: editor.zoomFactor,
-			showGuides: editor.showGuides,
-			editColor: editor.editColor,
-			editTool: editor.editTool,
-			editMode: editor.editMode,
-			editFilled: editor.editFilled,
-			editSelectFnShiftWrap: editor.editSelectFnShiftWrap,
-			editSelectFnShiftAttr: editor.editSelectFnShiftAttr,
-			editSelectFnBlockAttr: editor.editSelectFnBlockAttr
-		}));
+		const conf = pick(editor, [
+			'undoLevels', 'zoomFactor', 'showGuides',
+			'editColor', 'editTool', 'editMode', 'editFilled', 'editBrushShape',
+			'editSelectFnShiftWrap', 'editSelectFnShiftAttr', 'editSelectFnBlockAttr'
+		]);
+
+		localStorage.setItem(COLORACE_EDITOR_CONFIGURATION, JSON.stringify(conf));
 	});
 
 	dispatch({
@@ -58,5 +64,5 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 		payload: editor
 	});
 
-	setTimeout(doAfterConfig, 128);
+	setTimeout(doAfterConfig, 256);
 };
