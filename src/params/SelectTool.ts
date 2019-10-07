@@ -13,9 +13,9 @@ import {
 	actionSelectNone,
 	actionSelectClear,
 	actionSelectInvert,
-	actionSelectCopy,
-	actionSelectShift
-} from "../actions/editor";
+	actionSelectCopy
+} from "../actions/base";
+import { actionSelectShift } from "../actions/selectShift";
 
 
 export interface SelectToolItem {

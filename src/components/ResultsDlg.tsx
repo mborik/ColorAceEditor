@@ -9,7 +9,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Classes, Dialog, TextArea, Switch, NonIdealState } from "@blueprintjs/core";
 import { EditorReducerState } from '../reducers/editor';
-import { actionResults } from '../actions/editor';
+import { actionResults } from '../actions/base';
 import toHex from '../utils/toHex';
 
 

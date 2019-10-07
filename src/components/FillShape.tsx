@@ -11,7 +11,7 @@ import { Button, Navbar, Tooltip, Position, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
-import { actionFillShapeChanged } from '../actions/editor';
+import { actionFillShapeChanged } from '../actions/base';
 
 
 const FillShape: React.FunctionComponent = () => {

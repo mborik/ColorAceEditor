@@ -11,7 +11,7 @@ import { Button, ButtonGroup, Navbar, Tooltip, Position, Icon, KeyCombo } from "
 
 import constants from '../params/constants';
 import { Editor } from '../editor/Editor';
-import { actionColorChanged } from '../actions/editor';
+import { actionColorChanged } from '../actions/base';
 import { PaletteItems } from '../params/Palette';
 
 

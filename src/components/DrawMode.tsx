@@ -11,7 +11,7 @@ import { Button, ButtonGroup, Navbar, Tooltip, Position, KeyCombo } from "@bluep
 
 import constants from '../params/constants';
 import { Editor, EditorTool, EditorDrawMode } from '../editor/Editor';
-import { actionDrawModeChanged } from '../actions/editor';
+import { actionDrawModeChanged } from '../actions/base';
 import { DrawModeItems } from '../params/DrawMode';
 
 

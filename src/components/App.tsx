@@ -9,7 +9,7 @@ import React from 'react';
 import { Hotkey, Hotkeys, HotkeysTarget } from "@blueprintjs/core";
 
 import { HotkeyItems } from '../params/Hotkeys';
-import { EditorReducerAction, EditorReducerStoreProps } from '../actions/editor';
+import { EditorReducerAction, EditorReducerStoreProps } from '../actions/base';
 
 import AboutDlg from './AboutDlg';
 import Main from './Main';

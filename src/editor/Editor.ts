@@ -13,7 +13,7 @@ import { Selection } from "./Selection";
 import { Scroller } from "scroller";
 
 
-export enum EditorTool {
+export const enum EditorTool {
 	Selection  = 'TBFN_SELECT',
 	AttrSelect = 'TBFN_ATTRSEL',
 	Pencil     = 'TBFN_PENCIL',
@@ -28,14 +28,14 @@ export enum EditorTool {
 	FillShape  = 'TBSM_FILLSHAPE'
 }
 
-export enum EditorDrawMode {
+export const enum EditorDrawMode {
 	Reset = 'TBDM_RESET',
 	Set   = 'TBDM_SET',
 	Over  = 'TBDM_OVER',
 	Color = 'TBDM_COLOR'
 }
 
-export enum EditorDirection {
+export const enum EditorDirection {
 	// shifts
 	UP = 'DIR_UP',
 	LT = 'DIR_LT',
@@ -52,7 +52,6 @@ export interface EditorOptions {
 	canvas: HTMLCanvasElement;
 	upload: HTMLCanvasElement;
 	status?: HTMLDivElement;
-	undo?: number;
 }
 
 interface CanvasCoordinates {
@@ -71,7 +70,7 @@ export class Editor extends FileOps {
 	contentHeight: number = 0;
 	zoomFactor: number = 1;
 	showGuides: boolean = true;
-	undoLevels: number = 10;
+	undoLevels: number = 50;
 	editColor: number = 0;
 	editTool: EditorTool = EditorTool.Pencil;
 	editMode: EditorDrawMode = EditorDrawMode.Over;
@@ -113,7 +112,6 @@ export class Editor extends FileOps {
 		this.canvas = opt.canvas;
 		this.ctx = this.canvas.getContext("2d");
 
-		this.undoLevels = opt.undo || 10;
 		this.statusBar = opt.status || null;
 		this.selectionActionCallback = opt.selectCB;
 	}

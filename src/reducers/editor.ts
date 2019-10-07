@@ -5,7 +5,7 @@
 
 import { Toaster } from "@blueprintjs/core";
 import { Editor } from "../editor/Editor";
-import { EditorAction } from "../actions/editor";
+import { EditorAction } from "../actions/base";
 
 
 export interface EditorReducerState {

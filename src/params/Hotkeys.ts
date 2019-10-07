@@ -18,7 +18,6 @@ import {
 	actionSelectClear,
 	actionSelectInvert,
 	actionSelectCopy,
-	actionSelectShift,
 	actionViewportZoom,
 	actionViewportPan,
 	actionToggleGuides,
@@ -28,7 +27,8 @@ import {
 	actionResults,
 	actionLoadFile,
 	actionSaveFile
-} from "../actions/editor";
+} from "../actions/base";
+import { actionSelectShift } from "../actions/selectShift";
 
 
 export type HotkeyItemAction = (editor: Editor, e: KeyboardEvent) => EditorReducerAction;

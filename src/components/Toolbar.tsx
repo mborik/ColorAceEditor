@@ -11,7 +11,7 @@ import { Button, ButtonGroup, Navbar, Tooltip, Position, KeyCombo } from "@bluep
 
 import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
-import { actionToolChanged } from '../actions/editor';
+import { actionToolChanged } from '../actions/base';
 import { ToolbarItems } from '../params/Toolbar';
 
 

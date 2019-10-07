@@ -12,11 +12,8 @@ import { ResizeSensor, IResizeEntry } from '@blueprintjs/core';
 import devLog from '../utils/logger';
 
 import { EditorReducerState } from '../reducers/editor';
-import {
-	actionInitEditorInstance,
-	actionSelectionChanged,
-	actionUploadFile
-} from '../actions/editor';
+import { actionInitEditorInstance } from '../actions/initEditorInstance';
+import { actionUploadFile } from "../actions/uploadFile";
 
 
 const Main: React.FunctionComponent = () => {
@@ -62,14 +59,7 @@ const Main: React.FunctionComponent = () => {
 	//-----------------------------------------------------------------------------------
 	useEffect(() => {
 		devLog('initializing ColorAceEditor instance...');
-
-		dispatch(actionInitEditorInstance({
-			selectCB: (nonEmpty: boolean) => dispatch(actionSelectionChanged(nonEmpty)),
-			canvas: document.getElementById('drawingCanvas') as HTMLCanvasElement,
-			upload: document.getElementById('uploadCanvas') as HTMLCanvasElement,
-			status: document.getElementById('statusBar') as HTMLDivElement,
-			undo: 50
-		}));
+		actionInitEditorInstance(dispatch);
 	},
 	[ dispatch ]);
 

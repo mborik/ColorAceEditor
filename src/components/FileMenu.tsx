@@ -8,7 +8,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button, Navbar, ButtonGroup, Popover, Classes } from "@blueprintjs/core";
-import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions/editor';
+import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions/base';
 
 const FileMenu: React.FunctionComponent = () => {
 	const dispatch = useDispatch();

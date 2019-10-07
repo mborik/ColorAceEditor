@@ -8,7 +8,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Navbar, Icon } from "@blueprintjs/core";
-import { actionAbout } from '../actions/editor';
+import { actionAbout } from '../actions/base';
 
 import Toolbar from './Toolbar';
 import DrawMode from './DrawMode';

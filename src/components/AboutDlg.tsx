@@ -9,7 +9,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Classes, Dialog } from "@blueprintjs/core";
 import { EditorReducerState } from '../reducers/editor';
-import { actionAbout } from '../actions/editor';
+import { actionAbout } from '../actions/base';
 
 
 /**

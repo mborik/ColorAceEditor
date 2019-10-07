@@ -12,7 +12,7 @@ import { Button, ButtonGroup, Navbar, Tooltip, Position, Popover, Menu, MenuItem
 import constants from '../params/constants';
 import { Editor, EditorTool } from '../editor/Editor';
 import { SelectToolItems, SelectToolSubMenu } from '../params/SelectTool';
-import { actionSelectFnCheckboxChanged } from '../actions/editor';
+import { actionSelectFnCheckboxChanged } from '../actions/base';
 
 
 const SelectTools: React.FunctionComponent = () => {

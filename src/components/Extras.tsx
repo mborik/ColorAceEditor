@@ -8,7 +8,8 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Navbar, Tooltip, KeyCombo, Position, ButtonGroup, Popover, Menu, MenuItem } from "@blueprintjs/core";
-import { actionUndo, actionToggleGuides, actionImportScreen } from '../actions/editor';
+import { actionUndo, actionToggleGuides } from '../actions/base';
+import { actionImportScreen } from '../actions/importScreen';
 import { EditorReducerState } from '../reducers/editor';
 import constants from '../params/constants';
 import database from '../params/screen.db';

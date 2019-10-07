@@ -1,10 +1,15 @@
+/*
+ * PMD 85 ColorAce picture editor
+ * redux actions base definitions
+ *
+ * Copyright (c) 2019 Martin Bórik
+ */
+
 import { Dispatch } from "redux";
-import { IToastProps } from "@blueprintjs/core";
-import { getInstance as ColorAceEditor,
-	EditorOptions, EditorTool, EditorDrawMode, EditorDirection, editor } from "../editor/Editor";
+import { EditorTool, EditorDrawMode } from "../editor/Editor";
 import { EditorReducerState } from "../reducers/editor";
 
-export enum EditorAction {
+export const enum EditorAction {
 	InitEditorInstance = 'INIT_EDITOR_INSTANCE',
 	SelectionChanged = 'SELECTION_CHANGED',
 	ToolChanged = 'TOOL_CHANGED',
@@ -43,11 +48,6 @@ export interface EditorReducerStoreProps {
 }
 
 //---------------------------------------------------------------------------------------
-export const actionInitEditorInstance = (opt: EditorOptions): EditorReducerAction => ({
-	type: EditorAction.InitEditorInstance,
-	payload: ColorAceEditor(opt)
-});
-
 export const actionSelectionChanged = (nonEmpty: boolean): EditorReducerAction => ({
 	type: EditorAction.SelectionChanged,
 	payload: { nonEmpty }
@@ -100,26 +100,6 @@ export const actionSelectCopy = (cut: boolean = false): EditorReducerAction => (
 	payload: { cut }
 });
 
-export const actionSelectShift = (direction: EditorDirection) =>
-	(dispatch: Dispatch, getState: () => EditorReducerState) => {
-		const editor = getState().editor;
-		if (!editor) {
-			return;
-		}
-
-		if (editor.editSelectFnShiftAttr && !editor.selection.testAttrBounds()) {
-			return dispatch(actionToast({
-				icon: 'new-grid-item',
-				message: 'Selection not fit to attributes!'
-			}));
-		}
-
-		return dispatch({
-			type: EditorAction.SelectShiftFlip,
-			payload: { direction }
-		});
-	};
-
 export const actionViewportZoom = (zoomDelta: number): EditorReducerAction => ({
 	type: EditorAction.ViewportZoom,
 	payload: { zoomDelta }
@@ -160,16 +140,6 @@ export const actionResults = (open: boolean): EditorReducerAction => ({
 	payload: { open }
 });
 
-export const actionToast = (toastParams: IToastProps): EditorReducerAction => ({
-	type: EditorAction.Toast,
-	payload: {
-		intent: 'warning',
-		icon: 'warning-sign',
-		message: 'something happen!?',
-		...toastParams
-	}
-});
-
 export const actionLoadFile = (): EditorReducerAction => ({
 	type: EditorAction.LoadFile
 });
@@ -178,52 +148,3 @@ export const actionSaveFile = (fileName?: string): EditorReducerAction => ({
 	type: EditorAction.SaveFile,
 	payload: { fileName }
 });
-
-export const actionUploadFile = (file: File) =>
-	(dispatch: Dispatch, getState: () => EditorReducerState) => {
-		const state = getState();
-		if (!(file && state.editor)) {
-			return;
-		}
-
-		const progressEl = document.getElementById('progress') as HTMLElement;
-		const updateProgress = (amount: number) => {
-			if (amount < 1) {
-				progressEl.style.display = 'block';
-				progressEl.style.width = Math.round(amount * 100) + 'vw';
-			} else {
-				progressEl.style.display = null;
-				progressEl.style.width = null;
-			}
-		}
-
-		state.editor.upload(file, updateProgress)
-			.then(() => dispatch(actionRefresh()))
-			.catch((error: string) => dispatch(actionToast({
-				intent: 'danger',
-				message: error
-			})))
-			.finally(() => {
-				// wipe the last loaded file to allow reopen of same file again...
-				(document.getElementById('uploadFile') as any).value = null;
-			});
-	};
-
-export const actionImportScreen = (filename: string) =>
-	(dispatch: Dispatch, getState: () => EditorReducerState) => {
-		const state = getState();
-		if (!(filename && state.editor)) {
-			return;
-		}
-
-		fetch(filename)
-			.then(response => response.arrayBuffer())
-			.then(buffer => {
-				editor.pixel.readPMD85vram(new Uint8Array(buffer));
-				dispatch(actionRefresh());
-			})
-			.catch((error: string) => dispatch(actionToast({
-				intent: 'danger',
-				message: error
-			})));
-	};
