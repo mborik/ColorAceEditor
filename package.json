@@ -1,9 +1,10 @@
 {
   "name": "colorace-editor-react",
-  "description": "Online pixelart screen editor for Tesla PMD 85 microcomputer.",
+  "displayName": "ColorACE Screen Editor",
+  "description": "Online pixelart screen editor for an 8-bit personal micro-computer Tesla PMD 85",
   "license": "MIT",
-  "version": "1.2.3",
-  "homepage": "http://mborik.github.io/ColorAceEditor",
+  "version": "1.2.4",
+  "homepage": "https://pmd85.borik.net/colorace",
   "dependencies": {
     "@blueprintjs/core": "^3.18.0",
     "@types/node": "12.7.2",
@@ -11,7 +12,6 @@
     "@types/react-dom": "16.8.5",
     "@types/react-redux": "^7.1.2",
     "@use-it/event-listener": "^0.1.3",
-    "gh-pages": "^2.1.1",
     "node-sass": "^4.12.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -25,8 +25,6 @@
     "typescript-debounce-decorator": "0.0.17"
   },
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "exit 1"

@@ -1,0 +1,14 @@
+{
+	"name": "ColorACE Screen Editor",
+	"short_name": "ColorAceEditor",
+	"start_url": ".",
+	"display": "minimal-ui",
+	"orientation": "landscape",
+	"background_color": "#182026",
+	"description": "Online pixelart screen editor for Tesla PMD 85, an 8-bit personal micro-computer produced in eighties of 20th century in former Czechoslovakia.",
+	"icons": [{
+		"src": "public/logo.png",
+		"sizes": "72x72",
+		"type": "image/png"
+	}]
+}
