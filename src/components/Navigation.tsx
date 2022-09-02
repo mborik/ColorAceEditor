@@ -27,7 +27,7 @@ const Navigation: React.FunctionComponent = () => {
 	[ dispatch ]);
 
 	return <nav>
-		<Navbar className="bp3-dark">
+		<Navbar className="bp4-dark">
 			<Navbar.Group align="center" onClick={handleOpenAboutDlg}>
 				<Navbar.Heading>ColorACE Screen Editor</Navbar.Heading>
 			</Navbar.Group>

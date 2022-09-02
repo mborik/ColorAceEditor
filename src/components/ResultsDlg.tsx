@@ -55,7 +55,7 @@ const ResultsDlg: React.FunctionComponent = () => {
 		<div className={Classes.DIALOG_BODY}>
 			{results ? (
 				<TextArea
-					className="bp3-monospace-text bp3-intent-primary"
+					className="bp4-monospace-text bp4-intent-primary"
 					rows={16}
 					fill={true}
 					readOnly={true}

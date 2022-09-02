@@ -41,11 +41,11 @@ const Main: React.FunctionComponent = () => {
 	[ editor ]);
 
 	const handleMouseMove = useCallback(
-		(e: React.MouseEvent) => editor && editor.action.mouseMove(e),
+		(e: unknown) => editor && editor.action.mouseMove(e as React.MouseEvent),
 	[ editor ]);
 
 	const handleMouseUp = useCallback(
-		(e: React.MouseEvent) => editor && editor.action.mouseUp(e),
+		(e: unknown) => editor && editor.action.mouseUp(e as React.MouseEvent),
 	[ editor ]);
 
 	const handleUploadFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
@@ -62,7 +62,7 @@ const Main: React.FunctionComponent = () => {
 
 	return <>
 		<ResizeSensor onResize={handleResize}>
-			<main className="bp3-fill" role="main"
+			<main className="bp4-fill" role="main"
 				onWheel={handleMouseWheel}
 				onMouseDown={handleMouseDown}>
 
