@@ -26,8 +26,10 @@ const store = createStore(
 );
 
 ReactDOM.render(
-	<Provider store={store}>
-		<App {...store} />
-	</Provider>,
+	<HotkeysProvider>
+		<Provider store={store}>
+			<App />
+		</Provider>
+	</HotkeysProvider>,
 	document.getElementById('wrapper')
 );

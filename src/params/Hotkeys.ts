@@ -5,7 +5,7 @@
  * Copyright (c) 2019 Martin Bórik
  */
 
-import { IHotkeyProps } from "@blueprintjs/core";
+import { HotkeyConfig } from "@blueprintjs/core";
 import { Editor, EditorTool, EditorDrawMode, EditorDirection } from "../editor/Editor";
 import {
 	EditorReducerAction,
@@ -33,22 +33,17 @@ import { actionSelectShift } from "../actions/selectShift";
 
 export type HotkeyItemAction = (editor: Editor, e: KeyboardEvent) => EditorReducerAction;
 
-export class HotkeyItem implements IHotkeyProps {
-	/** Unique identifier */
-	key: string;
-
-	global: boolean = true;
-	preventDefault: boolean = true;
-	stopPropagation: boolean = true;
+export class HotkeyItem implements HotkeyConfig {
+	global = true;
+	allowInInput = false;
+	preventDefault = true;
+	stopPropagation = true;
 
 	constructor(
 		public group: string,
 		public label: string,
 		public combo: string,
-		public handler: HotkeyItemAction) {
-
-		this.key = `HKEY_${combo.replace(/\W/g, '_').toUpperCase()}`;
-	}
+		public handler: HotkeyItemAction) {}
 }
 
 export const HotkeyItems: HotkeyItem[] = [
