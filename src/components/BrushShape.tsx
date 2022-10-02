@@ -2,16 +2,15 @@
  * PMD 85 ColorAce picture editor
  * BrushShape component
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 import React, { useState, useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import { Button, Classes, Dialog, Navbar, Tooltip, Position } from "@blueprintjs/core";
 
 import constants from '../params/constants';
 import { EditorTool } from '../editor/Editor';
-import { Pixelator } from '../editor/Pixelator';
+import { useEditor } from './EditorProvider';
 
 
 interface HTMLCanvasExtended extends HTMLCanvasElement {
@@ -20,40 +19,28 @@ interface HTMLCanvasExtended extends HTMLCanvasElement {
 	putPixel: (x: number, y: number, set: boolean) => void;
 }
 
-const BrushShape: React.FunctionComponent = () => {
+const BrushShape: React.VFC = () => {
+	const { editor } = useEditor();
 	const [ opened, setOpened ] = useState<boolean>(false);
-	const [ canvas, setCanvas ] = useState<HTMLCanvasExtended>(null);
+	const [ canvas, setCanvas ] = useState<HTMLCanvasExtended>();
 
-	const { editorPixelator, brushSize, visible } = useSelector((state: any) => {
-		let editorPixelator: Pixelator = null;
-		let brushSize: number = 0;
-		let visible: boolean = false;
-
-		if (state.editor) {
-			const editor = state.editor;
-
-			editorPixelator = editor.pixel;
-			brushSize = Math.sqrt(editorPixelator.brush.length);
-			visible = (editor.editTool === EditorTool.Brush);
-		}
-
-		return { editorPixelator, brushSize, visible };
-	});
+	const { pixel: editorPixelator } = editor ?? {};
+	const brushSize = editorPixelator?.brush?.length ? Math.sqrt(editorPixelator.brush.length) : 0;
+	const visible = (editor?.editTool === EditorTool.Brush);
 
 	const resetShape = useCallback(() => {
-		editorPixelator.resetBrushShape();
-		canvas.refresh();
+		editorPixelator?.resetBrushShape();
+		canvas?.refresh();
 	},
 	[ editorPixelator, canvas ]);
 
 	const canvasRef = useCallback((canvas: HTMLCanvasExtended) => {
-		if (!canvas || canvas.touched) {
+		const canvasCtx = canvas.getContext('2d');
+		if (!editorPixelator || !canvasCtx || canvas.touched) {
 			return;
 		}
 
-		const canvasCtx = canvas.getContext('2d');
 		const pixel = canvasCtx.createImageData(1, 1);
-
 		canvas.putPixel = (x: number, y: number, set: boolean) => {
 			if (x < 0 || x > brushSize || y < 0 || y > brushSize) {
 				return;

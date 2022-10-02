@@ -2,28 +2,27 @@
  * PMD 85 ColorAce picture editor
  * Main component, drawing canvas container
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 import React, { useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ResizeSensor, IResizeEntry } from '@blueprintjs/core';
+import { ResizeEntry } from '@blueprintjs/core';
+import { ResizeSensor2 } from '@blueprintjs/popover2';
 import useEventListener from '@use-it/event-listener';
 import devLog from '../utils/logger';
 
-import { EditorReducerState } from '../reducers/editor';
+import { useEditor } from './EditorProvider';
 import { actionInitEditorInstance } from '../actions/initEditorInstance';
 import { actionUploadFile } from "../actions/uploadFile";
 
 
-const Main: React.FunctionComponent = () => {
-	const dispatch = useDispatch();
-	const editor = useSelector((state: EditorReducerState) => state.editor);
+const Main: React.VFC = () => {
+	const { dispatch, editor } = useEditor();
 
-	const handleResize = useCallback((entries: IResizeEntry[]) => {
+	const handleResize = useCallback((entries: ResizeEntry[]) => {
 		const entry = entries.shift();
-		if (entry) {
-			const rect = entry.contentRect;
+		if (editor && entry) {
+			const { contentRect: rect } = entry;
 
 			devLog('viewport dimensions set to renderer', rect);
 			editor.setDimensions(rect.width, rect.height);
@@ -33,23 +32,23 @@ const Main: React.FunctionComponent = () => {
 	[ editor ]);
 
 	const handleMouseWheel = useCallback(
-		(e: React.WheelEvent) => editor && editor.action.mouseWheel(e),
+		(e: React.WheelEvent) => editor?.action.mouseWheel(e),
 	[ editor ]);
 
 	const handleMouseDown = useCallback(
-		(e: React.MouseEvent) => editor && editor.action.mouseDown(e),
+		(e: React.MouseEvent) => editor?.action.mouseDown(e),
 	[ editor ]);
 
 	const handleMouseMove = useCallback(
-		(e: unknown) => editor && editor.action.mouseMove(e as React.MouseEvent),
+		(e: unknown) => editor?.action.mouseMove(e as React.MouseEvent),
 	[ editor ]);
 
 	const handleMouseUp = useCallback(
-		(e: unknown) => editor && editor.action.mouseUp(e as React.MouseEvent),
+		(e: unknown) => editor?.action.mouseUp(e as React.MouseEvent),
 	[ editor ]);
 
 	const handleUploadFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
-		dispatch(actionUploadFile(e.target.files[0])),
+		actionUploadFile(e?.target?.files?.[0]),
 	[ dispatch ]);
 
 	useEventListener('contextmenu', e => e.preventDefault(), document.documentElement);
@@ -61,14 +60,14 @@ const Main: React.FunctionComponent = () => {
 
 
 	return <>
-		<ResizeSensor onResize={handleResize}>
+		<ResizeSensor2 onResize={handleResize}>
 			<main className="bp4-fill" role="main"
 				onWheel={handleMouseWheel}
 				onMouseDown={handleMouseDown}>
 
 				<canvas id="drawingCanvas" />
 			</main>
-		</ResizeSensor>
+		</ResizeSensor2>
 
 		<form hidden encType="multipart/form-data">
 			<input type="file" id="uploadFile" onChange={handleUploadFile} />

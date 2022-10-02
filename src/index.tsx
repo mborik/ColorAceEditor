@@ -1,22 +1,23 @@
 /*
  * PMD 85 ColorAce picture editor
- * React app entry point, Redux store/reducer initialization
+ * React app entry point and initialization
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { HotkeysProvider } from '@blueprintjs/core';
 import App from './components/App';
+import EditorProvider from "./components/EditorProvider";
 
 (async () => {
-	// Wait until CSS is loaded before rendering components because some of them (like Table)
-	// rely on those styles to take accurate DOM measurements.
 	await import("./index.scss");
 	ReactDOM.render((
 		<HotkeysProvider>
-			<App />
+			<EditorProvider>
+				<App />
+			</EditorProvider>
 		</HotkeysProvider>
 	), document.querySelector("#wrapper"));
 })();

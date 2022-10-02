@@ -1,31 +1,22 @@
 /*
  * PMD 85 ColorAce picture editor
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { Dispatch } from "redux";
-import { EditorAction } from "./base";
+import { DispatchAction, EditorAction } from "./base";
 import { actionToast } from "./toast";
-import { EditorDirection } from "../editor/Editor";
-import { EditorReducerState } from "../reducers/editor";
+import { Editor, EditorDirection } from "../editor/Editor";
 
 
-export const actionSelectShift = (direction: EditorDirection) =>
-	(dispatch: Dispatch, getState: () => EditorReducerState) => {
-		const editor = getState().editor;
-		if (!editor) {
-			return;
-		}
-
-		if (editor.editSelectFnShiftAttr && !editor.selection.testAttrBounds()) {
-			return dispatch(actionToast({
-				icon: 'new-grid-item',
-				message: 'Selection not fit to attributes!'
-			}));
-		}
-
-		return dispatch({
-			type: EditorAction.SelectShiftFlip,
-			payload: { direction }
+export const actionSelectShift = (editor: Editor, direction: EditorDirection): DispatchAction => {
+	if (editor.editSelectFnShiftAttr && !editor.selection.testAttrBounds()) {
+		return actionToast({
+			icon: 'new-grid-item',
+			message: 'Selection not fit to attributes!'
 		});
+	}
+	return {
+		type: EditorAction.SelectShiftFlip,
+		payload: { direction }
 	};
+};

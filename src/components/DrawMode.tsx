@@ -2,72 +2,57 @@
  * PMD 85 ColorAce picture editor
  * DrawMode component
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { Button, ButtonGroup, Navbar, Tooltip, Position, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
-import { Editor, EditorTool, EditorDrawMode } from '../editor/Editor';
+import { EditorTool, EditorDrawMode } from '../editor/Editor';
 import { actionDrawModeChanged } from '../actions/base';
 import { DrawModeItems } from '../params/DrawMode';
+import { useEditor } from './EditorProvider';
 
 
-const DrawMode: React.FunctionComponent = () => {
-	const { modes, noSelection } = useSelector((state: any) => {
-		const editor: Editor = state.editor;
-
-		if (editor == null) {
-			return {
-				tools: DrawModeItems,
-				noSelection: false
-			};
-		}
-
-		return {
-			noSelection: (
-				editor.editTool !== EditorTool.Selection &&
-				editor.editTool !== EditorTool.AttrSelect
-			),
-			modes: DrawModeItems.map(mode => ({
-				...mode,
-				active: (mode.id === editor.editMode),
-				content: <>
-					<label>{mode.title}</label>
-					<KeyCombo combo={mode.hotkey} />
-				</>
-			}))
-		};
-	});
-
-	const dispatch = useDispatch();
+const DrawMode: React.VFC = () => {
+	const { dispatch, editor } = useEditor()
 	const dispatchChange = useCallback(
 		(editMode: EditorDrawMode) => dispatch(actionDrawModeChanged(editMode)),
 		[ dispatch ]
 	);
 
+	const noSelection = (
+		editor?.editTool !== EditorTool.Selection &&
+		editor?.editTool !== EditorTool.AttrSelect
+	);
+
 	return noSelection ? (
 		<Navbar.Group align="left">
 			<ButtonGroup>
-				{modes.map(m => (
-					<Tooltip
-						key={`${m.id}_TT`}
-						content={m.content}
-						position={Position.BOTTOM_RIGHT}
-						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
+				{DrawModeItems.map(mode => {
+					const active = (mode.id === editor?.editMode)
+					return (
+						<Tooltip
+							key={`${mode.id}_TT`}
+							content={<>
+								<label>{mode.title}</label>
+								<KeyCombo combo={mode.hotkey} />
+							</>}
+							position={Position.BOTTOM_RIGHT}
+							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
 
-						<Button
-							id={m.id}
-							key={m.id}
-							text={m.caption}
-							active={m.active}
-							intent={m.active ? 'primary' : undefined}
-							onClick={() => dispatchChange(m.id)}
-						/>
-					</Tooltip>
-				))}
+							<Button
+								id={mode.id}
+								key={mode.id}
+								text={mode.caption}
+								active={active}
+								intent={active ? 'primary' : undefined}
+								onClick={() => dispatchChange(mode.id)}
+							/>
+						</Tooltip>
+					)}
+				)}
 			</ButtonGroup>
 		</Navbar.Group>
 	) : null;

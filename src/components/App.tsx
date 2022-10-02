@@ -2,15 +2,14 @@
  * PMD 85 ColorAce picture editor
  * App entry component
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import React, { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import * as React from "react";
 import { HotkeyConfig, useHotkeys } from "@blueprintjs/core";
 
 import { HotkeyItems } from '../params/Hotkeys';
-import { EditorReducerState } from '../reducers/editor';
+import { useEditor } from './EditorProvider';
 
 import AboutDlg from './AboutDlg';
 import Main from './Main';
@@ -18,10 +17,9 @@ import Navigation from './Navigation';
 import ResultsDlg from './ResultsDlg';
 
 
-const App: React.FunctionComponent = () => {
-	const dispatch = useDispatch();
-	const { editor } = useSelector((state: EditorReducerState) => state);
-	const hotkeyItems = useMemo(() => {
+const App: React.VFC = () => {
+	const { dispatch, editor } = useEditor();
+	const hotkeyItems = React.useMemo(() => {
 		if (editor) {
 			return HotkeyItems.map(({ handler, ...hotkeyConfig }) => ({
 				...hotkeyConfig,
@@ -31,9 +29,9 @@ const App: React.FunctionComponent = () => {
 						dispatch(action);
 					}
 				},
-			}) as HotkeyConfig)
+			}) as HotkeyConfig);
 		}
-		return []
+		return [];
 	}, [editor])
 
 	const { handleKeyDown, handleKeyUp } = useHotkeys(hotkeyItems);
