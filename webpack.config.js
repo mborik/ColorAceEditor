@@ -42,9 +42,8 @@ const webpackConfig = Object.assign({}, baseConfig, {
 	plugins: baseConfig.plugins.concat([
 		new CopyWebpackPlugin({
 			patterns: [
-				// to: is relative to dist/
 				{ from: "src/index.html", to: "." },
-				{ from: "public/*", to: "." },
+				{ from: "public", to: "." },
 			],
 		}),
 		new PackageJsonPlugin({
