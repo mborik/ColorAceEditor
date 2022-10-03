@@ -1,6 +1,6 @@
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const DotenvPlugin = require('dotenv-webpack');
+const PackageJsonPlugin = require('pkg.json-webpack-plugin');
 const optimizeConstEnum = require('ts-transformer-optimize-const-enum').default;
 
 const baseConfig = require("@blueprintjs/webpack-build-scripts/webpack.config.base");
@@ -47,7 +47,10 @@ const webpackConfig = Object.assign({}, baseConfig, {
 				{ from: "public/*", to: "." },
 			],
 		}),
-		new DotenvPlugin()
+		new PackageJsonPlugin({
+			key: 'package',
+			include: ['version', 'releaseYear'],
+		})
 	]),
 
 	module: {

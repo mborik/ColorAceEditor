@@ -4,7 +4,13 @@
   "description": "Online pixelart screen editor for an 8-bit personal micro-computer Tesla PMD 85",
   "license": "MIT",
   "version": "1.3.0",
+  "releaseYear": "2022",
   "homepage": "https://pmd85.borik.net/colorace",
+  "author": {
+    "name": "Martin Bórik",
+    "email": "martin@borik.net",
+    "url": "https://github.com/mborik"
+  },
   "private": true,
   "repository": {
     "type": "git",
@@ -42,7 +48,7 @@
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.8.5",
     "copy-webpack-plugin": "^6.4.0",
-    "dotenv-webpack": "^8.0.1",
+    "pkg.json-webpack-plugin": "^2.0.2",
     "ts-transformer-optimize-const-enum": "^0.1.2",
     "typescript": "^4.8.2",
     "webpack": "^5.71.0",

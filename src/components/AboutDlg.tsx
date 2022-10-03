@@ -30,16 +30,19 @@ const AboutDlg: React.VFC = () => {
 		<div className={Classes.DIALOG_BODY}>
 			<img src="logo.png" alt="ColorACE Screen Editor" />
 			<h2>Screen Editor <span className="app-version">v{
-				process.env.REACT_APP_VERSION
+				process.env.package.version
 			}</span></h2>
 
-			<p>Online pixelart screen editor for <b><Link
-					href="https://pmd85.borik.net/" text="Tesla PMD 85" /></b>,<br />
+			<p>Online pixelart screen editor for <b>
+				<Link href="https://pmd85.borik.net/" text="Tesla PMD 85" /></b>,
+				<br />
 				an 8-bit personal micro-computer produced in eighties
 				of 20th century in former Czechoslovakia.</p>
 
-			<p>Copyright &copy; 2012-2022 <Link
-				href="https://github.com/mborik" text="Martin Bórik" /></p>
+			<p>Copyright &copy; 2012-{
+				process.env.package.releaseYear
+			} <Link href="https://github.com/mborik" text="Martin Bórik" />
+			</p>
 
 			<hr />
 			<div className={Classes.DIALOG_FOOTER}>
