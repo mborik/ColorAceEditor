@@ -5,13 +5,14 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import React, { useEffect, useCallback } from 'react';
+import * as React from "react";
 import { ResizeEntry } from '@blueprintjs/core';
 import { ResizeSensor2 } from '@blueprintjs/popover2';
 import useEventListener from '@use-it/event-listener';
 import devLog from '../utils/logger';
 
 import { useEditor } from './EditorProvider';
+import { Dispatch } from "../actions/base";
 import { actionInitEditorInstance } from '../actions/initEditorInstance';
 import { actionUploadFile } from "../actions/uploadFile";
 
@@ -19,7 +20,10 @@ import { actionUploadFile } from "../actions/uploadFile";
 const Main: React.VFC = () => {
 	const { dispatch, editor } = useEditor();
 
-	const handleResize = useCallback((entries: ResizeEntry[]) => {
+	type UseCallbackStateCallback = (currentDispatch: Dispatch) => void
+	const [initCallback, setCallBackQueue] = React.useState<UseCallbackStateCallback>();
+
+	const handleResize = React.useCallback((entries: ResizeEntry[]) => {
 		const entry = entries.shift();
 		if (editor && entry) {
 			const { contentRect: rect } = entry;
@@ -31,23 +35,23 @@ const Main: React.VFC = () => {
 	},
 	[ editor ]);
 
-	const handleMouseWheel = useCallback(
+	const handleMouseWheel = React.useCallback(
 		(e: React.WheelEvent) => editor?.action.mouseWheel(e),
 	[ editor ]);
 
-	const handleMouseDown = useCallback(
+	const handleMouseDown = React.useCallback(
 		(e: React.MouseEvent) => editor?.action.mouseDown(e),
 	[ editor ]);
 
-	const handleMouseMove = useCallback(
+	const handleMouseMove = React.useCallback(
 		(e: unknown) => editor?.action.mouseMove(e as React.MouseEvent),
 	[ editor ]);
 
-	const handleMouseUp = useCallback(
+	const handleMouseUp = React.useCallback(
 		(e: unknown) => editor?.action.mouseUp(e as React.MouseEvent),
 	[ editor ]);
 
-	const handleUploadFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
+	const handleUploadFile = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
 		actionUploadFile(e?.target?.files?.[0]),
 	[ dispatch ]);
 
@@ -56,8 +60,21 @@ const Main: React.VFC = () => {
 	useEventListener('mouseup', handleMouseUp, document.documentElement);
 
 	//-----------------------------------------------------------------------------------
-	useEffect(() => actionInitEditorInstance(dispatch), [ dispatch ]);
+	React.useEffect(() => {
+		const doActionAfterInit = actionInitEditorInstance(dispatch)
+		setTimeout(() => {
+			const action = doActionAfterInit()
+			setCallBackQueue(() => (currentDispatch) => currentDispatch(action))
+		}, 256)
+	}, []);
 
+	React.useEffect(() => {
+		if (typeof initCallback === 'function') {
+			initCallback(dispatch);
+			setCallBackQueue(undefined);
+		}
+	},
+	[ initCallback, dispatch ]);
 
 	return <>
 		<ResizeSensor2 onResize={handleResize}>

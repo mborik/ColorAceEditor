@@ -7,6 +7,7 @@ import * as React from "react";
 import { Editor } from "../editor/Editor";
 import { EditorAction, DispatchAction, Dispatch } from "../actions/base";
 import { showToast } from "../actions/toast";
+import devLog from "../utils/logger";
 
 
 export interface EditorContextState {
@@ -30,19 +31,19 @@ const EditorProvider = ({ children }) => {
 	const [state, setState] = React.useState<EditorContextState>(defaultState);
 
 	const dispatch = React.useCallback(({ type, payload }: DispatchAction) => {
-		if (type === EditorAction.InitEditorInstance) {
-			return setState((prevState) => ({
-				...prevState,
-				editor: payload
-			}));
-		}
-
 		const { editor } = state;
 		if (!editor) {
+			if (type === EditorAction.InitEditorInstance) {
+				return setState((prevState) => ({
+					...prevState,
+					editor: payload
+				}));
+			}
 			return;
 		}
 
-		const { action } = editor
+		devLog(type, payload ?? '');
+		const { action } = editor;
 
 		switch (type) {
 			case EditorAction.ToolChanged:
@@ -169,7 +170,8 @@ const EditorProvider = ({ children }) => {
 				editor.download(payload.fileName);
 				break;
 		}
-	}, []);
+	},
+	[ state.editor ]);
 
 	return <Context.Provider value={{ ...state, dispatch }}>{children}</Context.Provider>;
 };

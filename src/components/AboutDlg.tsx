@@ -43,9 +43,7 @@ const AboutDlg: React.VFC = () => {
 
 			<hr />
 			<div className={Classes.DIALOG_FOOTER}>
-				<p>Built on <Link href="https://reactjs.org/" text="React" />
-					and&nbsp;
-					<Link href="https://blueprintjs.com/"
+				<p>Built on <Link href="https://blueprintjs.com/"
 						text="BlueprintJS UI framework" />.<br />
 					Licensed under the MIT license.
 				</p>

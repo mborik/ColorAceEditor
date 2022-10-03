@@ -3,7 +3,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, EditorAction } from "./base";
+import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from "./base";
 import { Editor, getInstance } from "../editor/Editor";
 import devLog from '../utils/logger';
 
@@ -26,7 +26,7 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 		status: document.getElementById('statusBar') as HTMLDivElement
 	});
 
-	let doAfterConfig = (): any => dispatch(actionAbout(true));
+	let doActionAfterInit = (): DispatchAction => actionAbout(true);
 
 	try {
 		const configuration: EditorConfig = JSON.parse(
@@ -35,12 +35,12 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 
 		if (configuration) {
 			devLog('ColorAceEditor configuration:', configuration);
-			doAfterConfig = () => {
+			doActionAfterInit = () => {
 				for (let opt in configuration) {
 					editor[opt] = configuration[opt];
 				}
 
-				dispatch(actionRefresh());
+				return actionRefresh();
 			};
 		}
 	} catch (_) {
@@ -73,5 +73,5 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 		payload: editor
 	});
 
-	setTimeout(doAfterConfig, 256);
+	return doActionAfterInit;
 };
