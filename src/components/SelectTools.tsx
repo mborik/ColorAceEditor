@@ -2,106 +2,102 @@
  * PMD 85 ColorAce picture editor
  * SelectTools component
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import * as React from "react";
 import { Button, ButtonGroup, Navbar, Tooltip, Position, Popover, Menu, MenuItem, MenuDivider, Icon, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
-import { Editor, EditorTool } from '../editor/Editor';
-import { SelectToolItems, SelectToolSubMenu } from '../params/SelectTool';
+import { EditorTool } from '../editor/Editor';
+import { SelectToolItemAction, SelectToolItems, SelectToolSubMenu } from '../params/SelectTool';
 import { actionSelectFnCheckboxChanged } from '../actions/base';
+import { useEditor } from "./EditorProvider";
 
 
-const SelectTools: React.FunctionComponent = () => {
-	const dispatch = useDispatch();
-	const dispatchChange = useCallback((action) => dispatch(action), [ dispatch ]);
-	const dispatchCheckboxChange = useCallback((checkboxProperty: string) =>
+const SelectTools: React.VFC = () => {
+	const { dispatch, editor } = useEditor();
+	const dispatchChange = React.useCallback((actionHandler: SelectToolItemAction) => {
+		if (!editor || !actionHandler) {
+			return
+		}
+		dispatch(actionHandler(editor))
+	},
+	[ dispatch, editor ]);
+
+	const dispatchCheckboxChange = React.useCallback((checkboxProperty: string) =>
 		dispatch(actionSelectFnCheckboxChanged(checkboxProperty)),
 		[ dispatch ]
 	);
 
-	const { selection, tools, menu } = useSelector((state: any) => {
-		const editor: Editor = state.editor;
+	if (!editor) {
+		return null;
+	}
 
-		if (editor == null) {
-			return {
-				selection: false,
-				tools: [],
-				menu: []
-			};
+	const isSelectionMode =
+		editor.editTool === EditorTool.Selection ||
+		editor.editTool === EditorTool.AttrSelect;
+
+	const	menu = editor.selection.nonEmpty() ? SelectToolSubMenu.map(
+		(item: any, idx: number) => {
+			if (item.divider) {
+				return { ...item, key: `TBSD_${idx}` };
+
+			} else if (item.checkbox) {
+				const checked = editor[item.checkboxProperty];
+				return {
+					key: item.id,
+					id: item.id,
+					icon: item.icon,
+					text: (checked && item.checkedText) ? item.checkedText : item.text,
+					shouldDismissPopover: false,
+					labelElement: <Icon icon={checked ? 'tick' : 'blank'} />,
+					onClick: () => dispatchCheckboxChange(item.checkboxProperty)
+				};
+			}
+			else {
+				return {
+					key: item.id,
+					id: item.id,
+					icon: item.icon,
+					text: item.text,
+					labelElement: item.hotkey ? <KeyCombo combo={item.hotkey} /> : undefined,
+					onClick: () => dispatchChange(item.action)
+				};
+			}
 		}
+	) : [];
 
-		return {
-			selection: (
-				editor.editTool === EditorTool.Selection ||
-				editor.editTool === EditorTool.AttrSelect
-			),
-			tools: SelectToolItems.map(tool => ({
-				...tool,
-				active: false,
-				enabled: tool.enabled || editor.selection.nonEmpty(),
-				content: <>
-					<label>{tool.title}</label>
-					<KeyCombo combo={tool.hotkey} />
-				</>
-			})),
-			menu: editor.selection.nonEmpty() ? SelectToolSubMenu.map(
-				(item: any, idx: number) => {
-					if (item.divider) {
-						return { ...item, key: `TBSD_${idx}` };
-
-					} else if (item.checkbox) {
-						const checked = editor[item.checkboxProperty];
-						return {
-							key: item.id,
-							id: item.id,
-							icon: item.icon,
-							text: (checked && item.checkedText) ? item.checkedText : item.text,
-							shouldDismissPopover: false,
-							labelElement: <Icon icon={checked ? 'tick' : 'blank'} />,
-							onClick: () => dispatchCheckboxChange(item.checkboxProperty)
-						};
-					}
-					else {
-						return {
-							key: item.id,
-							id: item.id,
-							icon: item.icon,
-							text: item.text,
-							labelElement: item.hotkey ? <KeyCombo combo={item.hotkey} /> : undefined,
-							onClick: () => item.action ? dispatchChange(item.action) : null
-						};
-					}
-				}
-			) : []
-		};
-	});
-
-	return selection ? (
+	return isSelectionMode ? (
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
-				{tools.map(t => (
-					<Tooltip
-						key={`${t.id}_TT`}
-						content={t.enabled ? t.content : undefined}
-						disabled={!t.enabled}
-						position={Position.BOTTOM_RIGHT}
-						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
+				{SelectToolItems.map((tool) => {
+					const isEnabled = (tool.enabled || editor.selection.nonEmpty())
 
-						<Button
-							id={t.id}
-							key={t.id}
-							icon={t.icon}
-							disabled={!t.enabled}
-							active={t.active}
-							intent={t.active ? 'primary' : undefined}
-							onClick={() => t.action ? dispatchChange(t.action) : null}
-						/>
-					</Tooltip>
-				))}
+					return (
+						<Tooltip
+							key={`${tool.id}_TT`}
+							disabled={!isEnabled}
+							position={Position.BOTTOM_RIGHT}
+							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
+							content={isEnabled ? (
+								<>
+									<label>{tool.title}</label>
+									<KeyCombo combo={tool.hotkey} />
+								</>
+							) : undefined}>
+
+							<Button
+								id={tool.id}
+								key={tool.id}
+								icon={tool.icon}
+								disabled={!isEnabled}
+								active={false}
+								onClick={() => tool.action && dispatchChange(tool.action)}
+							/>
+						</Tooltip>
+					)
+				})}
 				<Popover
 					disabled={menu.length === 0}
 					position={Position.BOTTOM_LEFT}

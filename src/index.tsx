@@ -1,33 +1,24 @@
 /*
  * PMD 85 ColorAce picture editor
- * React app entry point, Redux store/reducer initialization
+ * React app entry point and initialization
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
-import { createLogger } from 'redux-logger';
-import thunkMiddleware from 'redux-thunk';
-
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { HotkeysProvider } from '@blueprintjs/core';
 import App from './components/App';
-import { editorReducer } from './reducers/editor';
-import './index.scss';
+import EditorProvider from "./components/EditorProvider";
+import { APP_WRAPPER } from "./params/querySelectors";
 
-
-const dev: boolean = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development');
-
-const store = createStore(
-	editorReducer,
-	dev ? applyMiddleware(thunkMiddleware, createLogger()) :
-		applyMiddleware(thunkMiddleware)
-);
-
-ReactDOM.render(
-	<Provider store={store}>
-		<App {...store} />
-	</Provider>,
-	document.getElementById('wrapper')
-);
+(async () => {
+	await import("./index.scss");
+	ReactDOM.render((
+		<HotkeysProvider>
+			<EditorProvider>
+				<App />
+			</EditorProvider>
+		</HotkeysProvider>
+	), APP_WRAPPER());
+})();

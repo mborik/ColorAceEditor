@@ -2,28 +2,30 @@
  * PMD 85 ColorAce picture editor
  * Selection toolbar item definitions
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 import { IconName } from "@blueprintjs/core";
-import { EditorDirection } from "../editor/Editor";
+import { Editor, EditorDirection } from "../editor/Editor";
 import {
-	EditorReducerAction,
 	actionSelectAll,
 	actionSelectNone,
 	actionSelectClear,
 	actionSelectInvert,
-	actionSelectCopy
+	actionSelectCopy,
+	DispatchAction
 } from "../actions/base";
 import { actionSelectShift } from "../actions/selectShift";
 
+
+export type SelectToolItemAction = (editor: Editor) => DispatchAction;
 
 export interface SelectToolItem {
 	/** Unique identifier */
 	id: string;
 
 	/** Reducer action */
-	action?: EditorReducerAction;
+	action?: SelectToolItemAction;
 
 	/**
 	 * BlueprintJS icon identifier
@@ -52,7 +54,7 @@ export interface SelectToolSubMenuItem {
 	id?: string;
 
 	/** Reducer action */
-	action?: EditorReducerAction;
+	action?: SelectToolItemAction;
 
 	/**
 	 * BlueprintJS icon identifier
@@ -80,31 +82,31 @@ export const SelectToolItems: SelectToolItem[] = [{
 	title: 'select all',
 	hotkey: 'mod+A',
 	enabled: true,
-	action: actionSelectAll()
+	action: () => actionSelectAll()
 }, {
 	id: 'TBST_DESELECT',
 	icon: 'disable',
 	title: 'deselect',
 	hotkey: 'mod+D',
-	action: actionSelectNone()
+	action: () => actionSelectNone()
 }, {
 	id: 'TBST_CUT',
 	icon: 'cut',
 	title: 'cut',
 	hotkey: 'mod+X',
-	action: actionSelectCopy(true)
+	action: () => actionSelectCopy(true)
 }, {
 	id: 'TBST_CLONE',
 	icon: 'duplicate',
 	title: 'clone',
 	hotkey: 'mod+C',
-	action: actionSelectCopy(false)
+	action: () => actionSelectCopy(false)
 }, {
 	id: 'TBST_CLEAR',
 	icon: 'eraser',
 	title: 'clear',
 	hotkey: 'del',
-	action: actionSelectClear()
+	action: () => actionSelectClear()
 }];
 
 export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
@@ -112,19 +114,19 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 	icon: 'right-join',
 	text: 'Invert',
 	hotkey: 'mod+I',
-	action: actionSelectInvert()
+	action: () => actionSelectInvert()
 }, {
 	divider: true
 }, {
 	id: 'TBSM_FLIP_H',
 	icon: 'double-caret-horizontal',
 	text: 'Flip Horizontal',
-	action: actionSelectShift(EditorDirection.FH) as any
+	action: editor => actionSelectShift(editor, EditorDirection.FH)
 }, {
 	id: 'TBSM_FLIP_V',
 	icon: 'double-caret-vertical',
 	text: 'Flip Vertical',
-	action: actionSelectShift(EditorDirection.FV) as any
+	action: editor => actionSelectShift(editor, EditorDirection.FV)
 }, {
 	divider: true
 }, {
@@ -132,25 +134,25 @@ export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
 	icon: 'double-chevron-up',
 	text: 'Shift Up',
 	hotkey: 'mod+up',
-	action: actionSelectShift(EditorDirection.UP) as any
+	action: editor => actionSelectShift(editor, EditorDirection.UP)
 }, {
 	id: 'TBSM_MOVE_LEFT',
 	icon: 'double-chevron-left',
 	text: 'Shift Left',
 	hotkey: 'mod+left',
-	action: actionSelectShift(EditorDirection.LT) as any
+	action: editor => actionSelectShift(editor, EditorDirection.LT)
 }, {
 	id: 'TBSM_MOVE_RIGHT',
 	icon: 'double-chevron-right',
 	text: 'Shift Right',
 	hotkey: 'mod+right',
-	action: actionSelectShift(EditorDirection.RT) as any
+	action: editor => actionSelectShift(editor, EditorDirection.RT)
 }, {
 	id: 'TBSM_MOVE_DOWN',
 	icon: 'double-chevron-down',
 	text: 'Shift Down',
 	hotkey: 'mod+down',
-	action: actionSelectShift(EditorDirection.DN) as any
+	action: editor => actionSelectShift(editor, EditorDirection.DN)
 }, {
 	divider: true
 }, {

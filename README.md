@@ -2,7 +2,7 @@
 
 Online pixelart screen editor for Tesla PMD 85, an 8-bit personal micro-computer produced in eighties of 20th century in former Czechoslovakia.
 
-This is the second, _TypeScriptified_ iteration of this project built on [React](https://reactjs.org/)+[Redux](https://redux.js.org) and [BlueprintJS UI framework](https://blueprintjs.com).
+This is the second, _TypeScriptified_ iteration of this project built on [React](https://reactjs.org/) and [BlueprintJS UI framework](https://blueprintjs.com).
 
 
 ## Available Scripts

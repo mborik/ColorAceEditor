@@ -2,11 +2,10 @@
  * PMD 85 ColorAce picture editor
  * Navigation panel component
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { Navbar, Icon } from "@blueprintjs/core";
 import { actionAbout } from '../actions/base';
 
@@ -18,16 +17,17 @@ import SelectTools from './SelectTools';
 import Palette from './Palette';
 import FileMenu from './FileMenu';
 import Extras from './Extras';
+import { useEditor } from './EditorProvider';
 
 
-const Navigation: React.FunctionComponent = () => {
-	const dispatch = useDispatch();
+const Navigation: React.VFC = () => {
+	const { dispatch } = useEditor();
 	const handleOpenAboutDlg = useCallback(
 		() => dispatch(actionAbout(true)),
 	[ dispatch ]);
 
 	return <nav>
-		<Navbar className="bp3-dark">
+		<Navbar className="bp4-dark">
 			<Navbar.Group align="center" onClick={handleOpenAboutDlg}>
 				<Navbar.Heading>ColorACE Screen Editor</Navbar.Heading>
 			</Navbar.Group>

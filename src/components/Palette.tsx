@@ -2,78 +2,74 @@
  * PMD 85 ColorAce picture editor
  * Palette component
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Button, ButtonGroup, Navbar, Tooltip, Position, Icon, KeyCombo } from "@blueprintjs/core";
+import { Button, ButtonGroup, Navbar, Tooltip, Position, Icon, KeyCombo, IconSize } from "@blueprintjs/core";
 
 import constants from '../params/constants';
-import { Editor } from '../editor/Editor';
 import { actionColorChanged } from '../actions/base';
 import { PaletteItems } from '../params/Palette';
+import { useEditor } from './EditorProvider';
+import { IconCodepoints } from '@blueprintjs/icons';
 
 
-const Palette: React.FunctionComponent = () => {
-	const palette = useSelector((state: any) => {
-		const editor: Editor = state.editor;
-
-		if (editor) {
-			return PaletteItems.map((item: any) => ({
-				...item,
-				icon: item.icon || 'symbol-square',
-				iconSize: item.icon ? Icon.SIZE_STANDARD : 24,
-				color: item.color || '#ffffff7f',
-				active: (item.value === editor.editColor),
-				content: item.attrs && item.attrs.length ? <>
-					<code>
-						attr0: <b>{item.attrs[0]}</b><br/>
-						attr1: <b>{item.attrs[1]}</b>
-					</code>
-					<KeyCombo combo={item.value.toString()} />
-				</> : <>
-					<span>
-						no color change<br />
-						<i>(attrs not modified)</i>
-					</span>
-					<KeyCombo combo="D" />
-				</>
-			}));
-		}
-
-		return PaletteItems;
-	});
-
-	const dispatch = useDispatch();
+const Palette: React.VFC = () => {
+	const { dispatch, editor } = useEditor();
 	const dispatchChange = useCallback(
 		(editColor: number) => dispatch(actionColorChanged(editColor)),
 		[ dispatch ]
 	);
 
-	return (
+	return editor ? (
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
-				{palette.map(t => (
-					<Tooltip
-						key={`${t.id}_TT`}
-						content={t.content}
-						position={Position.BOTTOM_RIGHT}
-						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
+				{PaletteItems.map((tool) => {
+					const { attrs, value } = tool;
+					const isActive = (value === editor.editColor);
 
-						<Button
-							id={t.id}
-							key={t.id}
-							icon={<Icon icon={t.icon} iconSize={t.iconSize} color={t.color} />}
-							active={t.active}
-							intent={t.active ? 'primary' : undefined}
-							onClick={() => dispatchChange(t.value)}
-						/>
-					</Tooltip>
-				))}
+					return (
+						<Tooltip
+							key={`${tool.id}_TT`}
+							position={Position.BOTTOM_RIGHT}
+							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
+							content={attrs?.length ? (
+								<>
+									<code>
+										attr0: <b>{attrs[0]}</b><br/>
+										attr1: <b>{attrs[1]}</b>
+									</code>
+									<KeyCombo combo={value.toString()} />
+								</>
+							) : (
+								<>
+									<span>
+										no color change<br />
+										<i>(attrs not modified)</i>
+									</span>
+									<KeyCombo combo="D" />
+								</>
+							)}>
+
+							<Button
+								id={tool.id}
+								key={tool.id}
+								icon={<Icon
+									icon={tool.icon ?? 'symbol-square'}
+									iconSize={tool.icon ? IconSize.STANDARD : 24}
+									color={tool.color ?? '#ffffff7f'}
+								/>}
+								active={isActive}
+								intent={isActive ? 'primary' : undefined}
+								onClick={() => dispatchChange(value)}
+							/>
+						</Tooltip>
+					)
+				})}
 			</ButtonGroup>
 		</Navbar.Group>
-	);
+	) : null;
 }
 
 export default Palette;

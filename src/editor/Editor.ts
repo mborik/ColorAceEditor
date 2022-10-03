@@ -2,7 +2,7 @@
  * PMD 85 ColorAce picture editor
  * ColorAceEditor namespace and base class definition acting as singleton
  *
- * Copyright (c) 2012-2019 Martin Bórik
+ * Copyright (c) 2012-2022 Martin Bórik
  */
 
 import { ActionHandler } from "./ActionHandler";
@@ -46,7 +46,7 @@ export const enum EditorDirection {
 	FV = 'FLIP_V'
 }
 
-type EditorSelectionActionFn = (nonEmpty: boolean) => {};
+type EditorSelectionActionFn = (nonEmpty: boolean) => void;
 export interface EditorOptions {
 	selectCB: EditorSelectionActionFn;
 	canvas: HTMLCanvasElement;
@@ -60,11 +60,11 @@ interface CanvasCoordinates {
 	column: number;
 }
 
-export var editor: Editor = null;
+export var editor: Nullable<Editor> = null;
 export class Editor extends FileOps {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
-	statusBar: HTMLDivElement;
+	statusBar: Nullable<HTMLDivElement>;
 
 	contentWidth: number = 0;
 	contentHeight: number = 0;
@@ -80,7 +80,7 @@ export class Editor extends FileOps {
 	editSelectFnShiftAttr: boolean = false;
 	editSelectFnBlockAttr: boolean = false;
 
-	selectionActionCallback: EditorSelectionActionFn = (() => null);
+	selectionActionCallback: EditorSelectionActionFn;
 
 	coordsRecorder: { x: number, y: number }[] = [];
 
@@ -109,9 +109,13 @@ export class Editor extends FileOps {
 			throw Error("ColorAceEditor: Canvas element not defined!");
 		}
 
-		this.canvas = opt.canvas;
-		this.ctx = this.canvas.getContext("2d");
+		const canvasContext = opt.canvas.getContext("2d");
+		if (!(canvasContext instanceof CanvasRenderingContext2D)) {
+			throw Error("ColorAceEditor: Canvas rendering context not defined!");
+		}
 
+		this.ctx = canvasContext
+		this.canvas = opt.canvas;
 		this.statusBar = opt.status || null;
 		this.selectionActionCallback = opt.selectCB;
 	}

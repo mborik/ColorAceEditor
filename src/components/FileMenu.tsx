@@ -2,16 +2,16 @@
  * PMD 85 ColorAce picture editor
  * FileMenu component
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 import React, { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { Button, Navbar, ButtonGroup, Popover, Classes } from "@blueprintjs/core";
 import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions/base';
+import { useEditor } from './EditorProvider';
 
-const FileMenu: React.FunctionComponent = () => {
-	const dispatch = useDispatch();
+const FileMenu: React.VFC = () => {
+	const { dispatch } = useEditor();
 	const handleClickLoad = useCallback(() => dispatch(actionLoadFile()), [ dispatch ]);
 	const handleClickSave = useCallback(() => dispatch(actionSaveFile()), [ dispatch ]);
 	const handleClickNew = useCallback(() => dispatch(actionCleanup()), [ dispatch ]);

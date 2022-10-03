@@ -209,26 +209,21 @@ export class FileOps {
 
 		if (blob) {
 			try {
-				if (navigator && navigator.msSaveOrOpenBlob) { // for IE
-					navigator.msSaveOrOpenBlob(blob, encodeURIComponent(filename));
+				const url = URL.createObjectURL(blob);
+				const downloadLink = document.createElement('a');
+				const parentElement = this.uploadCanvas.parentElement;
 
-				} else {
-					const url = URL.createObjectURL(blob);
-					const downloadLink = document.createElement('a');
-					const parentElement = this.uploadCanvas.parentElement;
+				downloadLink.href = url;
+				downloadLink.setAttribute('download', encodeURIComponent(filename));
 
-					downloadLink.href = url;
-					downloadLink.setAttribute('download', encodeURIComponent(filename));
+				parentElement.appendChild(downloadLink);
+				downloadLink.click();
 
-					parentElement.appendChild(downloadLink);
-					downloadLink.click();
-
-					setTimeout(function () {
-						// revoking of created url and anchor removal...
-						URL.revokeObjectURL(url);
-						downloadLink.remove();
-					}, 2000);
-				}
+				setTimeout(function () {
+					// revoking of created url and anchor removal...
+					URL.revokeObjectURL(url);
+					downloadLink.remove();
+				}, 2000);
 			}
 			catch (ex) {
 				console.error(ex);

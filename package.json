@@ -3,41 +3,61 @@
   "displayName": "ColorACE Screen Editor",
   "description": "Online pixelart screen editor for an 8-bit personal micro-computer Tesla PMD 85",
   "license": "MIT",
-  "version": "1.2.4",
+  "version": "1.3.0",
+  "releaseYear": "2022",
   "homepage": "https://pmd85.borik.net/colorace",
-  "dependencies": {
-    "@blueprintjs/core": "^3.19.0",
-    "@types/node": "12.7.2",
-    "@types/react": "16.9.2",
-    "@types/react-dom": "16.8.5",
-    "@types/react-redux": "^7.1.4",
-    "@use-it/event-listener": "^0.1.3",
-    "babel-plugin-const-enum": "0.0.2",
-    "customize-cra": "^0.8.0",
-    "node-sass": "^4.12.0",
-    "react": "^16.10.2",
-    "react-app-rewired": "^2.1.3",
-    "react-dom": "^16.10.2",
-    "react-redux": "^7.1.1",
-    "react-scripts": "^3.2.0",
-    "redux": "^4.0.4",
-    "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.3.0",
-    "scroller": "0.0.3",
-    "typescript": "3.5.3",
-    "typescript-debounce-decorator": "0.0.17"
+  "author": {
+    "name": "Martin Bórik",
+    "email": "martin@borik.net",
+    "url": "https://github.com/mborik"
+  },
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mborik/ColorAceEditor.git"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "exit 1"
+    "bundle": "webpack --config ./webpack.config.js",
+    "clean": "rm -rf dist/*",
+    "dev": "webpack-dev-server --config ./webpack.config.js --host 0.0.0.0",
+    "dist": "cross-env NODE_ENV=production npm run bundle",
+    "test": "exit 0"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "dependencies": {
+    "@blueprintjs/core": "^4.10.2",
+    "@blueprintjs/icons": "^4.6.0",
+    "@blueprintjs/popover2": "^1.6.7",
+    "@use-it/event-listener": "^0.1.7",
+    "classnames": "^2.3.2",
+    "core-js": "^3.25.3",
+    "dom4": "^2.1.5",
+    "moment": "^2.29.1",
+    "normalize.css": "^8.0.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-transition-group": "^4.4.1",
+    "scroller": "0.0.3",
+    "tslib": "~2.3.1",
+    "typescript-debounce-decorator": "^0.0.18"
+  },
+  "devDependencies": {
+    "@blueprintjs/node-build-scripts": "^5.2.0",
+    "@blueprintjs/webpack-build-scripts": "^3.2.1",
+    "@types/lodash-es": "~4.17.6",
+    "@types/node": "^12.7.2",
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.8.5",
+    "copy-webpack-plugin": "^6.4.0",
+    "pkg.json-webpack-plugin": "^2.0.2",
+    "ts-transformer-optimize-const-enum": "^0.1.2",
+    "typescript": "^4.8.2",
+    "webpack": "^5.71.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.1"
   },
   "browserslist": {
     "production": [
-      ">0.2%",
+      ">0.5%",
       "not dead",
       "not op_mini all"
     ],
