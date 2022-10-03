@@ -31,6 +31,7 @@
     "classnames": "^2.3.2",
     "core-js": "^3.25.3",
     "dom4": "^2.1.5",
+    "lodash.debounce": "^4.0.8",
     "moment": "^2.29.1",
     "normalize.css": "^8.0.1",
     "react": "^16.14.0",

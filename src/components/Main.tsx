@@ -9,12 +9,13 @@ import * as React from "react";
 import { HotkeyConfig, useHotkeys } from '@blueprintjs/core';
 import { ResizeSensor2, ResizeSensor2Props } from '@blueprintjs/popover2';
 import useEventListener from '@use-it/event-listener';
-import devLog from '../utils/logger';
 import { useEditor } from './EditorProvider';
 import { Dispatch } from "../actions/base";
 import { actionInitEditorInstance } from '../actions/initEditorInstance';
 import { actionUploadFile } from "../actions/uploadFile";
 import { HotkeyItems } from '../params/Hotkeys';
+import constants from "../params/constants";
+import devLog from '../utils/logger';
 
 
 type InitCallbackFn = (currentDispatch: Dispatch) => void
@@ -88,7 +89,8 @@ const Main: React.VFC = () => {
 		setTimeout(() => {
 			const action = doActionAfterInit()
 			setCallBackQueue((): InitCallbackFn => (currentDispatch) => currentDispatch(action))
-		}, 256)
+		},
+		constants.DEBOUNCE_TIMEOUT)
 	}, []);
 
 	React.useEffect(() => {

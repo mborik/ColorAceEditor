@@ -6,6 +6,7 @@
  */
 
 import * as React from "react";
+import debounce from "lodash/debounce";
 import { Button, ButtonGroup, Navbar, Tooltip, Position, Popover, Menu, MenuItem, MenuDivider, Icon, KeyCombo } from "@blueprintjs/core";
 
 import constants from '../params/constants';
@@ -17,6 +18,26 @@ import { useEditor } from "./EditorProvider";
 
 const SelectTools: React.VFC = () => {
 	const { dispatch, editor } = useEditor();
+	const [isSelectionNonEmpty, setIsSelectionNonEmpty] = React.useState(false);
+
+	const debouncedObservedSelection = debounce(
+		(selection) => setIsSelectionNonEmpty(selection.nonEmpty()),
+		constants.DEBOUNCE_TIMEOUT
+	);
+
+	React.useEffect(() => {
+		if (!editor) {
+			return;
+		}
+		editor.selection = new Proxy(editor.selection, {
+			set(...args) {
+				debouncedObservedSelection(args[0]);
+				return Reflect.set(...args);
+			}
+		})
+	},
+	[ editor ])
+
 	const dispatchChange = React.useCallback((actionHandler: SelectToolItemAction) => {
 		if (!editor || !actionHandler) {
 			return
@@ -27,8 +48,7 @@ const SelectTools: React.VFC = () => {
 
 	const dispatchCheckboxChange = React.useCallback((checkboxProperty: string) =>
 		dispatch(actionSelectFnCheckboxChanged(checkboxProperty)),
-		[ dispatch ]
-	);
+	[ dispatch ]);
 
 	if (!editor) {
 		return null;
@@ -38,7 +58,7 @@ const SelectTools: React.VFC = () => {
 		editor.editTool === EditorTool.Selection ||
 		editor.editTool === EditorTool.AttrSelect;
 
-	const	menu = editor.selection.nonEmpty() ? SelectToolSubMenu.map(
+	const	menu = isSelectionNonEmpty ? SelectToolSubMenu.map(
 		(item: any, idx: number) => {
 			if (item.divider) {
 				return { ...item, key: `TBSD_${idx}` };
@@ -72,7 +92,7 @@ const SelectTools: React.VFC = () => {
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
 				{SelectToolItems.map((tool) => {
-					const isEnabled = (tool.enabled || editor.selection.nonEmpty())
+					const isEnabled = (tool.enabled || isSelectionNonEmpty)
 
 					return (
 						<Tooltip

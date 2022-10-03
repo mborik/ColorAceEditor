@@ -5,4 +5,5 @@
 
 export default {
 	TOOLTIP_TIMEOUT: 600,
+	DEBOUNCE_TIMEOUT: 128,
 };

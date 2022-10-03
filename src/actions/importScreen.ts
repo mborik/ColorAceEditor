@@ -6,6 +6,7 @@
 import { actionRefresh, Dispatch } from "./base";
 import { actionToast } from "./toast";
 import { Editor } from "../editor/Editor";
+import constants from "../params/constants";
 
 
 export const actionImportScreen = ({
@@ -27,7 +28,8 @@ export const actionImportScreen = ({
 			editor.pixel.readPMD85vram(new Uint8Array(buffer));
 			setTimeout(() => {
 				dispatch(actionRefresh());
-			}, 256);
+			},
+			constants.DEBOUNCE_TIMEOUT);
 		})
 		.catch((error: string) => dispatch(actionToast({
 			intent: 'danger',
