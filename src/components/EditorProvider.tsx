@@ -8,6 +8,7 @@ import { Editor } from "../editor/Editor";
 import { EditorAction, DispatchAction, Dispatch } from "../actions/base";
 import { showToast } from "../actions/toast";
 import devLog from "../utils/logger";
+import { UPLOAD } from "../params/querySelectors";
 
 
 export interface EditorContextState {
@@ -163,7 +164,7 @@ const EditorProvider = ({ children }) => {
 				break;
 
 			case EditorAction.LoadFile:
-				(document.getElementById('uploadFile') as HTMLInputElement).click();
+				UPLOAD.INPUT().click();
 				break;
 
 			case EditorAction.SaveFile:

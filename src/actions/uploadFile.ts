@@ -4,6 +4,7 @@
  */
 
 import { useEditor } from "../components/EditorProvider";
+import { PROGRESS_BAR, UPLOAD } from "../params/querySelectors";
 import { actionRefresh } from "./base";
 import { actionToast } from "./toast";
 
@@ -14,7 +15,7 @@ export const actionUploadFile = (file?: File) => {
 		return;
 	}
 
-	const { style } = document.getElementById('progress') as HTMLElement;
+	const { style } = PROGRESS_BAR();
 	const updateProgress = (amount: number) => {
 		if (amount < 1) {
 			style.display = 'block';
@@ -33,6 +34,6 @@ export const actionUploadFile = (file?: File) => {
 		})))
 		.finally(() => {
 			// wipe the last loaded file to allow reopen of same file again...
-			(document.getElementById('uploadFile') as any).value = null;
+			UPLOAD.INPUT().value = '';
 		});
 };

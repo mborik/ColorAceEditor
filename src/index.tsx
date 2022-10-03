@@ -10,6 +10,7 @@ import * as ReactDOM from "react-dom";
 import { HotkeysProvider } from '@blueprintjs/core';
 import App from './components/App';
 import EditorProvider from "./components/EditorProvider";
+import { APP_WRAPPER } from "./params/querySelectors";
 
 (async () => {
 	await import("./index.scss");
@@ -19,5 +20,5 @@ import EditorProvider from "./components/EditorProvider";
 				<App />
 			</EditorProvider>
 		</HotkeysProvider>
-	), document.querySelector("#wrapper"));
+	), APP_WRAPPER());
 })();

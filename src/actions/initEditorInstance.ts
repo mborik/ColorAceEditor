@@ -6,6 +6,7 @@
 import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from "./base";
 import { Editor, getInstance } from "../editor/Editor";
 import devLog from '../utils/logger';
+import { CANVAS, STATUS_BAR, UPLOAD } from "../params/querySelectors";
 
 
 const COLORACE_EDITOR_CONFIGURATION = 'colorace-editor-configuration';
@@ -21,9 +22,9 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 
 	const editor = getInstance({
 		selectCB: (nonEmpty: boolean) => dispatch(actionSelectionChanged(nonEmpty)),
-		canvas: document.getElementById('drawingCanvas') as HTMLCanvasElement,
-		upload: document.getElementById('uploadCanvas') as HTMLCanvasElement,
-		status: document.getElementById('statusBar') as HTMLDivElement
+		canvas: CANVAS(),
+		status: STATUS_BAR(),
+		upload: UPLOAD.CANVAS(),
 	});
 
 	let doActionAfterInit = (): DispatchAction => actionAbout(true);
