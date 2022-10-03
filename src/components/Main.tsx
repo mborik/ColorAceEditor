@@ -71,8 +71,12 @@ const Main: React.VFC = () => {
 	[ editor ]);
 
 	const handleUploadFile = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) =>
-		actionUploadFile(e?.target?.files?.[0]),
-	[ dispatch ]);
+		actionUploadFile({
+			dispatch,
+			editor,
+			file: e?.target?.files?.[0]
+		}),
+	[ dispatch, editor ]);
 
 	useEventListener('contextmenu', e => e.preventDefault(), document.documentElement);
 	useEventListener('mousemove', handleMouseMove, document.documentElement);

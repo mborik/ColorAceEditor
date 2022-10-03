@@ -3,22 +3,31 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { actionRefresh } from "./base";
+import { actionRefresh, Dispatch } from "./base";
 import { actionToast } from "./toast";
-import { useEditor } from "../components/EditorProvider";
+import { Editor } from "../editor/Editor";
 
 
-export const actionImportScreen = (filename: string) => {
-	const { dispatch, editor } = useEditor();
-	if (!(filename && editor)) {
+export const actionImportScreen = ({
+	dispatch,
+	editor,
+	fileName
+}: {
+	dispatch: Dispatch,
+	editor?: Nullable<Editor>,
+	fileName: string,
+}) => {
+	if (!(fileName && editor)) {
 		return;
 	}
 
-	fetch(filename)
+	fetch(fileName)
 		.then(response => response.arrayBuffer())
 		.then(buffer => {
 			editor.pixel.readPMD85vram(new Uint8Array(buffer));
-			dispatch(actionRefresh());
+			setTimeout(() => {
+				dispatch(actionRefresh());
+			}, 256);
 		})
 		.catch((error: string) => dispatch(actionToast({
 			intent: 'danger',

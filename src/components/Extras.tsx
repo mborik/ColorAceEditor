@@ -39,7 +39,11 @@ const Extras: React.VFC = () => {
 									key={`MNXI_${key}`}
 									text={item.name}
 									label={`[ ${item.author} ]`}
-									onClick={() => actionImportScreen(item.filename)}
+									onClick={() => actionImportScreen({
+										dispatch,
+										editor,
+										fileName: item.filename
+									})}
 								/>
 							))}
 						</Menu>

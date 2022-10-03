@@ -7,8 +7,8 @@ import * as React from "react";
 import { Editor } from "../editor/Editor";
 import { EditorAction, DispatchAction, Dispatch } from "../actions/base";
 import { showToast } from "../actions/toast";
-import devLog from "../utils/logger";
 import { UPLOAD } from "../params/querySelectors";
+import devLog from "../utils/logger";
 
 
 export interface EditorContextState {
@@ -50,28 +50,45 @@ const EditorProvider = ({ children }) => {
 			case EditorAction.ToolChanged:
 				if (!action.isActionInProgress()) {
 					editor.editTool = payload.editTool;
+					return setState((prevState) => ({
+						...prevState,
+						editor
+					}));
 				}
 				break;
 
 			case EditorAction.ColorChanged:
 				if (!action.isActionInProgress()) {
 					editor.editColor = payload.editColor;
+					return setState((prevState) => ({
+						...prevState,
+						editor
+					}));
 				}
 				break;
 
 			case EditorAction.DrawModeChanged:
 				editor.editMode = payload.editMode;
 				action.doAfterModeChanged();
-				break;
+				return setState((prevState) => ({
+					...prevState,
+					editor
+				}));
 
 			case EditorAction.FillShapeChanged:
 				editor.editFilled = payload.editFilled;
-				break;
+				return setState((prevState) => ({
+					...prevState,
+					editor
+				}));
 
 			case EditorAction.SelectFnCheckboxChanged: {
 				const prop = payload.checkboxProperty;
 				editor[prop] = !editor[prop];
-				break;
+				return setState((prevState) => ({
+					...prevState,
+					editor
+				}));
 			}
 
 			case EditorAction.SelectAll: {

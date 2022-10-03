@@ -34,7 +34,7 @@ const SelectTools: React.VFC = () => {
 		return null;
 	}
 
-	const selection =
+	const isSelectionMode =
 		editor.editTool === EditorTool.Selection ||
 		editor.editTool === EditorTool.AttrSelect;
 
@@ -68,31 +68,32 @@ const SelectTools: React.VFC = () => {
 		}
 	) : [];
 
-	return selection ? (
+	return isSelectionMode ? (
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
-				{SelectToolItems.map(tool => {
-					const enabled = tool.enabled || editor.selection.nonEmpty()
+				{SelectToolItems.map((tool) => {
+					const isEnabled = (tool.enabled || editor.selection.nonEmpty())
+
 					return (
 						<Tooltip
 							key={`${tool.id}_TT`}
-							content={enabled ? (
+							disabled={!isEnabled}
+							position={Position.BOTTOM_RIGHT}
+							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
+							content={isEnabled ? (
 								<>
 									<label>{tool.title}</label>
 									<KeyCombo combo={tool.hotkey} />
 								</>
-							) : undefined}
-							disabled={!enabled}
-							position={Position.BOTTOM_RIGHT}
-							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
+							) : undefined}>
 
 							<Button
 								id={tool.id}
 								key={tool.id}
 								icon={tool.icon}
-								disabled={!enabled}
+								disabled={!isEnabled}
 								active={false}
-								onClick={() => dispatchChange(tool.action)}
+								onClick={() => tool.action && dispatchChange(tool.action)}
 							/>
 						</Tooltip>
 					)

@@ -3,14 +3,21 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { useEditor } from "../components/EditorProvider";
+import { Editor } from "../editor/Editor";
 import { PROGRESS_BAR, UPLOAD } from "../params/querySelectors";
-import { actionRefresh } from "./base";
+import { actionRefresh, Dispatch } from "./base";
 import { actionToast } from "./toast";
 
 
-export const actionUploadFile = (file?: File) => {
-	const { dispatch, editor } = useEditor();
+export const actionUploadFile = ({
+	dispatch,
+	editor,
+	file
+}: {
+	dispatch: Dispatch,
+	editor?: Nullable<Editor>,
+	file?: File,
+}) => {
 	if (!(file && editor)) {
 		return;
 	}
@@ -27,7 +34,11 @@ export const actionUploadFile = (file?: File) => {
 	}
 
 	editor.upload(file, updateProgress)
-		.then(() => dispatch(actionRefresh()))
+		.then(() => {
+			setTimeout(() => {
+				dispatch(actionRefresh());
+			}, 256);
+		})
 		.catch((error: string) => dispatch(actionToast({
 			intent: 'danger',
 			message: error

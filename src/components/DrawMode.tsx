@@ -31,23 +31,24 @@ const DrawMode: React.VFC = () => {
 		<Navbar.Group align="left">
 			<ButtonGroup>
 				{DrawModeItems.map(mode => {
-					const active = (mode.id === editor?.editMode)
+					const isActive = (mode.id === editor?.editMode)
+
 					return (
 						<Tooltip
 							key={`${mode.id}_TT`}
+							position={Position.BOTTOM_RIGHT}
+							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
 							content={<>
 								<label>{mode.title}</label>
 								<KeyCombo combo={mode.hotkey} />
-							</>}
-							position={Position.BOTTOM_RIGHT}
-							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
+							</>}>
 
 							<Button
 								id={mode.id}
 								key={mode.id}
 								text={mode.caption}
-								active={active}
-								intent={active ? 'primary' : undefined}
+								active={isActive}
+								intent={isActive ? 'primary' : 'none'}
 								onClick={() => dispatchChange(mode.id)}
 							/>
 						</Tooltip>

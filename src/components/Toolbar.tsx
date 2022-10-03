@@ -25,35 +25,26 @@ const Toolbar: React.VFC = () => {
 	return editor ? (
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
-				{ToolbarItems.map(toolBarItem => {
-					const tool: any = {
-						...toolBarItem,
-						active: (toolBarItem.id === editor.editTool)
-					};
-
-					if (tool.active) {
-						tool.intent = 'primary';
-					} else if (tool.id === EditorTool.Pencil && editor.editTool === EditorTool.Recorder) {
-						tool.active = true;
-						tool.intent = 'warning';
-					}
+				{ToolbarItems.map((tool) => {
+					const isActive = (tool.id === editor.editTool);
+					const isRecorder = (tool.id === EditorTool.Pencil && editor.editTool === EditorTool.Recorder);
 
 					return (
 						<Tooltip
 							key={`${tool.id}_TT`}
+							position={Position.TOP_RIGHT}
+							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
 							content={<>
 								<label>{tool.title}</label>
 								<KeyCombo combo={tool.hotkey} />
-							</>}
-							position={Position.TOP_RIGHT}
-							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
+							</>}>
 
 							<Button
 								id={tool.id}
 								key={tool.id}
 								icon={tool.icon}
-								active={tool.active}
-								intent={tool.intent}
+								active={isActive || isRecorder}
+								intent={isRecorder ? 'warning' : isActive ? 'primary' : 'none'}
 								onClick={() => dispatchChange(tool.id)}
 							/>
 						</Tooltip>

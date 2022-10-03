@@ -21,29 +21,29 @@ const FillShape: React.VFC = () => {
 		[ dispatch ]
 	);
 
-	const active: boolean = editor?.editFilled === true;
-	const visible: boolean = (
+	const isActive: boolean = (editor?.editFilled === true);
+	const isVisible: boolean = (
 		editor?.editTool === EditorTool.Ellipse ||
 		editor?.editTool === EditorTool.Rectangle
 	);
 
-	return visible ? (
+	return isVisible ? (
 		<Navbar.Group align="right">
 			<Tooltip
 				position={Position.BOTTOM_RIGHT}
-				hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
+				hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
 				content={<>
 					<label>filled shape</label>
 					<KeyCombo combo="V" />
-				</>}
+				</>}>
 
 				<Button
 					id={EditorTool.FillShape}
 					key={EditorTool.FillShape}
 					icon='contrast'
-					active={active}
-					intent={active ? 'primary' : undefined}
-					onClick={() => dispatchChange(!active)}
+					active={isActive}
+					intent={isActive ? 'primary' : undefined}
+					onClick={() => dispatchChange(!isActive)}
 				/>
 			</Tooltip>
 		</Navbar.Group>
