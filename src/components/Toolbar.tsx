@@ -6,48 +6,56 @@
  */
 
 import * as React from "react";
-import { Button, ButtonGroup, Navbar, Tooltip, Position, KeyCombo } from "@blueprintjs/core";
+import { Button, ButtonGroup, Navbar, Position, KeyCombo } from "@blueprintjs/core";
+import { Tooltip2 } from "@blueprintjs/popover2";
 
 import constants from '../params/constants';
-import { EditorTool } from '../editor/Editor';
-import { actionToolChanged } from '../actions/base';
+import { OVERLAY_WRAPPER } from "../params/querySelectors";
 import { ToolbarItems } from '../params/Toolbar';
+import { actionToolChanged } from '../actions/base';
+import { EditorTool } from '../editor/Editor';
 import { useEditor } from './EditorProvider';
 
 
 const Toolbar: React.VFC = () => {
-	const { dispatch, editor } = useEditor()
-	const dispatchChange = React.useCallback(
-		(editTool: EditorTool) => dispatch(actionToolChanged(editTool)),
-		[ dispatch ]
-	);
+	const { dispatch, editor } = useEditor();
+	const portalContainer = OVERLAY_WRAPPER();
 
 	return editor ? (
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
 				{ToolbarItems.map((tool) => {
 					const isActive = (tool.id === editor.editTool);
-					const isRecorder = (tool.id === EditorTool.Pencil && editor.editTool === EditorTool.Recorder);
+					const isRecorder = (
+						tool.id === EditorTool.Pencil &&
+						editor.editTool === EditorTool.Recorder
+					);
 
 					return (
-						<Tooltip
+						<Tooltip2
 							key={`${tool.id}_TT`}
 							position={Position.TOP_RIGHT}
 							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
+							portalContainer={portalContainer}
 							content={<>
 								<label>{tool.title}</label>
 								<KeyCombo combo={tool.hotkey} />
-							</>}>
-
-							<Button
-								id={tool.id}
-								key={tool.id}
-								icon={tool.icon}
-								active={isActive || isRecorder}
-								intent={isRecorder ? 'warning' : isActive ? 'primary' : 'none'}
-								onClick={() => dispatchChange(tool.id)}
-							/>
-						</Tooltip>
+							</>}
+							renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+								<Button
+									{...targetProps}
+									id={tool.id}
+									key={tool.id}
+									icon={tool.icon}
+									active={isActive || isRecorder}
+									intent={isRecorder ? 'warning' : isActive ? 'primary' : 'none'}
+									elementRef={elementRef}
+									onClick={() => {
+										!isActive && dispatch(actionToolChanged(tool.id));
+									}}
+								/>
+							)}
+						/>
 					)
 				})}
 			</ButtonGroup>

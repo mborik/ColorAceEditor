@@ -5,22 +5,20 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import React, { useCallback } from 'react';
-import { Button, ButtonGroup, Navbar, Tooltip, Position, Icon, KeyCombo, IconSize } from "@blueprintjs/core";
+import * as React from 'react';
+import { Button, ButtonGroup, Navbar, Position, Icon, KeyCombo, IconSize } from "@blueprintjs/core";
+import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
-import { actionColorChanged } from '../actions/base';
+import { OVERLAY_WRAPPER } from '../params/querySelectors';
 import { PaletteItems } from '../params/Palette';
+import { actionColorChanged } from '../actions/base';
 import { useEditor } from './EditorProvider';
-import { IconCodepoints } from '@blueprintjs/icons';
 
 
 const Palette: React.VFC = () => {
 	const { dispatch, editor } = useEditor();
-	const dispatchChange = useCallback(
-		(editColor: number) => dispatch(actionColorChanged(editColor)),
-		[ dispatch ]
-	);
+	const portalContainer = OVERLAY_WRAPPER();
 
 	return editor ? (
 		<Navbar.Group align="center">
@@ -30,10 +28,11 @@ const Palette: React.VFC = () => {
 					const isActive = (value === editor.editColor);
 
 					return (
-						<Tooltip
+						<Tooltip2
 							key={`${tool.id}_TT`}
 							position={Position.BOTTOM_RIGHT}
 							hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
+							portalContainer={portalContainer}
 							content={attrs?.length ? (
 								<>
 									<code>
@@ -50,21 +49,26 @@ const Palette: React.VFC = () => {
 									</span>
 									<KeyCombo combo="D" />
 								</>
-							)}>
-
-							<Button
-								id={tool.id}
-								key={tool.id}
-								icon={<Icon
-									icon={tool.icon ?? 'symbol-square'}
-									iconSize={tool.icon ? IconSize.STANDARD : 24}
-									color={tool.color ?? '#ffffff7f'}
-								/>}
-								active={isActive}
-								intent={isActive ? 'primary' : undefined}
-								onClick={() => dispatchChange(value)}
-							/>
-						</Tooltip>
+							)}
+							renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+								<Button
+									{...targetProps}
+									elementRef={elementRef}
+									id={tool.id}
+									key={tool.id}
+									icon={<Icon
+										icon={tool.icon ?? 'symbol-square'}
+										iconSize={tool.icon ? IconSize.STANDARD : 24}
+										color={tool.color ?? '#ffffff7f'}
+									/>}
+									active={isActive}
+									intent={isActive ? 'primary' : 'none'}
+									onClick={() => {
+										!isActive && dispatch(actionColorChanged(value))
+									}}
+								/>
+							)}
+						/>
 					)
 				})}
 			</ButtonGroup>

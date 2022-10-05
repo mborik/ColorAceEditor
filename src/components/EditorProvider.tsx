@@ -82,30 +82,27 @@ const EditorProvider = ({ children }) => {
 					editor
 				}));
 
-			case EditorAction.SelectFnCheckboxChanged: {
+			case EditorAction.SelectFnCheckboxChanged:
 				const prop = payload.checkboxProperty;
 				editor[prop] = !editor[prop];
 				return setState((prevState) => ({
 					...prevState,
 					editor
 				}));
-			}
 
-			case EditorAction.SelectAll: {
+			case EditorAction.SelectAll:
 				if (!action.isActionInProgress()) {
 					editor.selection.set(0, 0, 287, 255);
 					editor.refresh();
 				}
 				break;
-			}
 
-			case EditorAction.SelectNone: {
+			case EditorAction.SelectNone:
 				if (!action.isActionInProgress() && editor.selection.nonEmpty()) {
 					editor.selection.reset();
 					editor.refresh();
 				}
 				break;
-			}
 
 			case EditorAction.SelectClear:
 				action.fillSelection(payload.resetAttrs);
@@ -129,40 +126,39 @@ const EditorProvider = ({ children }) => {
 				editor.refresh();
 				break;
 
-			case EditorAction.ViewportCleanup: {
+			case EditorAction.ViewportCleanup:
 				editor.pixel.clearViewport();
 				editor.refresh();
 				break;
-			}
 
-			case EditorAction.ToggleGuides: {
+			case EditorAction.ToggleGuides:
 				editor.showGuides = !editor.showGuides;
 				editor.refresh();
-				break;
-			}
+				return setState((prevState) => ({
+					...prevState,
+					editor
+				}));
 
 			case EditorAction.ViewportZoom:
 				action.zoomViewport(payload.zoomDelta);
 				break;
 
-			case EditorAction.ViewportPan: {
+			case EditorAction.ViewportPan:
 				editor.scroller.scrollBy(
 					payload.position.x,
 					payload.position.y
 				);
 				break;
-			}
 
 			case EditorAction.Cancel:
 				action.cancel();
 				break;
 
-			case EditorAction.Undo: {
+			case EditorAction.Undo:
 				if (!action.isActionInProgress() && editor.pixel.undo()) {
 					editor.refresh();
 				}
 				break;
-			}
 
 			case EditorAction.About:
 				return setState((prevState) => ({

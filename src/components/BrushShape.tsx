@@ -5,10 +5,12 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import React, { useState, useCallback } from 'react';
-import { Button, Classes, Dialog, Navbar, Tooltip, Position } from "@blueprintjs/core";
+import * as React from 'react';
+import { Button, Classes, Dialog, Navbar, Position } from "@blueprintjs/core";
+import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
+import { OVERLAY_WRAPPER } from '../params/querySelectors';
 import { EditorTool } from '../editor/Editor';
 import { useEditor } from './EditorProvider';
 
@@ -21,21 +23,15 @@ interface HTMLCanvasExtended extends HTMLCanvasElement {
 
 const BrushShape: React.VFC = () => {
 	const { editor } = useEditor();
-	const [ opened, setOpened ] = useState<boolean>(false);
-	const [ canvas, setCanvas ] = useState<HTMLCanvasExtended>();
+	const [ opened, setOpened ] = React.useState<boolean>(false);
+	const [ canvas, setCanvas ] = React.useState<HTMLCanvasExtended>();
 
 	const { pixel: editorPixelator } = editor ?? {};
 	const brushSize = editorPixelator?.brush?.length ? Math.sqrt(editorPixelator.brush.length) : 0;
-	const visible = (editor?.editTool === EditorTool.Brush);
+	const visible = (editor?.editTool === EditorTool.Brush) && editorPixelator;
 
-	const resetShape = useCallback(() => {
-		editorPixelator?.resetBrushShape();
-		canvas?.refresh();
-	},
-	[ editorPixelator, canvas ]);
-
-	const canvasRef = useCallback((canvas: HTMLCanvasExtended) => {
-		const canvasCtx = canvas.getContext('2d');
+	const canvasRef = React.useCallback((canvas: HTMLCanvasExtended) => {
+		const canvasCtx = canvas?.getContext('2d');
 		if (!editorPixelator || !canvasCtx || canvas.touched) {
 			return;
 		}
@@ -145,13 +141,14 @@ const BrushShape: React.VFC = () => {
 
 	return visible ? (
 		<Navbar.Group align="right">
-			<Tooltip
+			<Tooltip2
 				content="brush shape editor"
 				position={Position.BOTTOM_RIGHT}
+				portalContainer={OVERLAY_WRAPPER()}
 				hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
 
 				<Button icon='cog' onClick={() => setOpened(true)} />
-			</Tooltip>
+			</Tooltip2>
 
 			<Dialog
 				isOpen={opened}
@@ -169,7 +166,14 @@ const BrushShape: React.VFC = () => {
 				</div>
 				<div className={Classes.DIALOG_FOOTER}>
 					<div className={Classes.DIALOG_FOOTER_ACTIONS}>
-						<Button onClick={() => resetShape()} intent="danger">Reset</Button>
+						<Button
+							intent="danger"
+							onClick={() => {
+								editorPixelator.resetBrushShape();
+								canvas?.refresh();
+							}}>
+								Reset
+							</Button>
 						<Button onClick={() => setOpened(false)}>Close</Button>
 					</div>
 				</div>

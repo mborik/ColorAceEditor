@@ -5,84 +5,104 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import React, { useCallback } from 'react';
-import { Button, Navbar, Tooltip, KeyCombo, Position, ButtonGroup, Popover, Menu, MenuItem } from "@blueprintjs/core";
-import { actionUndo, actionToggleGuides } from '../actions/base';
+import * as React from 'react';
+import { Button, ButtonGroup, KeyCombo, Menu, MenuItem, Navbar, Position } from "@blueprintjs/core";
+import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
+
+import { actionToggleGuides, actionUndo } from '../actions/base';
 import { actionImportScreen } from '../actions/importScreen';
 import constants from '../params/constants';
 import database from '../params/screen.db';
+import { OVERLAY_WRAPPER } from '../params/querySelectors';
 import { useEditor } from './EditorProvider';
 
 
 const Extras: React.VFC = () => {
 	const { dispatch, editor } = useEditor();
-	const handleUndo = useCallback(() => dispatch(actionUndo()), [ dispatch ]);
-	const handleToggleGuides = useCallback(() => dispatch(actionToggleGuides()), [ dispatch ]);
+	const portalContainer = OVERLAY_WRAPPER();
 
 	return editor ? (
 		<>
 			<Navbar.Group align="center">
 				<ButtonGroup fill={true}>
-					<Popover position="bottom-left"
-						modifiers={{ arrow: { enabled: false }}}>
-
-						<Button
-							id="TBEX_IMPORT"
-							key="TBEX_IMPORT"
-							icon="database"
-							rightIcon="caret-down"
-							text="IMPORT"
-						/>
-						<Menu>
-							{database.map((item, key) => (
-								<MenuItem
-									key={`MNXI_${key}`}
-									text={item.name}
-									label={`[ ${item.author} ]`}
-									onClick={() => actionImportScreen({
-										dispatch,
-										editor,
-										fileName: item.filename
-									})}
-								/>
-							))}
-						</Menu>
-					</Popover>
-					<Tooltip
+					<Popover2
+						position="bottom-left"
+						modifiers={{ arrow: { enabled: false }}}
+						portalContainer={portalContainer}
+						content={
+							<Menu>
+								{database.map((item, key) => (
+									<MenuItem
+										key={`MNXI_${key}`}
+										text={item.name}
+										label={`[ ${item.author} ]`}
+										onClick={() => {
+											actionImportScreen({ dispatch, editor, fileName: item.filename });
+										}}
+									/>
+								))}
+							</Menu>
+						}
+						renderTarget={({ isOpen, ref, ...targetProps }) => (
+							<Button
+								{...targetProps}
+								elementRef={ref}
+								active={isOpen}
+								id="TBEX_IMPORT"
+								key="TBEX_IMPORT"
+								icon="database"
+								rightIcon="caret-down"
+								text="IMPORT"
+							/>
+						)}
+					/>
+					<Tooltip2
 						key="TBEX_UNDO_TT"
+						position={Position.BOTTOM_RIGHT}
+						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
+						portalContainer={portalContainer}
 						content={<>
 							<label>undo</label>
 							<KeyCombo combo="cmd+Z" />
 						</>}
-						position={Position.BOTTOM_RIGHT}
-						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
-
-						<Button
-							id="TBEX_UNDO"
-							key="TBEX_UNDO"
-							icon="undo"
-							text="UNDO"
-							onClick={handleUndo}
-						/>
-					</Tooltip>
-					<Tooltip
+						renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+							<Button
+								{...targetProps}
+								elementRef={elementRef}
+								id="TBEX_UNDO"
+								key="TBEX_UNDO"
+								icon="undo"
+								text="UNDO"
+								onClick={() => {
+									dispatch(actionUndo());
+								}}
+							/>
+						)}
+					/>
+					<Tooltip2
 						key="TBEX_GUIDES_TT"
+						position={Position.BOTTOM_RIGHT}
+						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}
+						portalContainer={portalContainer}
 						content={<>
 							<label>toggle guidelines</label>
 							<KeyCombo combo="cmd+G" />
 						</>}
-						position={Position.BOTTOM_RIGHT}
-						hoverOpenDelay={constants.TOOLTIP_TIMEOUT}>
-
-						<Button
-							id="TBEX_GUIDES"
-							key="TBEX_GUIDES"
-							icon="grid"
-							active={editor.showGuides}
-							intent={editor.showGuides ? 'primary' : undefined}
-							onClick={handleToggleGuides}
-						/>
-					</Tooltip>
+						renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+							<Button
+								{...targetProps}
+								elementRef={elementRef}
+								id="TBEX_GUIDES"
+								key="TBEX_GUIDES"
+								icon="grid"
+								active={editor.showGuides}
+								intent={editor.showGuides ? 'primary' : 'none'}
+								onClick={() => {
+									dispatch(actionToggleGuides());
+								}}
+							/>
+						)}
+					/>
 				</ButtonGroup>
 			</Navbar.Group>
 		</>

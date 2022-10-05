@@ -5,8 +5,9 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import React, { useCallback } from 'react';
+import * as React from 'react';
 import { Navbar, Icon } from "@blueprintjs/core";
+import { useEditor } from './EditorProvider';
 import { actionAbout } from '../actions/base';
 
 import Toolbar from './Toolbar';
@@ -17,18 +18,14 @@ import SelectTools from './SelectTools';
 import Palette from './Palette';
 import FileMenu from './FileMenu';
 import Extras from './Extras';
-import { useEditor } from './EditorProvider';
 
 
 const Navigation: React.VFC = () => {
 	const { dispatch } = useEditor();
-	const handleOpenAboutDlg = useCallback(
-		() => dispatch(actionAbout(true)),
-	[ dispatch ]);
 
 	return <nav>
 		<Navbar className="bp4-dark">
-			<Navbar.Group align="center" onClick={handleOpenAboutDlg}>
+			<Navbar.Group align="center" onClick={() => { dispatch(actionAbout(true)) }}>
 				<Navbar.Heading>ColorACE Screen Editor</Navbar.Heading>
 			</Navbar.Group>
 

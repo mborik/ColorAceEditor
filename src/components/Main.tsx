@@ -9,6 +9,7 @@ import * as React from "react";
 import { HotkeyConfig, useHotkeys } from '@blueprintjs/core';
 import { ResizeSensor2, ResizeSensor2Props } from '@blueprintjs/popover2';
 import useEventListener from '@use-it/event-listener';
+
 import { useEditor } from './EditorProvider';
 import { Dispatch } from "../actions/base";
 import { actionInitEditorInstance } from '../actions/initEditorInstance';
