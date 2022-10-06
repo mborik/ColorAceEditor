@@ -1,81 +1,176 @@
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const PackageJsonPlugin = require('pkg.json-webpack-plugin');
-const optimizeConstEnum = require('ts-transformer-optimize-const-enum').default;
+const ForkTsCheckerNotifierPlugin = require("fork-ts-checker-notifier-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const PackageJsonPlugin = require("pkg.json-webpack-plugin");
+const ReactRefreshPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const WebpackNotifierPlugin = require("webpack-notifier");
+const optimizeConstEnum = require("ts-transformer-optimize-const-enum").default;
 
-const baseConfig = require("@blueprintjs/webpack-build-scripts/webpack.config.base");
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const DEV_PORT = process.env.PORT || 3000;
+const PACKAGE_NAME = "colorace-editor";
 
-const webpackConfig = Object.assign({}, baseConfig, {
-	entry: {
-		"app": [
-			// environment polyfills
-			"dom4",
-			"./polyfill.js",
-			// bundle entry points
-			"./src/index.tsx",
-		],
-	},
+const typescript = {
+  configFile: "src/tsconfig.json",
+  memoryLimit: 4096,
+};
 
-	devServer: {
-		historyApiFallback: true,
-		open: false,
-		client: {
-			logging: 'log',
-			overlay: {
-				warnings: true,
-				errors: true,
-			},
-		},
-		static: [
-			path.resolve(__dirname, "src"),
-			path.resolve(__dirname, "public")
-		],
-		port: 3000,
-	},
+const plugins = [
+  new ForkTsCheckerWebpackPlugin(
+    IS_PRODUCTION
+      ? {
+          async: false,
+          typescript: {
+            ...typescript,
+            useTypescriptIncrementalApi: true,
+          },
+        }
+      : { typescript }
+  ),
 
-	output: {
-		filename: "[name].js",
-		publicPath: "",
-		path: path.resolve(__dirname, "./dist"),
-	},
+  // CSS extraction is only enabled in production (see scssLoaders below).
+  new MiniCssExtractPlugin({ filename: "[name].css" }),
 
-	plugins: baseConfig.plugins.concat([
-		new CopyWebpackPlugin({
-			patterns: [
-				{ from: "src/index.html", to: "." },
-				{ from: "public", to: "." },
-			],
-		}),
-		new PackageJsonPlugin({
-			key: 'package',
-			include: ['version', 'releaseYear'],
-		})
-	]),
+  new PackageJsonPlugin({
+    key: "package",
+    include: ["version", "releaseYear"],
+  }),
 
-	module: {
-		rules: baseConfig.module.rules.map(rule => {
-			const { test, options } = rule
-			if (test && test.test('.ts')) {
-				return {
-					...rule,
-					options: {
-						...options,
-						getCustomTransformers: program => ({
-							before: [
-								optimizeConstEnum(program),
-							],
-							afterDeclarations: [
-								optimizeConstEnum(program),
-							],
-						}),
-					}
-				}
-			}
-			return rule
-		})
-	},
+  new CopyWebpackPlugin({
+    patterns: [
+      { from: "src/index.html", to: "." },
+      { from: "public", to: "." },
+    ],
+  }),
+];
 
-	target: 'browserslist'
-});
+if (!IS_PRODUCTION) {
+  plugins.push(
+    new ReactRefreshPlugin(),
+    new ForkTsCheckerNotifierPlugin({
+      title: `${PACKAGE_NAME}: typescript`,
+      excludeWarnings: false,
+    }),
+    new WebpackNotifierPlugin({ title: `${PACKAGE_NAME}: webpack` })
+  );
+}
 
-module.exports = webpackConfig;
+// Module loaders for .scss files, used in reverse order:
+// compile Sass, apply PostCSS, interpret CSS as modules.
+const scssLoaders = [
+  // Only extract CSS to separate file in production mode.
+  IS_PRODUCTION
+    ? { loader: MiniCssExtractPlugin.loader }
+    : require.resolve("style-loader"),
+  {
+    loader: require.resolve("css-loader"),
+    options: {
+      // necessary to minify @import-ed files using cssnano
+      importLoaders: 1,
+    },
+  },
+  {
+    loader: require.resolve("postcss-loader"),
+    options: {
+      postcssOptions: {
+        plugins: [
+          require("autoprefixer"),
+          require("cssnano")({ preset: "default" }),
+        ],
+      },
+    },
+  },
+  require.resolve("sass-loader"),
+];
+
+module.exports = {
+  // to automatically find tsconfig.json
+  context: __dirname,
+
+  devtool: IS_PRODUCTION ? false : "inline-source-map",
+
+  entry: {
+    app: [
+      // environment polyfills
+      "dom4",
+      "./polyfill.js",
+      // bundle entry points
+      "./src/index.tsx",
+    ],
+  },
+
+  devServer: {
+    allowedHosts: "all",
+    client: {
+      overlay: {
+        warnings: true,
+        errors: true,
+      },
+      progress: true,
+    },
+    devMiddleware: {
+      index: path.resolve(__dirname, "src/index.html"),
+      stats: "errors-only",
+    },
+    historyApiFallback: true,
+    https: false,
+    host: "0.0.0.0",
+    hot: true,
+    open: false,
+    port: DEV_PORT,
+    static: [
+      path.resolve(__dirname, "src"),
+      path.resolve(__dirname, "public"),
+    ],
+  },
+
+  output: {
+    filename: "[name].js",
+    publicPath: "",
+    path: path.resolve(__dirname, "dist"),
+  },
+
+  mode: IS_PRODUCTION ? "production" : "development",
+
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: require.resolve("source-map-loader"),
+      },
+      {
+        test: /\.tsx?$/,
+        loader: require.resolve("ts-loader"),
+        options: {
+          configFile: "src/tsconfig.json",
+          transpileOnly: !IS_PRODUCTION,
+          getCustomTransformers: (program) => ({
+            before: [optimizeConstEnum(program)],
+            afterDeclarations: [optimizeConstEnum(program)],
+          }),
+        },
+      },
+      {
+        test: /\.scss$/,
+        use: scssLoaders,
+      },
+      {
+        test: /\.(eot|ttf|woff|woff2|svg|png|gif|jpe?g)$/,
+        type: "asset/resource",
+        generator: {
+          filename: "assets/[name][ext][query][hash]",
+        },
+      },
+    ],
+  },
+
+  plugins,
+
+  resolve: {
+    extensions: [".js", ".ts", ".tsx", ".scss"],
+  },
+
+  target: "browserslist",
+};

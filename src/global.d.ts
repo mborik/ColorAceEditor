@@ -8,6 +8,11 @@ declare module "*.scss" {
  */
 type Nullable<T> = T | null;
 
-declare var process: {
-  env: { package: any }
+/**
+ * Augmented declaration of environment variables
+ */
+declare namespace NodeJS {
+  interface ProcessEnv {
+    package: any;
+  }
 }
