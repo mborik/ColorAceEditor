@@ -198,9 +198,6 @@ export class Pixelator {
 			}
 		}
 
-		this.bmp.data.set(this.bmpClamp);
-		ctx.putImageData(this.bmp, 0, 0);
-
 		ctx.save();
 		ctx.fillStyle = this.bmpBgColor;
 
@@ -213,6 +210,8 @@ export class Pixelator {
 		}
 
 		ctx.restore();
+		this.bmp.data.set(this.bmpClamp);
+		ctx.putImageData(this.bmp, 0, 0, 0, 0, x, y);
 	}
 
 	/**
