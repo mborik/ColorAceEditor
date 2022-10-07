@@ -15,6 +15,12 @@ import { Selection } from './Selection';
 import { Scroller } from 'scroller';
 
 
+export const enum EditorColorMode {
+	Full = 'TBCM_FULL',
+	RGB  = 'TBCM_RGB',
+	Mono = 'TBCM_MONO',
+}
+
 export const enum EditorTool {
 	Selection  = 'TBFN_SELECT',
 	AttrSelect = 'TBFN_ATTRSEL',
@@ -24,7 +30,7 @@ export const enum EditorTool {
 	Lines      = 'TBFN_LINES',
 	Ellipse    = 'TBFN_ELLIPSE',
 	Rectangle  = 'TBFN_RECT',
-	// secret weapon for point selection
+	// point position recorder
 	Recorder   = 'TBFN_RECORDER',
 	// filled shape mode
 	FillShape  = 'TBSM_FILLSHAPE'
@@ -77,6 +83,7 @@ export class Editor extends FileOps {
 	showGuides: boolean = true;
 	undoLevels: number = 50;
 	editColor: number = 0;
+	editColorMode: EditorColorMode = EditorColorMode.Full;
 	editTool: EditorTool = EditorTool.Pencil;
 	editMode: EditorDrawMode = EditorDrawMode.Over;
 	editFilled: boolean = false;

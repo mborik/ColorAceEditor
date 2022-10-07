@@ -6,14 +6,15 @@
  */
 
 import * as React from 'react';
-import { Button, ButtonGroup, KeyCombo, Menu, MenuItem, Navbar, Position } from '@blueprintjs/core';
+import { Button, ButtonGroup, KeyCombo, Menu, MenuDivider, MenuItem, Navbar, Position } from '@blueprintjs/core';
 import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
-import { actionToggleGuides, actionUndo } from '../actions/base';
+import { actionColorModeChanged, actionToggleGuides, actionUndo } from '../actions/base';
 import { actionImportScreen } from '../actions/importScreen';
 import constants from '../params/constants';
 import database from '../params/screen.db';
 import { OVERLAY_WRAPPER } from '../params/querySelectors';
+import { ColorModeItems } from '../params/ColorMode';
 import { useEditor } from './EditorProvider';
 
 
@@ -26,18 +27,19 @@ const Extras: React.VFC = () => {
 			<Navbar.Group align="center">
 				<ButtonGroup fill={true}>
 					<Popover2
-						position="bottom-left"
-						modifiers={{ arrow: { enabled: false } }}
+						position={Position.BOTTOM_LEFT}
 						portalContainer={portalContainer}
 						content={
 							<Menu>
-								{database.map((item, key) => (
+								<MenuDivider title="Screen Color Mode" />
+								{ColorModeItems.map((item) => (
 									<MenuItem
-										key={`MNXI_${key}`}
-										text={item.name}
-										label={`[ ${item.author} ]`}
+										key={item.id}
+										id={item.id}
+										icon={item.id === editor.editColorMode ? 'tick' : 'blank'}
+										text={item.label}
 										onClick={() => {
-											actionImportScreen({ dispatch, editor, fileName: item.filename });
+											dispatch(actionColorModeChanged(item.id));
 										}}
 									/>
 								))}
@@ -48,11 +50,12 @@ const Extras: React.VFC = () => {
 								{...targetProps}
 								elementRef={ref}
 								active={isOpen}
-								id="TBEX_IMPORT"
-								key="TBEX_IMPORT"
-								icon="database"
+								alignText="left"
+								id="TBEX_COLORS"
+								key="TBEX_COLORS"
+								icon="style"
 								rightIcon="caret-down"
-								text="IMPORT"
+								text="MODE"
 							/>
 						)}
 					/>
@@ -100,6 +103,42 @@ const Extras: React.VFC = () => {
 								onClick={() => {
 									dispatch(actionToggleGuides());
 								}}
+							/>
+						)}
+					/>
+				</ButtonGroup>
+			</Navbar.Group>
+			<Navbar.Group align="center">
+				<ButtonGroup fill={true}>
+					<Popover2
+						position="bottom-left"
+						modifiers={{ arrow: { enabled: false } }}
+						portalContainer={portalContainer}
+						content={
+							<Menu>
+								{database.map((item, key) => (
+									<MenuItem
+										key={`MNXI_${key}`}
+										text={item.name}
+										label={`[ ${item.author} ]`}
+										onClick={() => {
+											actionImportScreen({ dispatch, editor, fileName: item.filename });
+										}}
+									/>
+								))}
+							</Menu>
+						}
+						renderTarget={({ isOpen, ref, ...targetProps }) => (
+							<Button
+								{...targetProps}
+								elementRef={ref}
+								active={isOpen}
+								alignText="left"
+								id="TBEX_IMPORT"
+								key="TBEX_IMPORT"
+								icon="database"
+								rightIcon="caret-down"
+								text="IMPORT DEMO SCREEN"
 							/>
 						)}
 					/>

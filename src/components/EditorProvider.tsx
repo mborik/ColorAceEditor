@@ -67,6 +67,14 @@ const EditorProvider = ({ children }) => {
 				}
 				break;
 
+			case EditorAction.ColorModeChanged:
+				editor.editColorMode = payload.editColorMode;
+				editor.refresh();
+				return setState((prevState) => ({
+					...prevState,
+					editor
+				}));
+
 			case EditorAction.DrawModeChanged:
 				editor.editMode = payload.editMode;
 				action.doAfterModeChanged();

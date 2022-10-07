@@ -51,7 +51,7 @@ export const ToolbarItems: ToolbarItem[] = [{
 	hotkey: 'B'
 }, {
 	id: EditorTool.Fill,
-	icon: 'tint',
+	icon: 'color-fill',
 	title: 'fill',
 	hotkey: 'F'
 }, {

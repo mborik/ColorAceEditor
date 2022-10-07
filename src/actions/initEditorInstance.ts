@@ -12,7 +12,7 @@ import { CANVAS, STATUS_BAR, UPLOAD } from '../params/querySelectors';
 const COLORACE_EDITOR_CONFIGURATION = 'colorace-editor-configuration';
 
 type EditorConfig = Pick<Editor,
-	'undoLevels' | 'zoomFactor' | 'showGuides' |
+	'undoLevels' | 'zoomFactor' | 'showGuides' | 'editColorMode' |
 	'editColor' | 'editTool' | 'editMode' | 'editFilled' | 'editBrushShape' |
 	'editSelectFnShiftWrap' | 'editSelectFnShiftAttr' | 'editSelectFnBlockAttr'
 >
@@ -59,13 +59,13 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 		}
 
 		const {
-			undoLevels, zoomFactor, showGuides,
+			undoLevels, zoomFactor, showGuides, editColorMode,
 			editColor, editTool, editMode, editFilled, editBrushShape,
 			editSelectFnShiftWrap, editSelectFnShiftAttr, editSelectFnBlockAttr
 		} = editor;
 
 		localStorage.setItem(COLORACE_EDITOR_CONFIGURATION, JSON.stringify({
-			undoLevels, zoomFactor, showGuides,
+			undoLevels, zoomFactor, showGuides, editColorMode,
 			editColor, editTool, editMode, editFilled, editBrushShape,
 			editSelectFnShiftWrap, editSelectFnShiftAttr, editSelectFnBlockAttr
 		}));

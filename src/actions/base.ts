@@ -5,13 +5,14 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { EditorCoordinates, EditorTool, EditorDrawMode } from '../editor/Editor';
+import { EditorCoordinates, EditorTool, EditorDrawMode, EditorColorMode } from '../editor/Editor';
 
 export const enum EditorAction {
 	InitEditorInstance = 'INIT_EDITOR_INSTANCE',
 	SelectionChanged = 'SELECTION_CHANGED',
 	ToolChanged = 'TOOL_CHANGED',
 	ColorChanged = 'COLOR_CHANGED',
+	ColorModeChanged = 'COLOR_MODE_CHANGED',
 	DrawModeChanged = 'DRAW_MODE_CHANGED',
 	FillShapeChanged = 'FILL_SHAPE_CHANGED',
 	SelectFnCheckboxChanged = 'SELECT_FN_CHECKBOX_CHANGED',
@@ -56,6 +57,11 @@ export const actionToolChanged = (editTool: EditorTool): DispatchAction => ({
 export const actionColorChanged = (editColor: number): DispatchAction => ({
 	type: EditorAction.ColorChanged,
 	payload: { editColor }
+});
+
+export const actionColorModeChanged = (editColorMode: EditorColorMode): DispatchAction => ({
+	type: EditorAction.ColorModeChanged,
+	payload: { editColorMode }
 });
 
 export const actionDrawModeChanged = (editMode: EditorDrawMode): DispatchAction => ({

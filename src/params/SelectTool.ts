@@ -78,7 +78,7 @@ export interface SelectToolSubMenuItem {
 
 export const SelectToolItems: SelectToolItem[] = [{
 	id: 'TBST_SELECTALL',
-	icon: 'zoom-to-fit',
+	icon: 'fullscreen',
 	title: 'select all',
 	hotkey: 'mod+A',
 	enabled: true,
