@@ -2,10 +2,10 @@
  * PMD 85 ColorAce picture editor
  * Palette item definitions
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { IconName } from "@blueprintjs/core";
+import { IconName } from '@blueprintjs/core';
 
 
 export interface PaletteItem {

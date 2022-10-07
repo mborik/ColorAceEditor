@@ -3,8 +3,8 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { IToastProps, Toaster } from "@blueprintjs/core";
-import { EditorAction, DispatchAction } from "./base";
+import { IToastProps, Toaster } from '@blueprintjs/core';
+import { EditorAction, DispatchAction } from './base';
 
 
 const toast = Toaster.create();

@@ -3,12 +3,12 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import * as React from "react";
-import { Editor } from "../editor/Editor";
-import { EditorAction, DispatchAction, Dispatch } from "../actions/base";
-import { showToast } from "../actions/toast";
-import { UPLOAD } from "../params/querySelectors";
-import devLog from "../utils/logger";
+import * as React from 'react';
+import { Editor } from '../editor/Editor';
+import { EditorAction, DispatchAction, Dispatch } from '../actions/base';
+import { showToast } from '../actions/toast';
+import { UPLOAD } from '../params/querySelectors';
+import devLog from '../utils/logger';
 
 
 export interface EditorContextState {
@@ -124,7 +124,10 @@ const EditorProvider = ({ children }) => {
 
 			case EditorAction.ViewportRefresh:
 				editor.refresh();
-				break;
+				return setState((prevState) => ({
+					...prevState,
+					editor
+				}));
 
 			case EditorAction.ViewportCleanup:
 				editor.pixel.clearViewport();

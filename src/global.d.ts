@@ -1,4 +1,4 @@
-declare module "*.scss" {
+declare module '*.scss' {
   const styles: any;
   export = styles;
 }
@@ -7,6 +7,10 @@ declare module "*.scss" {
  * Include `null` to T
  */
 type Nullable<T> = T | null;
+/**
+ * Optional T
+ */
+type Optional<T> = T | undefined;
 
 /**
  * Augmented declaration of environment variables

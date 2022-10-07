@@ -5,17 +5,17 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import * as React from "react";
-import debounce from "lodash/debounce";
-import { Button, ButtonGroup, Navbar, Position, Menu, MenuItem, MenuDivider, Icon, KeyCombo } from "@blueprintjs/core";
-import { Popover2, Tooltip2 } from "@blueprintjs/popover2";
+import * as React from 'react';
+import debounce from 'lodash/debounce';
+import { Button, ButtonGroup, Navbar, Position, Menu, MenuItem, MenuDivider, Icon, KeyCombo } from '@blueprintjs/core';
+import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
-import { OVERLAY_WRAPPER } from "../params/querySelectors";
+import { OVERLAY_WRAPPER } from '../params/querySelectors';
 import { SelectToolItems, SelectToolSubMenu } from '../params/SelectTool';
 import { actionSelectFnCheckboxChanged } from '../actions/base';
 import { EditorTool } from '../editor/Editor';
-import { useEditor } from "./EditorProvider";
+import { useEditor } from './EditorProvider';
 
 
 const SelectTools: React.VFC = () => {
@@ -36,9 +36,9 @@ const SelectTools: React.VFC = () => {
 				debouncedObservedSelection(args[0]);
 				return Reflect.set(...args);
 			}
-		})
+		});
 	},
-	[ editor ])
+	[ editor ]);
 
 	if (!editor) {
 		return null;
@@ -53,7 +53,7 @@ const SelectTools: React.VFC = () => {
 		<Navbar.Group align="center">
 			<ButtonGroup fill={true}>
 				{SelectToolItems.map((tool) => {
-					const isEnabled = (tool.enabled || isSelectionNonEmpty)
+					const isEnabled = (tool.enabled || isSelectionNonEmpty);
 
 					return (
 						<Tooltip2
@@ -78,7 +78,7 @@ const SelectTools: React.VFC = () => {
 								}}
 							/>
 						</Tooltip2>
-					)
+					);
 				})}
 				<Popover2
 					position={Position.BOTTOM_LEFT}
@@ -136,6 +136,6 @@ const SelectTools: React.VFC = () => {
 			</ButtonGroup>
 		</Navbar.Group>
 	) : null;
-}
+};
 
 export default SelectTools;

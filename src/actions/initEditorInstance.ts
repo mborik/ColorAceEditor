@@ -3,18 +3,18 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from "./base";
-import { Editor, getInstance } from "../editor/Editor";
+import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from './base';
+import { Editor, getInstance } from '../editor/Editor';
 import devLog from '../utils/logger';
-import { CANVAS, STATUS_BAR, UPLOAD } from "../params/querySelectors";
+import { CANVAS, STATUS_BAR, UPLOAD } from '../params/querySelectors';
 
 
 const COLORACE_EDITOR_CONFIGURATION = 'colorace-editor-configuration';
 
 type EditorConfig = Pick<Editor,
-	"undoLevels" | "zoomFactor" | "showGuides" |
-	"editColor" | "editTool" | "editMode" | "editFilled" | "editBrushShape" |
-	"editSelectFnShiftWrap" | "editSelectFnShiftAttr" | "editSelectFnBlockAttr"
+	'undoLevels' | 'zoomFactor' | 'showGuides' |
+	'editColor' | 'editTool' | 'editMode' | 'editFilled' | 'editBrushShape' |
+	'editSelectFnShiftWrap' | 'editSelectFnShiftAttr' | 'editSelectFnBlockAttr'
 >
 
 export const actionInitEditorInstance = (dispatch: Dispatch) => {
@@ -37,14 +37,15 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 		if (configuration) {
 			devLog('ColorAceEditor configuration:', configuration);
 			doActionAfterInit = () => {
-				for (let opt in configuration) {
+				for (const opt in configuration) {
 					editor[opt] = configuration[opt];
 				}
 
 				return actionRefresh();
 			};
 		}
-	} catch (_) {
+	}
+	catch (_) {
 		console.error('invalid ColorAceEditor configuration!');
 	}
 
@@ -52,7 +53,8 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 		event.preventDefault();
 		if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 			delete event['returnValue'];
-		} else {
+		}
+		else {
 			event.returnValue = 'Unsaved changes will be lost. Are you sure?';
 		}
 

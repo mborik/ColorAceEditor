@@ -5,12 +5,12 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import * as React from "react";
-import { Button, ButtonGroup, Navbar, Position, KeyCombo } from "@blueprintjs/core";
-import { Tooltip2 } from "@blueprintjs/popover2";
+import * as React from 'react';
+import { Button, ButtonGroup, Navbar, Position, KeyCombo } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
-import { OVERLAY_WRAPPER } from "../params/querySelectors";
+import { OVERLAY_WRAPPER } from '../params/querySelectors';
 import { ToolbarItems } from '../params/Toolbar';
 import { actionToolChanged } from '../actions/base';
 import { EditorTool } from '../editor/Editor';
@@ -41,7 +41,7 @@ const Toolbar: React.VFC = () => {
 								<label>{tool.title}</label>
 								<KeyCombo combo={tool.hotkey} />
 							</>}
-							renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+							renderTarget={({ isOpen: _, ref: elementRef, ...targetProps }) => (
 								<Button
 									{...targetProps}
 									id={tool.id}
@@ -56,11 +56,11 @@ const Toolbar: React.VFC = () => {
 								/>
 							)}
 						/>
-					)
+					);
 				})}
 			</ButtonGroup>
 		</Navbar.Group>
 	) : null;
-}
+};
 
 export default Toolbar;

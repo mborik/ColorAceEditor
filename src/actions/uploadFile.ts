@@ -3,11 +3,11 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { Editor } from "../editor/Editor";
-import constants from "../params/constants";
-import { PROGRESS_BAR, UPLOAD } from "../params/querySelectors";
-import { actionRefresh, Dispatch } from "./base";
-import { actionToast } from "./toast";
+import { Editor } from '../editor/Editor';
+import constants from '../params/constants';
+import { PROGRESS_BAR, UPLOAD } from '../params/querySelectors';
+import { actionRefresh, Dispatch } from './base';
+import { actionToast } from './toast';
 
 
 export const actionUploadFile = ({
@@ -28,11 +28,12 @@ export const actionUploadFile = ({
 		if (amount < 1) {
 			style.display = 'block';
 			style.width = Math.round(amount * 100) + 'vw';
-		} else {
+		}
+		else {
 			style.display = '';
 			style.width = '';
 		}
-	}
+	};
 
 	editor.upload(file, updateProgress)
 		.then(() => {

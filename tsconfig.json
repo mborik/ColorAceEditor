@@ -22,7 +22,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "../dist",
+    "outDir": "./dist",
     "pretty": true,
     "removeComments": false,
     "resolveJsonModule": true,
@@ -33,10 +33,11 @@
     "stripInternal": true,
     "target": "esnext",
     "typeRoots": [
-      "../node_modules/@types"
+      "./node_modules/@types"
     ]
   },
   "include": [
-    "../node_modules/scroller"
+    "./node_modules/scroller",
+    "./src/**/*.tsx?"
   ]
 }

@@ -3,10 +3,10 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { actionRefresh, Dispatch } from "./base";
-import { actionToast } from "./toast";
-import { Editor } from "../editor/Editor";
-import constants from "../params/constants";
+import { actionRefresh, Dispatch } from './base';
+import { actionToast } from './toast';
+import { Editor } from '../editor/Editor';
+import constants from '../params/constants';
 
 
 export const actionImportScreen = ({

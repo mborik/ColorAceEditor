@@ -2,13 +2,13 @@
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.ActionHandler - mouse and action handlers
  *
- * Copyright (c) 2014-2019 Martin Bórik
+ * Copyright (c) 2014-2022 Martin Bórik
  */
 
 import React from 'react';
-import { debounce } from "typescript-debounce-decorator";
+import { debounce } from 'typescript-debounce-decorator';
 import { ActionShiftFlip } from './ActionShiftFlip';
-import { editor, EditorTool, EditorDrawMode } from "./Editor";
+import { editor, EditorTool, EditorDrawMode } from './Editor';
 import { EditorSnapshot, EditorSnippet } from './Pixelator';
 
 
@@ -19,13 +19,11 @@ export class ActionHandler extends ActionShiftFlip {
 	private lastPixelY: number = 0;
 	private startPixelX: number = 0;
 	private startPixelY: number = 0;
-	private activeSnippet: EditorSnippet = null;
-	private actionSnapshot: EditorSnapshot = null;
+	private activeSnippet?: EditorSnippet;
+	private actionSnapshot?: EditorSnapshot;
 
 	/**
 	 * Handler of `mousedown` event.
-	 *
-	 * @param {React.MouseEvent} e
 	 */
 	mouseDown(e: React.MouseEvent) {
 		const { x, y } = editor.translateCoords(e.pageX, e.pageY);
@@ -39,8 +37,8 @@ export class ActionHandler extends ActionShiftFlip {
 			this.mouseNotMoved = true;
 			this.mouseBtnFlag = 2;
 			return;
-
-		} else if (this.activeSnippet == null) {
+		}
+		else if (this.activeSnippet == null) {
 			switch (editor.editTool) {
 				case EditorTool.Selection: {
 					editor.selection.reset(x, y);
@@ -91,8 +89,6 @@ export class ActionHandler extends ActionShiftFlip {
 
 	/**
 	 * Handler of `mousemove` event.
-	 *
-	 * @param {React.MouseEvent} e
 	 */
 	mouseMove(e: React.MouseEvent) {
 		const { x, y, column } = editor.translateCoords(e.pageX, e.pageY);
@@ -101,16 +97,16 @@ export class ActionHandler extends ActionShiftFlip {
 
 		if (this.activeSnippet != null) {
 			this._placeSnippetTo(x, y);
-
-		} else if (this.mouseBtnFlag === 2) {
+		}
+		else if (this.mouseBtnFlag === 2) {
 			this.mouseNotMoved = false;
 
 			editor.scroller.doTouchMove([{
 				pageX: e.pageX,
 				pageY: e.pageY
 			}], e.timeStamp);
-
-		} else if (this.mouseBtnFlag !== 0) {
+		}
+		else if (this.mouseBtnFlag !== 0) {
 			this.mouseNotMoved = false;
 
 			switch (editor.editTool) {
@@ -191,20 +187,18 @@ export class ActionHandler extends ActionShiftFlip {
 
 	/**
 	 * Handler of `mouseup` event.
-	 *
-	 * @param {React.MouseEvent} e
 	 */
 	mouseUp(e: React.MouseEvent) {
 		if (this.mouseBtnFlag === 0) {
 			return;
-
-		} else if (this.activeSnippet != null) {
-			this.activeSnippet = null;
-
-		} else if (e.button > 0) {
+		}
+		else if (this.activeSnippet) {
+			this.activeSnippet = undefined;
+		}
+		else if (e.button > 0) {
 			editor.scroller.doTouchEnd(e.timeStamp);
-
-		} else {
+		}
+		else {
 			const { x, y } = editor.translateCoords(e.pageX, e.pageY);
 
 			switch (editor.editTool) {
@@ -289,22 +283,22 @@ export class ActionHandler extends ActionShiftFlip {
 			}
 		}
 
-		this.actionSnapshot = null;
+		this.actionSnapshot = undefined;
 		this.mouseNotMoved = true;
 		this.mouseBtnFlag = 0;
 	}
 
 	/**
 	 * Debounced handler of `mousewheel` event.
-	 *
-	 * @param {React.MouseEvent} e
 	 */
 	@debounce(16, { leading: true })
+	// @ts-ignore
 	mouseWheel(e: React.WheelEvent) {
 		let delta = 0;
 		if (e.deltaY > 0) {
 			delta = -1;
-		} else if (e.deltaY < 0) {
+		}
+		else if (e.deltaY < 0) {
 			delta = 1;
 		}
 
@@ -317,9 +311,9 @@ export class ActionHandler extends ActionShiftFlip {
 	/**
 	 * Helper method to zoom viewport by given delta zoom factor and redraw statusbar.
 	 *
-	 * @param {number} (optional) delta signed integer which modified zoom factor
-	 * @param {number} (optional) x coordinate to zoom in
-	 * @param {number} (optional) y coordinate to zoom in
+	 * @param delta Signed integer which modified zoom factor
+	 * @param x Coordinate to zoom in
+	 * @param y Coordinate to zoom in
 	 */
 	zoomViewport(delta: number = 0, x: number = this.lastPixelX, y: number = this.lastPixelY) {
 		const zoom = editor.zoomFactor + delta;
@@ -343,9 +337,6 @@ export class ActionHandler extends ActionShiftFlip {
 	/**
 	 * Clear to black or invert current selection.
 	 * Optionally reset attributes to green { 0, 0 }.
-	 *
-	 * @param {boolean} resetAttrs (optional)
-	 * @param {boolean} invert (optional)
 	 */
 	fillSelection(resetAttrs: boolean = false, invert: boolean = false) {
 		if (!this.isActionInProgress() && editor.selection.nonEmpty()) {
@@ -381,8 +372,8 @@ export class ActionHandler extends ActionShiftFlip {
 					editor.pixel.undo(this.actionSnapshot);
 					break;
 			}
-
-		} else if (this.activeSnippet != null) {
+		}
+		else if (this.activeSnippet != null) {
 			editor.pixel.undo();
 			editor.selection.set(
 				this.startPixelX, this.startPixelY,
@@ -390,13 +381,13 @@ export class ActionHandler extends ActionShiftFlip {
 				this.startPixelY + this.activeSnippet.height - 1
 			);
 
-			this.activeSnippet = null;
-
-		} else {
+			this.activeSnippet = undefined;
+		}
+		else {
 			return;
 		}
 
-		this.actionSnapshot = null;
+		this.actionSnapshot = undefined;
 		this.mouseNotMoved = true;
 		this.mouseBtnFlag = 0;
 
@@ -413,7 +404,7 @@ export class ActionHandler extends ActionShiftFlip {
 	/**
 	 * Create snippet with all pixel color data of given selection.
 	 *
-	 * @param {boolean} cut (optional) clear selection after copy
+	 * @param cut Clear selection after copy
 	 */
 	createSnippet(cut: boolean = false) {
 		if (!this.isActionInProgress() && editor.selection.nonEmpty()) {
@@ -453,12 +444,11 @@ export class ActionHandler extends ActionShiftFlip {
 
 	/**
 	 * Place active snippet in the center of given position.
-	 *
-	 * @param {number} sx
-	 * @param {number} sy
 	 */
 	private _placeSnippetTo(sx: number, sy: number) {
-		editor.pixel.undo(this.actionSnapshot);
+		if (!(editor.pixel.undo(this.actionSnapshot) && this.activeSnippet)) {
+			return;
+		}
 
 		sx -= (this.activeSnippet.width >> 1);
 		sy -= (this.activeSnippet.height >> 1);
@@ -483,15 +473,16 @@ export class ActionHandler extends ActionShiftFlip {
 
 				if (isCol && attrs) {
 					editor.pixel.putPixel(x, y, mode, c, false);
-
-				} else if (isSet) {
+				}
+				else if (isSet) {
 					editor.pixel.putPixel(
 						x, y,
 						(c ? cSet : cRes),
 						(attrs ? c : 0),
 						false
 					);
-				} else if (c) {
+				}
+				else if (c) {
 					editor.pixel.putPixel(
 						x, y,
 						isRes ? cRes : cSet,
@@ -511,9 +502,9 @@ export class ActionHandler extends ActionShiftFlip {
 	 * Method which takes into account ongoing action start, current and last
 	 * known mouse coordinates and calls `redrawOuterRect` to adjust to "outer" rect.
 	 *
-	 * @param {number} x2 current X coordinate
-	 * @param {number} y2 current Y coordinate
-	 * @param {boolean} attrs redraw also attributes
+	 * @param x2 Current X coordinate
+	 * @param y2 Current Y coordinate
+	 * @param attrs Redraw also attributes
 	 */
 	private _redrawMouseActionRect(x2: number, y2: number, attrs: boolean = true) {
 		let x1: number, y1: number;
@@ -521,25 +512,29 @@ export class ActionHandler extends ActionShiftFlip {
 		if (this.startPixelX > x2) {
 			x1 = x2;
 			x2 = this.startPixelX;
-		} else {
+		}
+		else {
 			x1 = this.startPixelX;
 		}
 
 		if (this.startPixelY > y2) {
 			y1 = y2;
 			y2 = this.startPixelY;
-		} else {
+		}
+		else {
 			y1 = this.startPixelY;
 		}
 
 		if (this.lastPixelX > x2) {
 			x2 = this.lastPixelX;
-		} else if (this.lastPixelX < x1) {
+		}
+		else if (this.lastPixelX < x1) {
 			x1 = this.lastPixelX;
 		}
 		if (this.lastPixelY > y2) {
 			y2 = this.lastPixelY;
-		} else if (this.lastPixelY < y1) {
+		}
+		else if (this.lastPixelY < y1) {
 			y1 = this.lastPixelY;
 		}
 

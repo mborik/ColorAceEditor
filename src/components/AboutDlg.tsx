@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Button, Classes, Dialog } from "@blueprintjs/core";
+import { Button, Classes, Dialog } from '@blueprintjs/core';
 import { actionAbout } from '../actions/base';
 import { useEditor } from './EditorProvider';
 
@@ -35,7 +35,7 @@ const AboutDlg: React.VFC = () => {
 
 			<p>Online pixelart screen editor for <b>
 				<Link href="https://pmd85.borik.net/" text="Tesla PMD 85" /></b>,
-				<br />
+			<br />
 				an 8-bit personal micro-computer produced in eighties
 				of 20th century in former Czechoslovakia.</p>
 
@@ -47,7 +47,7 @@ const AboutDlg: React.VFC = () => {
 			<hr />
 			<div className={Classes.DIALOG_FOOTER}>
 				<p>Built on <Link href="https://blueprintjs.com/"
-						text="BlueprintJS UI framework" />.<br />
+					text="BlueprintJS UI framework" />.<br />
 					Licensed under the MIT license.
 				</p>
 
@@ -64,6 +64,6 @@ const AboutDlg: React.VFC = () => {
 			</div>
 		</div>
 	</Dialog>;
-}
+};
 
 export default AboutDlg;

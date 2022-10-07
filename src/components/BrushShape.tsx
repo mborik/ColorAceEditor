@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { Button, Classes, Dialog, Navbar, Position } from "@blueprintjs/core";
+import { Button, Classes, Dialog, Navbar, Position } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
@@ -49,7 +49,7 @@ const BrushShape: React.VFC = () => {
 			pixel.data.set([ c, c, c, 255 ]);
 
 			canvasCtx.putImageData(pixel, x, y);
-		}
+		};
 
 		canvas.refresh = () => {
 			for (let i = 0, y = 0; y < brushSize; y++) {
@@ -60,7 +60,7 @@ const BrushShape: React.VFC = () => {
 					canvasCtx.putImageData(pixel, x, y);
 				}
 			}
-		}
+		};
 
 		const translateCoords = (sx: number, sy: number) => {
 			const brushSize = Math.sqrt(editorPixelator.brush.length);
@@ -92,7 +92,8 @@ const BrushShape: React.VFC = () => {
 				lastX = x;
 				lastY = y;
 
-			} else {
+			}
+			else {
 				mousePressed = 0;
 			}
 		});
@@ -173,13 +174,13 @@ const BrushShape: React.VFC = () => {
 								canvas?.refresh();
 							}}>
 								Reset
-							</Button>
+						</Button>
 						<Button onClick={() => setOpened(false)}>Close</Button>
 					</div>
 				</div>
 			</Dialog>
 		</Navbar.Group>
 	) : null;
-}
+};
 
 export default BrushShape;

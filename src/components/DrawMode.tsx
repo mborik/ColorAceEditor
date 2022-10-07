@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { Button, ButtonGroup, Navbar, Position, KeyCombo } from "@blueprintjs/core";
+import { Button, ButtonGroup, Navbar, Position, KeyCombo } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
@@ -42,7 +42,7 @@ const DrawMode: React.VFC = () => {
 								<label>{mode.title}</label>
 								<KeyCombo combo={mode.hotkey} />
 							</>}
-							renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+							renderTarget={({ isOpen: _, ref: elementRef, ...targetProps }) => (
 								<Button
 									{...targetProps}
 									id={mode.id}
@@ -57,11 +57,12 @@ const DrawMode: React.VFC = () => {
 								/>
 							)}
 						/>
-					)}
+					);
+				}
 				)}
 			</ButtonGroup>
 		</Navbar.Group>
 	) : null;
-}
+};
 
 export default DrawMode;

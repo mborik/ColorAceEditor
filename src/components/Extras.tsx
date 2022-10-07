@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { Button, ButtonGroup, KeyCombo, Menu, MenuItem, Navbar, Position } from "@blueprintjs/core";
+import { Button, ButtonGroup, KeyCombo, Menu, MenuItem, Navbar, Position } from '@blueprintjs/core';
 import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
 import { actionToggleGuides, actionUndo } from '../actions/base';
@@ -27,7 +27,7 @@ const Extras: React.VFC = () => {
 				<ButtonGroup fill={true}>
 					<Popover2
 						position="bottom-left"
-						modifiers={{ arrow: { enabled: false }}}
+						modifiers={{ arrow: { enabled: false } }}
 						portalContainer={portalContainer}
 						content={
 							<Menu>
@@ -65,7 +65,7 @@ const Extras: React.VFC = () => {
 							<label>undo</label>
 							<KeyCombo combo="cmd+Z" />
 						</>}
-						renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+						renderTarget={({ isOpen: _, ref: elementRef, ...targetProps }) => (
 							<Button
 								{...targetProps}
 								elementRef={elementRef}
@@ -88,7 +88,7 @@ const Extras: React.VFC = () => {
 							<label>toggle guidelines</label>
 							<KeyCombo combo="cmd+G" />
 						</>}
-						renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+						renderTarget={({ isOpen: _, ref: elementRef, ...targetProps }) => (
 							<Button
 								{...targetProps}
 								elementRef={elementRef}
@@ -107,6 +107,6 @@ const Extras: React.VFC = () => {
 			</Navbar.Group>
 		</>
 	) : null;
-}
+};
 
 export default Extras;

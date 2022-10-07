@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { Button, Navbar, ButtonGroup, Classes } from "@blueprintjs/core";
+import { Button, Navbar, ButtonGroup, Classes } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 
 import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions/base';
@@ -70,6 +70,6 @@ const FileMenu: React.VFC = () => {
 			</ButtonGroup>
 		</Navbar.Group>
 	);
-}
+};
 
 export default FileMenu;

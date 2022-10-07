@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { Navbar, Icon } from "@blueprintjs/core";
+import { Navbar, Icon } from '@blueprintjs/core';
 import { useEditor } from './EditorProvider';
 import { actionAbout } from '../actions/base';
 
@@ -25,7 +25,9 @@ const Navigation: React.VFC = () => {
 
 	return <nav>
 		<Navbar className="bp4-dark">
-			<Navbar.Group align="center" onClick={() => { dispatch(actionAbout(true)) }}>
+			<Navbar.Group align="center" onClick={() => {
+				dispatch(actionAbout(true));
+			}}>
 				<Navbar.Heading>ColorACE Screen Editor</Navbar.Heading>
 			</Navbar.Group>
 
@@ -64,7 +66,7 @@ const Navigation: React.VFC = () => {
 
 			<footer id="statusBar"></footer>
 		</Navbar>
-	</nav>
-}
+	</nav>;
+};
 
 export default Navigation;

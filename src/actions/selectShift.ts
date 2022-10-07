@@ -3,9 +3,9 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { DispatchAction, EditorAction } from "./base";
-import { actionToast } from "./toast";
-import { Editor, EditorDirection } from "../editor/Editor";
+import { DispatchAction, EditorAction } from './base';
+import { actionToast } from './toast';
+import { Editor, EditorDirection } from '../editor/Editor';
 
 
 export const actionSelectShift = (editor: Editor, direction: EditorDirection): DispatchAction => {

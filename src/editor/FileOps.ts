@@ -2,16 +2,16 @@
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.Uploader - processing of uploaded file
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { editor } from "./Editor";
+import { editor } from './Editor';
 
 
 export class FileOps {
 	constructor(public uploadCanvas: HTMLCanvasElement) {
 		if (!(uploadCanvas instanceof HTMLCanvasElement)) {
-			throw Error("ColorAceEditor: Image render canvas element not defined!");
+			throw Error('ColorAceEditor: Image render canvas element not defined!');
 		}
 	}
 
@@ -28,8 +28,9 @@ export class FileOps {
 	private countMostFrequent(arr: number[]) {
 		const counts = {};
 		arr.forEach(v => {
-			if (v > 0)
+			if (v > 0) {
 				counts[v] = (counts[v] || 0) + 1;
+			}
 		});
 
 		let result = 0, max = 0;
@@ -48,9 +49,6 @@ export class FileOps {
 	 * processed as standard screen-dump. In case of standard images with dimensions
 	 * 288x256 (or lower) it will be converted by complex algorithm with proper
 	 * color attribute matching.
-	 *
-	 * @param {File} file
-	 * @returns {Promise}
 	 */
 	upload(file: File, updateProgress?: (amount: number) => void): Promise<void> {
 		return new Promise((resolve, reject) => {
@@ -63,7 +61,7 @@ export class FileOps {
 
 				if (typeof file.type === 'string' && file.type.indexOf('image/') === 0) {
 					fr.onload = () => {
-						let img = new Image();
+						const img = new Image();
 
 						img.onload = () => {
 							if (img.width > 288 || img.height > 256) {
@@ -81,9 +79,12 @@ export class FileOps {
 							this.uploadCanvas.width = width;
 							this.uploadCanvas.height = rows;
 
-							const ctx = this.uploadCanvas.getContext("2d");
+							const ctx = this.uploadCanvas.getContext('2d');
+							if (!ctx) {
+								return reject('unexpected error!');
+							}
 
-							ctx.fillStyle = "black";
+							ctx.fillStyle = 'black';
 							ctx.fill();
 							ctx.drawImage(img, 0, 0);
 
@@ -104,12 +105,12 @@ export class FileOps {
 									i = (y * 48) + cx;
 									c = this.countMostFrequent(attr);
 
-									editor.pixel.attrs[i]      = editor.pixel.pal[c][7];
+									editor.pixel.attrs[i] = editor.pixel.pal[c][7];
 									editor.pixel.attrs[i + 48] = editor.pixel.pal[c][8];
 
 									x = (y * 288) + (cx * 6);
 									for (i = 0; i < 12; x++) {
-										editor.pixel.surface[x]       = attr[i++] ? c : 0;
+										editor.pixel.surface[x] = attr[i++] ? c : 0;
 										editor.pixel.surface[x + 288] = attr[i++] ? c : 0;
 									}
 								}
@@ -121,7 +122,8 @@ export class FileOps {
 								y += 2;
 								if (y < rows) {
 									requestAnimationFrame(loopY);
-								} else {
+								}
+								else {
 									editor.refresh();
 
 									if (typeof updateProgress === 'function') {
@@ -186,7 +188,7 @@ export class FileOps {
 		}
 
 
-		let blob: Blob = null;
+		let blob: Nullable<Blob> = null;
 
 		try {
 			blob = new Blob([ bin ], { type });
@@ -216,10 +218,10 @@ export class FileOps {
 				downloadLink.href = url;
 				downloadLink.setAttribute('download', encodeURIComponent(filename));
 
-				parentElement.appendChild(downloadLink);
+				parentElement?.appendChild(downloadLink);
 				downloadLink.click();
 
-				setTimeout(function () {
+				setTimeout(function() {
 					// revoking of created url and anchor removal...
 					URL.revokeObjectURL(url);
 					downloadLink.remove();

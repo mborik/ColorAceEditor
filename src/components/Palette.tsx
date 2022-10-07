@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { Button, ButtonGroup, Navbar, Position, Icon, KeyCombo, IconSize } from "@blueprintjs/core";
+import { Button, ButtonGroup, Navbar, Position, Icon, KeyCombo, IconSize } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
@@ -50,7 +50,7 @@ const Palette: React.VFC = () => {
 									<KeyCombo combo="D" />
 								</>
 							)}
-							renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+							renderTarget={({ isOpen: _, ref: elementRef, ...targetProps }) => (
 								<Button
 									{...targetProps}
 									elementRef={elementRef}
@@ -64,16 +64,16 @@ const Palette: React.VFC = () => {
 									active={isActive}
 									intent={isActive ? 'primary' : 'none'}
 									onClick={() => {
-										!isActive && dispatch(actionColorChanged(value))
+										!isActive && dispatch(actionColorChanged(value));
 									}}
 								/>
 							)}
 						/>
-					)
+					);
 				})}
 			</ButtonGroup>
 		</Navbar.Group>
 	) : null;
-}
+};
 
 export default Palette;

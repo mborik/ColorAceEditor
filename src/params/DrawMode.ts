@@ -2,10 +2,10 @@
  * PMD 85 ColorAce picture editor
  * Drawing mode toolbar item definitions
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { EditorDrawMode } from "../editor/Editor";
+import { EditorDrawMode } from '../editor/Editor';
 
 
 export interface DrawModeItem {

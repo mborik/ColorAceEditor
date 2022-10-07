@@ -2,33 +2,33 @@
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.Drawing - custom artistic methods
  *
- * Copyright (c) 2012-2019 Martin Bórik
+ * Copyright (c) 2012-2022 Martin Bórik
  */
 
-import { editor, EditorDrawMode } from "./Editor";
+import { editor, EditorDrawMode, EditorCoordinates } from './Editor';
 
 
 export class Drawing {
 	/**
 	 * putPixel wrapper only.
 	 *
-	 * @param {number} x coordinate in surface (0-287)
-	 * @param {number} y coordinate in surface (0-255)
-	 * @param {boolean} shouldRedraw (optional) default true
+	 * @param x Coordinate in surface (0-287)
+	 * @param y Coordinate in surface (0-255)
+	 * @param shouldRedraw default true
 	 */
 	dot(x: number, y: number, shouldRedraw: boolean = true) {
 		editor.pixel.putPixel(x, y, editor.editMode, editor.editColor, shouldRedraw);
-	};
+	}
 
 	/**
 	 * Bresenham's scan-line algorithm.
 	 *
-	 * @param {number} x1 coordinate in surface (0-287)
-	 * @param {number} y1 coordinate in surface (0-255)
-	 * @param {number} x2 coordinate in surface (0-287)
-	 * @param {number} y2 coordinate in surface (0-255)
-	 * @param {boolean} drawFirst flag if it's needed to draw first point of line
-	 * @param {boolean} shouldRedraw (optional) default true
+	 * @param x1 Coordinate in surface (0-287)
+	 * @param y1 Coordinate in surface (0-255)
+	 * @param x2 Coordinate in surface (0-287)
+	 * @param y2 Coordinate in surface (0-255)
+	 * @param drawFirst Flag if it's needed to draw first point of line
+	 * @param shouldRedraw default true
 	 */
 	line(x1: number, y1: number, x2: number, y2: number, drawFirst: boolean, shouldRedraw: boolean = true) {
 		const dx = Math.abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
@@ -60,8 +60,8 @@ export class Drawing {
 	/**
 	 * Brush drawing algorithm.
 	 *
-	 * @param {number} x coordinate in surface (0-287)
-	 * @param {number} y coordinate in surface (0-255)
+	 * @param x Coordinate in surface (0-287)
+	 * @param y Coordinate in surface (0-255)
 	 */
 	brush(x: number, y: number) {
 		const brushSize = Math.sqrt(editor.pixel.brush.length);
@@ -86,14 +86,14 @@ export class Drawing {
 	/**
 	 * Flood-fill algorithm inspired by http://rosettacode.org/wiki/Bitmap/Flood_fill.
 	 *
-	 * @param {number} x coordinate in surface (0-287)
-	 * @param {number} y coordinate in surface (0-255)
+	 * @param sx Coordinate in surface (0-287)
+	 * @param sy Coordinate in surface (0-255)
 	 */
 	floodFill(sx: number, sy: number) {
 		let cx1 = sx, cy1 = sy, cx2 = sx, cy2 = sy;
 
 		let mode = editor.editMode;
-		let set: boolean = !!editor.pixel.getPixel(sx, sy);
+		const set: boolean = !!editor.pixel.getPixel(sx, sy);
 
 		if (mode === EditorDrawMode.Over) {
 			mode = set ? EditorDrawMode.Reset : EditorDrawMode.Set;
@@ -101,12 +101,11 @@ export class Drawing {
 
 		const test = (x: number, y: number) => (!editor.pixel.getPixel(x, y) === set);
 		const visited = new Set<number>();
-		const queue: WebKitPoint[] = [];
-		let point: WebKitPoint = { x: sx, y: sy };
+		const queue: EditorCoordinates[] = [];
+		let point: Optional<EditorCoordinates> = { x: sx, y: sy };
 
 		do {
-			let x = point.x;
-			let y = point.y;
+			let { x, y } = point;
 
 			while (x > 0 && !test(x - 1, y)) {
 				x--;
@@ -120,12 +119,14 @@ export class Drawing {
 
 				if (x < cx1) {
 					cx1 = x;
-				} else if (x > cx2) {
+				}
+				else if (x > cx2) {
 					cx2 = x;
 				}
 				if (y < cy1) {
 					cy1 = y;
-				} else if (y > cy2) {
+				}
+				else if (y > cy2) {
 					cy2 = y;
 				}
 
@@ -158,17 +159,17 @@ export class Drawing {
 	/**
 	 * Simple rectangle drawing algorithm.
 	 *
-	 * @param {number} x1 coordinate in surface (0-287)
-	 * @param {number} y1 coordinate in surface (0-255)
-	 * @param {number} x2 coordinate in surface (0-287)
-	 * @param {number} y2 coordinate in surface (0-255)
-	 * @param {boolean} filled flag if we filling the rectangle
+	 * @param x1 Coordinate in surface (0-287)
+	 * @param y1 Coordinate in surface (0-255)
+	 * @param x2 Coordinate in surface (0-287)
+	 * @param y2 Coordinate in surface (0-255)
+	 * @param filled Flag if we filling the rectangle
 	 */
 	rectangle(x1: number, y1: number, x2: number, y2: number, filled: boolean) {
 		if (x1 === x2 || y1 === y2) {
 			this.dot(x1, y1, false);
-
-		} else {
+		}
+		else {
 			// sort out the coords
 			let sw: number;
 			if (x1 > x2) {
@@ -191,7 +192,8 @@ export class Drawing {
 					for (++x; x < x2; x++) {
 						this.dot(x, y, false);
 					}
-				} else {
+				}
+				else {
 					x = x2;
 				}
 
@@ -203,17 +205,17 @@ export class Drawing {
 	/**
 	 * Complex ellipse drawing algorithm.
 	 *
-	 * @param {number} x1 coordinate in surface (0-287)
-	 * @param {number} y1 coordinate in surface (0-255)
-	 * @param {number} x2 coordinate in surface (0-287)
-	 * @param {number} y2 coordinate in surface (0-255)
-	 * @param {boolean} filled flag if we filling the ellipse
+	 * @param x1 Coordinate in surface (0-287)
+	 * @param y1 Coordinate in surface (0-255)
+	 * @param x2 Coordinate in surface (0-287)
+	 * @param y2 Coordinate in surface (0-255)
+	 * @param filled Flag if we filling the ellipse
 	 */
 	ellipse(x1: number, y1: number, x2: number, y2: number, filled: boolean) {
 		if (x1 === x2 || y1 === y2) {
 			this.dot(x1, y1, false);
-
-		} else {
+		}
+		else {
 			const coords = new Set<number>();
 			const putPixel = (x: number, y: number) => {
 				if (x >= 0 && x < 288 && y >= 0 && y < 256) {
@@ -247,12 +249,12 @@ export class Drawing {
 			let firstRun = true;
 
 			for (let x = 0; x <= radiusX; ++x) {
-				let xPos = x + x1;
-				let rxPos = ellipseWidth - x - 1 + x1;
+				const xPos = x + x1;
+				const rxPos = ellipseWidth - x - 1 + x1;
 
-				let xRad = x - radiusX;
-				let yRad = radiusY * -(Math.sqrt(1 - (xRad / radiusX) ** 2));
-				let y = Math.floor(yRad + radiusY);
+				const xRad = x - radiusX;
+				const yRad = radiusY * -(Math.sqrt(1 - (xRad / radiusX) ** 2));
+				const y = Math.floor(yRad + radiusY);
 				let yPos = y + y1;
 
 				let ryPos = ellipseHeight - y - 1 + y1;
@@ -267,8 +269,8 @@ export class Drawing {
 				// while there's a >1 jump in y, fill in the gap
 				// (assumes that this is not 1st time we've tracked y, x != 0)
 				for (let j = prevY - 1; !firstRun && j > y - 1 && y > 0; --j) {
-					let jPos = j + y1;
-					let rjPos = ellipseHeight - j - 1 + y1;
+					const jPos = j + y1;
+					const rjPos = ellipseHeight - j - 1 + y1;
 
 					if (jPos === rjPos - 1) {
 						continue;

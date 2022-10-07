@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { Button, Navbar, Position, KeyCombo } from "@blueprintjs/core";
+import { Button, Navbar, Position, KeyCombo } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
@@ -35,7 +35,7 @@ const FillShape: React.VFC = () => {
 					<label>filled shape</label>
 					<KeyCombo combo="V" />
 				</>}
-				renderTarget={({ isOpen, ref: elementRef, ...targetProps }) => (
+				renderTarget={({ isOpen: _, ref: elementRef, ...targetProps }) => (
 					<Button
 						{...targetProps}
 						id={EditorTool.FillShape}
@@ -52,6 +52,6 @@ const FillShape: React.VFC = () => {
 			/>
 		</Navbar.Group>
 	) : null;
-}
+};
 
 export default FillShape;

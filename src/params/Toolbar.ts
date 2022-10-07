@@ -2,11 +2,11 @@
  * PMD 85 ColorAce picture editor
  * Toolbar item definitions
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { IconName } from "@blueprintjs/core";
-import { EditorTool } from "../editor/Editor";
+import { IconName } from '@blueprintjs/core';
+import { EditorTool } from '../editor/Editor';
 
 
 export interface ToolbarItem {

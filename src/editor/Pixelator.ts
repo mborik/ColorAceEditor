@@ -2,10 +2,10 @@
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.Pixelator - canvas level methods
  *
- * Copyright (c) 2012-2014 Martin Borik
+ * Copyright (c) 2012-2022 Martin Bórik
  */
 
-import { editor, EditorDrawMode } from "./Editor";
+import { editor, EditorDrawMode } from './Editor';
 
 
 const FULL_ALPHA = 0xFFFFFFFF;
@@ -29,11 +29,11 @@ export class Pixelator {
 	private currentZoom: number = 0;
 	private scrollerX: number = 0;
 	private scrollerY: number = 0;
-	private bmp: ImageData = null;
-	private bmpW: number = null;
-	private bmpH: number = null;
-	private bmpClamp: Uint8ClampedArray = null;
-	private bmpDWORD: Uint32Array = null;
+	private bmp: ImageData;
+	private bmpW: number;
+	private bmpH: number;
+	private bmpClamp: Uint8ClampedArray;
+	private bmpDWORD: Uint32Array;
 	private bmpBgColor: string;
 
 	snapshots: EditorSnapshot[] = [];
@@ -50,7 +50,7 @@ export class Pixelator {
 	];
 
 	surface: Uint8ClampedArray = new Uint8ClampedArray(288 * 256);
-	attrs: Uint8ClampedArray  = new Uint8ClampedArray((288 * 256) / 6);
+	attrs: Uint8ClampedArray = new Uint8ClampedArray((288 * 256) / 6);
 	brush: Uint8ClampedArray = new Uint8ClampedArray(15 * 15);
 
 	/**
@@ -63,7 +63,7 @@ export class Pixelator {
 			let r = this.pal[i][4];
 			let g = this.pal[i][5];
 			let b = this.pal[i][6];
-			let y = Math.floor(96 - ((255 + r + g + b) / 16));
+			const y = Math.floor(96 - ((255 + r + g + b) / 16));
 
 			this.pal[i][0] = a | (b << 16) | (g << 8) | r;
 
@@ -97,7 +97,7 @@ export class Pixelator {
 	/**
 	 * Binary decoding of PMD 85 screen.
 	 *
-	 * @param {(Uint8Array|number[])} videoRam with dump of PMD 85 VRAM (0xC000-0xFFFF)
+	 * @param videoRam With dump of PMD 85 VRAM (0xC000-0xFFFF)
 	 */
 	readPMD85vram(videoRam: Uint8Array | number[]) {
 		if (videoRam.length !== 16384) {
@@ -138,31 +138,33 @@ export class Pixelator {
 	/**
 	 * Returns nonzero if we need to show guideline for exact X coordinate.
 	 *
-	 * @param {number} x coordinate in surface (0-287)
+	 * @param x Coordinate in surface (0-287)
 	 */
 	isGuide = (x: number) => (editor.showGuides && ((x % 6) === 5)) ? 3 : 0;
 
 	/**
 	 * Main render callback of Scroller.
 	 *
-	 * @param {number} left Absolute X Scroller position
-	 * @param {number} top Absolute Y Scroller position
-	 * @param {number} zoom Scroller internal zoom factor
+	 * @param left Absolute X Scroller position
+	 * @param top Absolute Y Scroller position
+	 * @param zoom Scroller internal zoom factor
 	 */
 	render(left: number, top: number, zoom: number) {
-		let x = 0, y = 0, z = 0, s: number;
+		const { canvas, ctx, contentWidth, contentHeight, selection } = editor;
 		const l = Math.max(Math.floor(left / zoom), 0);
 		const t = Math.max(Math.floor(top / zoom), 0);
+
+		let x = 0, y = 0, z = 0, s: number;
 
 		this.scrollerX = l * zoom;
 		this.scrollerY = t * zoom;
 
 		if (zoom !== this.currentZoom) {
 			editor.zoomFactor = this.currentZoom = zoom;
-			this.bmpW = editor.canvas.width = Math.min(288 * zoom, editor.contentWidth);
-			this.bmpH = editor.canvas.height = Math.min(256 * zoom, editor.contentHeight);
+			this.bmpW = canvas.width = Math.min(288 * zoom, contentWidth);
+			this.bmpH = canvas.height = Math.min(256 * zoom, contentHeight);
 
-			this.bmp = editor.ctx.createImageData(this.bmpW, this.bmpH);
+			this.bmp = ctx.createImageData(this.bmpW, this.bmpH);
 
 			const bmpBuffer = new ArrayBuffer(this.bmp.data.length);
 			this.bmpClamp = new Uint8ClampedArray(bmpBuffer);
@@ -174,46 +176,53 @@ export class Pixelator {
 			x = 0;
 
 			for (let j = l, k = ((i * 288) + j); j < 288; j++, k++) {
-				this.scalers[zoom](z + x, this.pal[this.surface[k]], this.isGuide(j));
+				this.scalers[zoom]?.(z + x, this.pal[this.surface[k]], this.isGuide(j));
 
-				if ((s = editor.selection.testBoundsX(j, i)))
+				if ((s = selection.testBoundsX(j, i))) {
 					this.marqueeX(z + x + (--s * (zoom - 1)), zoom, y);
-				if ((s = editor.selection.testBoundsY(j, i)))
+				}
+				if ((s = selection.testBoundsY(j, i))) {
 					this.marqueeY(z + x + (--s * (zoom - 1) * this.bmpW), zoom, x);
+				}
 
 				x += zoom;
-				if (x > w)
+				if (x > w) {
 					break;
+				}
 			}
 
 			y += zoom;
 			z += zoom * this.bmpW;
-			if (y >= this.bmpH)
+			if (y >= this.bmpH) {
 				break;
+			}
 		}
 
 		this.bmp.data.set(this.bmpClamp);
-		editor.ctx.putImageData(this.bmp, 0, 0);
+		ctx.putImageData(this.bmp, 0, 0);
+
+		ctx.save();
+		ctx.fillStyle = this.bmpBgColor;
 
 		// clear overlapped areas if needed...
 		if (x < w) {
-			editor.ctx.fillStyle = this.bmpBgColor;
-			editor.ctx.fillRect(x, 0, this.bmpW - x, this.bmpH);
+			ctx.fillRect(x, 0, this.bmpW - x, this.bmpH);
 		}
 		if (y < (this.bmpH - zoom)) {
-			editor.ctx.fillStyle = this.bmpBgColor;
-			editor.ctx.fillRect(0, y, x, this.bmpH - y);
+			ctx.fillRect(0, y, x, this.bmpH - y);
 		}
+
+		ctx.restore();
 	}
 
 	/**
 	 * Helper method to redraw "outer rectangle" (grown to whole attributes).
 	 *
-	 * @param {number} x1 top-left X coordinate in surface (0-287)
-	 * @param {number} y1 top-left Y coordinate in surface (0-255)
-	 * @param {number} x2 bottom-right X coordinate in surface (0-287)
-	 * @param {number} y2 bottom-right Y coordinate in surface (0-255)
-	 * @param {boolean} attrs (optional) Refresh color from attributes.
+	 * @param x1 Top-left X coordinate in surface (0-287)
+	 * @param y1 Top-left Y coordinate in surface (0-255)
+	 * @param x2 Bottom-right X coordinate in surface (0-287)
+	 * @param y2 Bottom-right Y coordinate in surface (0-255)
+	 * @param refreshAttributes Refresh color from attributes.
 	 */
 	redrawOuterRect(x1: number, y1: number, x2: number, y2: number, refreshAttributes?: boolean) {
 		x1 = Math.max(0, Math.floor(--x1 / 6) * 6);
@@ -227,19 +236,19 @@ export class Pixelator {
 	/**
 	 * Redraws a selected rectangle region of the surface.
 	 *
-	 * @param {number} x coordinate in surface (0-287)
-	 * @param {number} y coordinate in surface (0-255)
-	 * @param {number} w width of redraw window
-	 * @param {number} h height of redraw window
-	 * @param {boolean} refreshAttributes (optional) Refresh color from attributes.
+	 * @param x Coordinate in surface (0-287)
+	 * @param y Coordinate in surface (0-255)
+	 * @param w Width of redraw window
+	 * @param h Height of redraw window
+	 * @param refreshAttributes Refresh color from attributes.
 	 */
 	redrawRect(x: number, y: number, w: number, h: number, refreshAttributes?: boolean) {
 		const zoom = this.currentZoom;
 
 		let c: number, d: number, bound: number;
-		let sx: number, sy: number;
-		let bx: number, by: number;
-		let sw = this.bmpW - zoom;
+		let sx: Optional<number>, sy: Optional<number>;
+		let bx: Optional<number>, by: Optional<number>;
+		const sw = this.bmpW - zoom;
 		let sz = (sy = (y * zoom) - this.scrollerY) * this.bmpW;
 
 		for (let i = y; i < (y + h); i++) {
@@ -259,12 +268,14 @@ export class Pixelator {
 				}
 
 				if (sx >= 0 && sy >= 0) {
-					this.scalers[zoom](sz + sx, this.pal[c], this.isGuide(j));
+					this.scalers[zoom]?.(sz + sx, this.pal[c], this.isGuide(j));
 
-					if ((bound = editor.selection.testBoundsX(j, i)))
+					if ((bound = editor.selection.testBoundsX(j, i))) {
 						this.marqueeX(sz + sx + (--bound * (zoom - 1)), zoom, sy);
-					if ((bound = editor.selection.testBoundsY(j, i)))
+					}
+					if ((bound = editor.selection.testBoundsY(j, i))) {
 						this.marqueeY(sz + sx + (--bound * (zoom - 1) * this.bmpW), zoom, sx);
+					}
 
 					if (bx === undefined) {
 						bx = sx;
@@ -273,18 +284,20 @@ export class Pixelator {
 				}
 
 				sx += zoom;
-				if (sx > sw)
+				if (sx > sw) {
 					break;
+				}
 			}
 
 			sy += zoom;
 			sz += zoom * this.bmpW;
-			if (sy >= this.bmpH)
+			if (sy >= this.bmpH) {
 				break;
+			}
 		}
 
 		this.bmp.data.set(this.bmpClamp);
-		if (bx !== undefined) {
+		if (sx !== undefined && sy !== undefined && bx !== undefined && by !== undefined) {
 			sx -= bx;
 			sy -= by;
 			editor.ctx.putImageData(this.bmp, 0, 0, bx, by, sx, sy);
@@ -294,11 +307,11 @@ export class Pixelator {
 	/**
 	 * Putting pixel onto surface in specified color and mode.
 	 *
-	 * @param {number} x coordinate in surface (0-287)
-	 * @param {number} y coordinate in surface (0-255)
-	 * @param {EditorDrawMode} mode of drawing
-	 * @param {number} color 0 = no color change, 1 - 7 change to palette color
-	 * @param {boolean} shouldRedraw (optional) default true
+	 * @param x Coordinate in surface (0-287)
+	 * @param y Coordinate in surface (0-255)
+	 * @param mode Mode of drawing
+	 * @param color 0 = no color change, 1 - 7 change to palette color
+	 * @param shouldRedraw default true
 	 */
 	putPixel(x: number, y: number,
 		mode: EditorDrawMode = editor.editMode, color: number = editor.editColor,
@@ -325,7 +338,7 @@ export class Pixelator {
 			this.attrs[a2] = this.pal[c][8];
 		}
 		else {
-			let d = this.attrs[a1];
+			const d = this.attrs[a1];
 			c = this.attrs[a2];
 			c = (d | c | ((d * c) ? 0 : 4));
 		}
@@ -358,7 +371,7 @@ export class Pixelator {
 			y = (y * zoom) - this.scrollerY;
 			x = (x * zoom) - this.scrollerX;
 
-			this.scalers[zoom]((y * this.bmpW) + x, this.pal[c], this.isGuide(x));
+			this.scalers[zoom]?.((y * this.bmpW) + x, this.pal[c], this.isGuide(x));
 
 			this.bmp.data.set(this.bmpClamp);
 			editor.ctx.putImageData(this.bmp, 0, 0, x, y, zoom, zoom);
@@ -368,9 +381,9 @@ export class Pixelator {
 	/**
 	 * Getting pixel color and mode from surface.
 	 *
-	 * @param {number} x coordinate in surface (0-287)
-	 * @param {number} y coordinate in surface (0-255)
-	 * @returns {number} color value (1-7) of set pixel or 0 if pixel not set
+	 * @param x Coordinate in surface (0-287)
+	 * @param y Coordinate in surface (0-255)
+	 * @returns color value (1-7) of set pixel or 0 if pixel not set
 	 */
 	getPixel(x: number, y: number): number {
 		if (x < 0 || x >= 288 || y < 0 || y >= 256) {
@@ -397,8 +410,8 @@ export class Pixelator {
 	/**
 	 * Do snapshot of current screen to undo buffer.
 	 *
-	 * @param {boolean} justGet (optional) just return snapshot, not put into undo-buffer
-	 * @returns {EditorSnapshot} current screen snapshot
+	 * @param justGet Just return snapshot, not put into undo-buffer
+	 * @returns Current screen snapshot
 	 */
 	doSnapshot(justGet: boolean = false): EditorSnapshot {
 		const result: EditorSnapshot = {
@@ -419,10 +432,9 @@ export class Pixelator {
 	/**
 	 * Do undo operation.
 	 *
-	 * @param {EditorSnapshot} (optional) snapshot to restore
-	 * @returns {boolean} operation result
+	 * @param snapshot Snapshot to restore
 	 */
-	undo(snapshot: EditorSnapshot = this.snapshots.pop()): boolean {
+	undo(snapshot: Optional<EditorSnapshot> = this.snapshots.pop()): boolean {
 		if (!snapshot) {
 			return false;
 		}
@@ -435,9 +447,6 @@ export class Pixelator {
 
 	/**
 	 * Return true if last snapshot was in given type.
-	 *
-	 * @param {string} type
-	 * @returns {boolean} operation result
 	 */
 	lastSnapshotOfType(type: string): boolean {
 		const len = this.snapshots.length;
@@ -452,9 +461,9 @@ export class Pixelator {
 	/**
 	 * Draw marquee for X coordinate.
 	 *
-	 * @param  {number} p pointer to bitmap
-	 * @param  {number} z zoom factor
-	 * @param  {number} y coordinate
+	 * @param p Pointer to bitmap
+	 * @param z Zoom factor
+	 * @param y Coordinate
 	 */
 	marqueeX(p: number, z: number, y: number) {
 		for (let i = 0; i < z; i++, y++) {
@@ -466,9 +475,9 @@ export class Pixelator {
 	/**
 	 * Draw marquee for Y coordinate.
 	 *
-	 * @param  {number} p pointer to bitmap
-	 * @param  {number} z zoom factor
-	 * @param  {number} x coordinate
+	 * @param p Pointer to bitmap
+	 * @param z Zoom factor
+	 * @param x Coordinate
 	 */
 	marqueeY(p: number, z: number, x: number) {
 		for (let i = 0; i < z; i++, x++, p++) {
@@ -499,7 +508,7 @@ export class Pixelator {
 	/**
 	 * Scaler functions for each zoom factor separately.
 	 */
-	scalers: ((ptr: number, palEntry: any[], grid: number) => void)[] = [
+	scalers: Nullable<(ptr: number, palEntry: any[], grid: number) => void>[] = [
 		null,
 	// 1x1
 		(p: number, c: any[]) => {
@@ -507,7 +516,7 @@ export class Pixelator {
 		},
 	// 2x2
 		(p: number, c: any[]) => {
-			var a = c[0], o = this.bmpW - 1;
+			const a = c[0], o = this.bmpW - 1;
 
 			this.bmpDWORD[p++] = a;
 			this.bmpDWORD[p] = a;
@@ -517,7 +526,7 @@ export class Pixelator {
 		},
 	// 3x3
 		(p: number, c: any[], g: number) => {
-			var a = c[0], o = this.bmpW - 2;
+			const a = c[0], o = this.bmpW - 2;
 
 			this.bmpDWORD[p++] = a;
 			this.bmpDWORD[p++] = a;
@@ -533,7 +542,7 @@ export class Pixelator {
 		},
 	// 4x4
 		(p: number, c: any[], g: number) => {
-			var a = c[0], b = c[g | 1], o = this.bmpW - 3;
+			const a = c[0], b = c[g | 1], o = this.bmpW - 3;
 
 			this.bmpDWORD[p++] = a;
 			this.bmpDWORD[p++] = a;
@@ -559,9 +568,9 @@ export class Pixelator {
 		null,
 	// 6x6
 		(p: number, c: any[], g: number) => {
-			var a = c[0], b = c[1], d = c[g | 1], i: number, o = this.bmpW - 5;
+			const a = c[0], b = c[1], d = c[g | 1], o = this.bmpW - 5;
 
-			for (i = 0; i < 5; i++) {
+			for (let i = 0; i < 5; i++) {
 				this.bmpDWORD[p++] = a;
 				this.bmpDWORD[p++] = a;
 				this.bmpDWORD[p++] = a;
@@ -582,85 +591,95 @@ export class Pixelator {
 		null,
 	// 8x8
 		(p: number, c: any[], g: number) => {
-			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i: number, j: number, o = this.bmpW - 7;
+			const a = c[0], b = c[1], d = c[2], e = c[g | 1], o = this.bmpW - 7;
 
-			for (i = 0; i < 7; i++) {
-				for (j = 0; j < 7; j++)
+			for (let i = 0; i < 7; i++) {
+				for (let j = 0; j < 7; j++) {
 					this.bmpDWORD[p++] = a;
+				}
 				this.bmpDWORD[p] = (i & 1) ? e : b;
 				p += o;
 			}
 
-			for (j = 0; j < 7; j++)
+			for (let j = 0; j < 7; j++) {
 				this.bmpDWORD[p++] = d;
+			}
 			this.bmpDWORD[p] = c[g | 2];
 		},
 	// 9x9 disabled
 		null,
 	// 10x10
 		(p: number, c: any[], g: number) => {
-			var a = c[0], b = c[1], d = c[2], e = c[g | 1], i: number, j: number, o = this.bmpW - 9;
+			const a = c[0], b = c[1], d = c[2], e = c[g | 1], o = this.bmpW - 9;
 
-			for (i = 0; i < 9; i++) {
-				for (j = 0; j < 9; j++)
+			for (let i = 0; i < 9; i++) {
+				for (let j = 0; j < 9; j++) {
 					this.bmpDWORD[p++] = a;
+				}
 				this.bmpDWORD[p] = (i & 1) ? e : b;
 				p += o;
 			}
 
-			for (j = 0; j < 9; j++)
+			for (let j = 0; j < 9; j++) {
 				this.bmpDWORD[p++] = d;
+			}
 			this.bmpDWORD[p] = c[g | 2];
 		},
 	// 11x11 disabled
 		null,
 	// 12x12
 		(p: number, c: any[], g: number) => {
-			var a = c[0], b = c[1], d = c[g | 1], i: number, j: number, o = this.bmpW - 11;
+			const a = c[0], b = c[1], d = c[g | 1], o = this.bmpW - 11;
 
-			for (i = 0; i < 11; i++) {
-				for (j = 0; j < 11; j++)
+			for (let i = 0; i < 11; i++) {
+				for (let j = 0; j < 11; j++) {
 					this.bmpDWORD[p++] = a;
+				}
 				this.bmpDWORD[p] = (i & 1) ? d : b;
 				p += o;
 			}
 
-			for (j = 0; j < 11; j++)
+			for (let j = 0; j < 11; j++) {
 				this.bmpDWORD[p++] = 11;
+			}
 			this.bmpDWORD[p] = c[g | 2];
 		},
 	// 13x13 disabled
 		null,
 	// 14x14
 		(p: number, c: any[], g: number) => {
-			var a = c[0], b = c[1], d = c[g | 1], i: number, j: number, o = this.bmpW - 13;
+			const a = c[0], b = c[1], d = c[g | 1], o = this.bmpW - 13;
 
-			for (i = 0; i < 13; i++) {
-				for (j = 0; j < 13; j++)
+			for (let i = 0; i < 13; i++) {
+				for (let j = 0; j < 13; j++) {
 					this.bmpDWORD[p++] = a;
+				}
 				this.bmpDWORD[p] = (i & 1) ? d : b;
 				p += o;
 			}
 
-			for (j = 0; j < 13; j++)
+			for (let j = 0; j < 13; j++) {
 				this.bmpDWORD[p++] = 13;
+			}
 			this.bmpDWORD[p] = c[g | 2];
 		},
 	// 15x15 disabled
 		null,
 	// 16x16
 		(p: number, c: any[], g: number) => {
-			var a = c[0], b = c[1], d = c[g | 1], i: number, j: number, o = this.bmpW - 15;
+			const a = c[0], b = c[1], d = c[g | 1], o = this.bmpW - 15;
 
-			for (i = 0; i < 15; i++) {
-				for (j = 0; j < 15; j++)
+			for (let i = 0; i < 15; i++) {
+				for (let j = 0; j < 15; j++) {
 					this.bmpDWORD[p++] = a;
+				}
 				this.bmpDWORD[p] = (i & 1) ? d : b;
 				p += o;
 			}
 
-			for (j = 0; j < 15; j++)
+			for (let j = 0; j < 15; j++) {
 				this.bmpDWORD[p++] = 15;
+			}
 			this.bmpDWORD[p] = c[g | 2];
 		}
 	];

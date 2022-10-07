@@ -6,7 +6,7 @@
  */
 
 import React, { useMemo, useState, useCallback } from 'react';
-import { Button, Classes, Dialog, TextArea, Switch, NonIdealState } from "@blueprintjs/core";
+import { Button, Classes, Dialog, TextArea, Switch, NonIdealState } from '@blueprintjs/core';
 import { actionResults } from '../actions/base';
 import toHex from '../utils/toHex';
 import { useEditor } from './EditorProvider';
@@ -24,7 +24,8 @@ const ResultsDlg: React.VFC = () => {
 		return editor.coordsRecorder.map(({ x, y }) => {
 			if (hex) {
 				return `\t	db	#${toHex(x)}, #${toHex(y)}`;
-			} else {
+			}
+			else {
 				return `\t	db	${x}, ${y}`;
 			}
 		}).join('\n');
@@ -89,6 +90,6 @@ const ResultsDlg: React.VFC = () => {
 			</div>
 		</Dialog>
 	);
-}
+};
 
 export default ResultsDlg;

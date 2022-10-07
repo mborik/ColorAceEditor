@@ -5,8 +5,9 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { IconName } from "@blueprintjs/core";
-import { Editor, EditorDirection } from "../editor/Editor";
+import { IconName } from '@blueprintjs/core';
+import { Editor, EditorDirection } from '../editor/Editor';
+import { actionSelectShift } from '../actions/selectShift';
 import {
 	actionSelectAll,
 	actionSelectNone,
@@ -14,8 +15,7 @@ import {
 	actionSelectInvert,
 	actionSelectCopy,
 	DispatchAction
-} from "../actions/base";
-import { actionSelectShift } from "../actions/selectShift";
+} from '../actions/base';
 
 
 export type SelectToolItemAction = (editor: Editor) => DispatchAction;

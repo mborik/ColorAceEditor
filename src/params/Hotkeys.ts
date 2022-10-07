@@ -5,8 +5,8 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { HotkeyConfig } from "@blueprintjs/core";
-import { Editor, EditorTool, EditorDrawMode, EditorDirection } from "../editor/Editor";
+import { HotkeyConfig } from '@blueprintjs/core';
+import { Editor, EditorTool, EditorDrawMode, EditorDirection } from '../editor/Editor';
 import {
 	DispatchAction,
 	actionToolChanged,
@@ -27,8 +27,8 @@ import {
 	actionResults,
 	actionLoadFile,
 	actionSaveFile
-} from "../actions/base";
-import { actionSelectShift } from "../actions/selectShift";
+} from '../actions/base';
+import { actionSelectShift } from '../actions/selectShift';
 
 
 export type HotkeyItemAction = (editor: Editor, e: KeyboardEvent) => Nullable<DispatchAction>;
@@ -147,7 +147,7 @@ export const HotkeyItems: HotkeyItem[] = [
 		'3. Draw mode',
 		'Over',
 		'Z',
-		editor => actionDrawModeChanged(EditorDrawMode.Over)
+		() => actionDrawModeChanged(EditorDrawMode.Over)
 	),
 	new HotkeyItem(
 		'3. Draw mode',
@@ -162,7 +162,7 @@ export const HotkeyItems: HotkeyItem[] = [
 		'3. Draw mode',
 		'Colorize',
 		'C',
-		editor => actionDrawModeChanged(EditorDrawMode.Color)
+		() => actionDrawModeChanged(EditorDrawMode.Color)
 	),
 	new HotkeyItem(
 		'3. Draw mode',

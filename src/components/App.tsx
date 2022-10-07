@@ -5,8 +5,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import * as React from "react";
-import { useEditor } from './EditorProvider';
+import * as React from 'react';
 import AboutDlg from './AboutDlg';
 import Main from './Main';
 import Navigation from './Navigation';

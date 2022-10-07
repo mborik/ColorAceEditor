@@ -2,18 +2,18 @@
  * PMD 85 ColorAce picture editor
  * ColorAceEditor.ActionShiftFlip - selection shift functions
  *
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { editor, EditorDirection } from "./Editor";
-import { Selection } from "./Selection";
+import { editor, EditorDirection } from './Editor';
+import { Selection } from './Selection';
 
 
 export class ActionShiftFlip {
 	/**
 	 * Transform shift or flip direction (and settings) to specific handler method.
 	 *
-	 * @param {EditorDirection} dir - shift direction
+	 * @param dir Shift direction
 	 */
 	shiftFlipSelection(dir: EditorDirection) {
 		const s = editor.selection;
@@ -22,12 +22,12 @@ export class ActionShiftFlip {
 			if (dir === EditorDirection.FH) {
 				editor.pixel.doSnapshot();
 				this._flipHorizontal();
-
-			} else if (dir === EditorDirection.FV) {
+			}
+			else if (dir === EditorDirection.FV) {
 				editor.pixel.doSnapshot();
 				this._flipVertical();
-
-			} else {
+			}
+			else {
 				this._shiftSelection(dir);
 			}
 
@@ -310,5 +310,5 @@ export class ActionShiftFlip {
 				editor.pixel.attrs[atrPtr + k] = atrTail;
 			}
 		}
-	}
+	};
 }

@@ -5,12 +5,14 @@
  * Copyright (c) 2012-2022 Martin Bórik
  */
 
-import { ActionHandler } from "./ActionHandler";
-import { Drawing } from "./Drawing";
-import { FileOps } from "./FileOps";
-import { Pixelator } from "./Pixelator";
-import { Selection } from "./Selection";
-import { Scroller } from "scroller";
+/// <reference path="../global.d.ts" />
+
+import { ActionHandler } from './ActionHandler';
+import { Drawing } from './Drawing';
+import { FileOps } from './FileOps';
+import { Pixelator } from './Pixelator';
+import { Selection } from './Selection';
+import { Scroller } from 'scroller';
 
 
 export const enum EditorTool {
@@ -54,13 +56,16 @@ export interface EditorOptions {
 	status?: HTMLDivElement;
 }
 
-interface CanvasCoordinates {
+export interface EditorCoordinates {
 	x: number;
 	y: number;
+}
+
+interface CanvasCoordinates extends EditorCoordinates {
 	column: number;
 }
 
-export var editor: Nullable<Editor> = null;
+export let editor: Editor;
 export class Editor extends FileOps {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
@@ -106,15 +111,15 @@ export class Editor extends FileOps {
 		super(opt.upload);
 
 		if (!(opt.canvas instanceof HTMLCanvasElement)) {
-			throw Error("ColorAceEditor: Canvas element not defined!");
+			throw Error('ColorAceEditor: Canvas element not defined!');
 		}
 
-		const canvasContext = opt.canvas.getContext("2d");
+		const canvasContext = opt.canvas.getContext('2d');
 		if (!(canvasContext instanceof CanvasRenderingContext2D)) {
-			throw Error("ColorAceEditor: Canvas rendering context not defined!");
+			throw Error('ColorAceEditor: Canvas rendering context not defined!');
 		}
 
-		this.ctx = canvasContext
+		this.ctx = canvasContext;
 		this.canvas = opt.canvas;
 		this.statusBar = opt.status || null;
 		this.selectionActionCallback = opt.selectCB;
@@ -122,7 +127,6 @@ export class Editor extends FileOps {
 
 	/**
 	 * Brush shape getter/setter to convert between string and ArrayBuffer.
-	 * @type {string}
 	 */
 	get editBrushShape(): string {
 		return Array.from(this.pixel.brush)
@@ -135,14 +139,14 @@ export class Editor extends FileOps {
 				.replace(/\s/g, '')
 				.split('')
 				.map(v => v !== '.' ? 255 : 0)
-		)
+		);
 	}
 
 	/**
 	 * Set editor and scroller dimensions.
 	 *
-	 * @param {number} w - webpage workspace width
-	 * @param {number} h - webpage workspace height
+	 * @param w Workspace width
+	 * @param h Workspace height
 	 */
 	setDimensions(w: number, h: number) {
 		this.contentWidth = w;
@@ -156,9 +160,9 @@ export class Editor extends FileOps {
 	/**
 	 * Translation of "real world" coordinates on page to our pixel space.
 	 *
-	 * @param {number} sx - real mouse cursor X position
-	 * @param {number} sy - real mouse cursor X position
-	 * @return {CanvasCoordinates} object with properties 'x', 'y' and 'column'
+	 * @param sx Real mouse cursor X position
+	 * @param sy Real mouse cursor X position
+	 * @return Object with properties 'x', 'y' and 'column'
 	 */
 	translateCoords(sx: number, sy: number): CanvasCoordinates {
 		const rect = this.canvas.getBoundingClientRect();
@@ -180,9 +184,9 @@ export class Editor extends FileOps {
 	/**
 	 * Generate new status bar message string with coordinates.
 	 *
-	 * @param {number} x - viewport cursor X position
-	 * @param {number} y - viewport cursor X position
-	 * @param {number} column (optional) - viewport cursor attribute column by X
+	 * @param vx Viewport cursor X position
+	 * @param vy Viewport cursor X position
+	 * @param column Viewport cursor attribute column by X
 	 */
 	redrawStatusBar(vx: number, vy: number, column: number = Math.floor(vx / 6)) {
 		if (!this.statusBar) {
@@ -210,7 +214,7 @@ export class Editor extends FileOps {
 }
 
 /**
- * @return {Editor} singleton instance
+ * @return singleton instance
  */
 export const getInstance = (opt: EditorOptions): Editor =>
 	(editor instanceof Editor) ? editor : (editor = new Editor(opt));

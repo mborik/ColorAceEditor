@@ -1,6 +1,6 @@
 /*
  * PMD 85 ColorAce picture editor
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
 export default {
