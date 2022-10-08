@@ -11,7 +11,7 @@ import { Button, ButtonGroup, Navbar, Position, Menu, MenuItem, MenuDivider, Ico
 import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
-import { OVERLAY_WRAPPER } from '../params/querySelectors';
+import { OVERLAY_WRAPPER } from '../elements';
 import { SelectToolItems, SelectToolSubMenu } from '../params/SelectTool';
 import { actionSelectFnCheckboxChanged } from '../actions/base';
 import { EditorTool } from '../editor/Editor';

@@ -10,7 +10,7 @@ import { Button, ButtonGroup, Navbar, Position, KeyCombo } from '@blueprintjs/co
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../params/constants';
-import { OVERLAY_WRAPPER } from '../params/querySelectors';
+import { OVERLAY_WRAPPER } from '../elements';
 import { DrawModeItems } from '../params/DrawMode';
 import { actionDrawModeChanged } from '../actions/base';
 import { EditorTool } from '../editor/Editor';

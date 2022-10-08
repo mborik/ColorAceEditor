@@ -10,7 +10,7 @@ import { Button, Navbar, ButtonGroup, Classes } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 
 import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions/base';
-import { OVERLAY_WRAPPER } from '../params/querySelectors';
+import { OVERLAY_WRAPPER } from '../elements';
 import { useEditor } from './EditorProvider';
 
 const FileMenu: React.VFC = () => {

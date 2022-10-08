@@ -13,7 +13,7 @@ import { actionColorModeChanged, actionToggleGuides, actionUndo } from '../actio
 import { actionImportScreen } from '../actions/importScreen';
 import constants from '../params/constants';
 import database from '../params/screen.db';
-import { OVERLAY_WRAPPER } from '../params/querySelectors';
+import { OVERLAY_WRAPPER } from '../elements';
 import { ColorModeItems } from '../params/ColorMode';
 import { useEditor } from './EditorProvider';
 

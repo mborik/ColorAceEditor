@@ -5,7 +5,7 @@
 
 import { Editor } from '../editor/Editor';
 import constants from '../params/constants';
-import { PROGRESS_BAR, UPLOAD } from '../params/querySelectors';
+import { PROGRESS_BAR, UPLOAD } from '../elements';
 import { actionRefresh, Dispatch } from './base';
 import { actionToast } from './toast';
 

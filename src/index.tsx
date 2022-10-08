@@ -10,7 +10,7 @@ import * as ReactDOM from 'react-dom';
 import { HotkeysProvider } from '@blueprintjs/core';
 import App from './components/App';
 import EditorProvider from './components/EditorProvider';
-import { APP_WRAPPER } from './params/querySelectors';
+import { APP_WRAPPER } from './elements';
 
 (async () => {
 	await import('./index.scss');

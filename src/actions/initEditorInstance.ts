@@ -6,7 +6,7 @@
 import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from './base';
 import { Editor, getInstance } from '../editor/Editor';
 import devLog from '../utils/logger';
-import { CANVAS, STATUS_BAR, UPLOAD } from '../params/querySelectors';
+import { CANVAS, STATUS_BAR, UPLOAD } from '../elements';
 
 
 const COLORACE_EDITOR_CONFIGURATION = 'colorace-editor-configuration';
