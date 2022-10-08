@@ -138,7 +138,7 @@ const Extras: React.VFC = () => {
 								key="TBEX_IMPORT"
 								icon="database"
 								rightIcon="caret-down"
-								text="IMPORT DEMO SCREEN"
+								text="QUICK LOAD DEMO IMAGE"
 							/>
 						)}
 					/>

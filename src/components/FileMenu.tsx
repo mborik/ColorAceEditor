@@ -23,6 +23,7 @@ const FileMenu: React.VFC = () => {
 					id="TBFM_LOAD"
 					key="TBFM_LOAD"
 					icon="folder-shared-open"
+					alignText="left"
 					text="LOAD"
 					onClick={() => {
 						dispatch(actionLoadFile());
