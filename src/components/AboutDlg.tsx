@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Button, Classes, Dialog } from '@blueprintjs/core';
-import { actionAbout } from '../actions/base';
+import { actionAbout } from '../actions';
 import { useEditor } from './EditorProvider';
 
 /**

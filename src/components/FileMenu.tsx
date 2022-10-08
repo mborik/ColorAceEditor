@@ -9,7 +9,7 @@ import * as React from 'react';
 import { Button, Navbar, ButtonGroup, Classes } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 
-import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions/base';
+import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions';
 import { OVERLAY_WRAPPER } from '../elements';
 import { useEditor } from './EditorProvider';
 

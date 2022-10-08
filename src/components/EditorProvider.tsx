@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import { Editor } from '../editor/Editor';
-import { EditorAction, DispatchAction, Dispatch } from '../actions/base';
+import { EditorAction, DispatchAction, Dispatch } from '../actions';
 import { showToast } from '../actions/toast';
 import { UPLOAD } from '../elements';
 import devLog from '../utils/logger';

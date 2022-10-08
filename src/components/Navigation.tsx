@@ -8,7 +8,7 @@
 import * as React from 'react';
 import { Navbar, Icon } from '@blueprintjs/core';
 import { useEditor } from './EditorProvider';
-import { actionAbout } from '../actions/base';
+import { actionAbout } from '../actions';
 
 import Toolbar from './Toolbar';
 import DrawMode from './DrawMode';

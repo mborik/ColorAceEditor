@@ -6,7 +6,7 @@
 import { Editor } from '../editor/Editor';
 import constants from '../constants';
 import { PROGRESS_BAR, UPLOAD } from '../elements';
-import { actionRefresh, Dispatch } from './base';
+import { actionRefresh, Dispatch } from '.';
 import { actionToast } from './toast';
 
 

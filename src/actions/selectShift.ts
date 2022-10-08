@@ -3,7 +3,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { DispatchAction, EditorAction } from './base';
+import { DispatchAction, EditorAction } from '.';
 import { actionToast } from './toast';
 import { Editor, EditorDirection } from '../editor/Editor';
 

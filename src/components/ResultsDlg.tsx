@@ -7,7 +7,7 @@
 
 import React, { useMemo, useState, useCallback } from 'react';
 import { Button, Classes, Dialog, TextArea, Switch, NonIdealState } from '@blueprintjs/core';
-import { actionResults } from '../actions/base';
+import { actionResults } from '../actions';
 import toHex from '../utils/toHex';
 import { useEditor } from './EditorProvider';
 

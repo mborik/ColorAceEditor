@@ -13,7 +13,7 @@ import {
 	actionSelectClear,
 	actionSelectCopy,
 	DispatchAction
-} from '../actions/base';
+} from '../actions';
 
 
 export type SelectToolItemAction = (editor: Editor) => DispatchAction;

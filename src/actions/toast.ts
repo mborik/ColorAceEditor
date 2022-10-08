@@ -4,7 +4,7 @@
  */
 
 import { IToastProps, Toaster } from '@blueprintjs/core';
-import { EditorAction, DispatchAction } from './base';
+import { EditorAction, DispatchAction } from '.';
 
 
 const toast = Toaster.create();

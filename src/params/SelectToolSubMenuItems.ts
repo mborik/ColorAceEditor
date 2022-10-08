@@ -8,7 +8,7 @@
 import { IconName } from '@blueprintjs/core';
 import { EditorDirection } from '../editor/Editor';
 import { actionSelectShift } from '../actions/selectShift';
-import { actionSelectInvert } from '../actions/base';
+import { actionSelectInvert } from '../actions';
 import { SelectToolItemAction } from './SelectToolItems';
 
 

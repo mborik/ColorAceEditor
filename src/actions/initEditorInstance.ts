@@ -3,7 +3,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from './base';
+import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from '.';
 import { Editor, getInstance } from '../editor/Editor';
 import devLog from '../utils/logger';
 import constants from '../constants';

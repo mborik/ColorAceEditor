@@ -14,7 +14,7 @@ import constants from '../constants';
 import { OVERLAY_WRAPPER } from '../elements';
 import { SelectToolItems } from '../params/SelectToolItems';
 import { SelectToolSubMenuItems } from '../params/SelectToolSubMenuItems';
-import { actionSelectFnCheckboxChanged } from '../actions/base';
+import { actionSelectFnCheckboxChanged } from '../actions';
 import { EditorTool } from '../editor/Editor';
 import { useEditor } from './EditorProvider';
 

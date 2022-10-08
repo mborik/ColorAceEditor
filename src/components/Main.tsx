@@ -11,7 +11,7 @@ import { ResizeSensor2, ResizeSensor2Props } from '@blueprintjs/popover2';
 import useEventListener from '@use-it/event-listener';
 
 import { useEditor } from './EditorProvider';
-import { Dispatch } from '../actions/base';
+import { Dispatch } from '../actions';
 import { actionInitEditorInstance } from '../actions/initEditorInstance';
 import { actionUploadFile } from '../actions/uploadFile';
 import { HotkeyItems } from '../params/HotkeyItems';

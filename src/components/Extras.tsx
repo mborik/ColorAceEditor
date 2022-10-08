@@ -9,7 +9,7 @@ import * as React from 'react';
 import { Button, ButtonGroup, KeyCombo, Menu, MenuDivider, MenuItem, Navbar, Position } from '@blueprintjs/core';
 import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
-import { actionColorModeChanged, actionToggleGuides, actionUndo } from '../actions/base';
+import { actionColorModeChanged, actionToggleGuides, actionUndo } from '../actions';
 import { actionImportScreen } from '../actions/importScreen';
 import constants from '../constants';
 import { DemoScreenItems } from '../params/DemoScreenItems';

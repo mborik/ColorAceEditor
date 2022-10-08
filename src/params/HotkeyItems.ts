@@ -27,7 +27,7 @@ import {
 	actionResults,
 	actionLoadFile,
 	actionSaveFile
-} from '../actions/base';
+} from '../actions';
 import { actionSelectShift } from '../actions/selectShift';
 
 
