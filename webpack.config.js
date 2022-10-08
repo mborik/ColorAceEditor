@@ -146,7 +146,7 @@ module.exports = {
 				loader: require.resolve('ts-loader'),
 				options: {
 					configFile: 'tsconfig.json',
-					transpileOnly: !IS_PRODUCTION,
+					transpileOnly: true,
 					getCustomTransformers: (program) => ({
 						before: [optimizeConstEnum(program)],
 						afterDeclarations: [optimizeConstEnum(program)],

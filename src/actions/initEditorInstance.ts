@@ -38,10 +38,14 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 			devLog('ColorAceEditor configuration:', configuration);
 			doActionAfterInit = () => {
 				for (const opt in configuration) {
-					editor[opt] = configuration[opt];
+					const value = configuration[opt];
+					if (opt === 'editColorMode' && value) {
+						editor.pixel.changeColorMode(value);
+					}
+					else {
+						editor[opt] = value;
+					}
 				}
-
-				editor.pixel.changeColorMode(configuration.editColorMode);
 				return actionRefresh();
 			};
 		}
