@@ -31,6 +31,7 @@ const Context = React.createContext<EditorContext>(defaultState as EditorContext
 const EditorProvider = ({ children }) => {
 	const [state, setState] = React.useState<EditorContextState>(defaultState);
 
+	const withRender = () => setState((prevState) => ({ ...prevState }));
 	const dispatch = React.useCallback(({ type, payload }: DispatchAction) => {
 		const { editor } = state;
 		if (!editor) {
@@ -50,53 +51,35 @@ const EditorProvider = ({ children }) => {
 			case EditorAction.ToolChanged:
 				if (!action.isActionInProgress()) {
 					editor.editTool = payload.editTool;
-					return setState((prevState) => ({
-						...prevState,
-						editor
-					}));
+					return withRender();
 				}
 				break;
 
 			case EditorAction.ColorChanged:
 				if (!action.isActionInProgress()) {
 					editor.editColor = payload.editColor;
-					return setState((prevState) => ({
-						...prevState,
-						editor
-					}));
+					return withRender();
 				}
 				break;
 
 			case EditorAction.ColorModeChanged:
 				editor.editColorMode = payload.editColorMode;
 				editor.refresh();
-				return setState((prevState) => ({
-					...prevState,
-					editor
-				}));
+				return withRender();
 
 			case EditorAction.DrawModeChanged:
 				editor.editMode = payload.editMode;
 				action.doAfterModeChanged();
-				return setState((prevState) => ({
-					...prevState,
-					editor
-				}));
+				return withRender();
 
 			case EditorAction.FillShapeChanged:
 				editor.editFilled = payload.editFilled;
-				return setState((prevState) => ({
-					...prevState,
-					editor
-				}));
+				return withRender();
 
 			case EditorAction.SelectFnCheckboxChanged:
 				const prop = payload.checkboxProperty;
 				editor[prop] = !editor[prop];
-				return setState((prevState) => ({
-					...prevState,
-					editor
-				}));
+				return withRender();
 
 			case EditorAction.SelectAll:
 				if (!action.isActionInProgress()) {
@@ -132,10 +115,7 @@ const EditorProvider = ({ children }) => {
 
 			case EditorAction.ViewportRefresh:
 				editor.refresh();
-				return setState((prevState) => ({
-					...prevState,
-					editor
-				}));
+				return withRender();
 
 			case EditorAction.ViewportCleanup:
 				editor.pixel.clearViewport();
@@ -145,10 +125,7 @@ const EditorProvider = ({ children }) => {
 			case EditorAction.ToggleGuides:
 				editor.showGuides = !editor.showGuides;
 				editor.refresh();
-				return setState((prevState) => ({
-					...prevState,
-					editor
-				}));
+				return withRender();
 
 			case EditorAction.ViewportZoom:
 				action.zoomViewport(payload.zoomDelta);
