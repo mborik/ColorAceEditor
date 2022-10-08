@@ -6,45 +6,11 @@
  */
 
 import { IconName } from '@blueprintjs/core';
-import { Editor, EditorDirection } from '../editor/Editor';
+import { EditorDirection } from '../editor/Editor';
 import { actionSelectShift } from '../actions/selectShift';
-import {
-	actionSelectAll,
-	actionSelectNone,
-	actionSelectClear,
-	actionSelectInvert,
-	actionSelectCopy,
-	DispatchAction
-} from '../actions/base';
+import { actionSelectInvert } from '../actions/base';
+import { SelectToolItemAction } from './SelectToolItems';
 
-
-export type SelectToolItemAction = (editor: Editor) => DispatchAction;
-
-export interface SelectToolItem {
-	/** Unique identifier */
-	id: string;
-
-	/** Reducer action */
-	action?: SelectToolItemAction;
-
-	/**
-	 * BlueprintJS icon identifier
-	 * @see https://blueprintjs.com/docs/#icons
-	 */
-	icon: IconName;
-
-	/** Tooltip */
-	title: string;
-
-	/** Key combo */
-	hotkey: string;
-
-	/** Force enabled button flag */
-	enabled?: boolean;
-
-	/** Currently active button flag */
-	active?: boolean;
-}
 
 export interface SelectToolSubMenuItem {
 	/** Divider item */
@@ -68,48 +34,17 @@ export interface SelectToolSubMenuItem {
 	/** Key combo */
 	hotkey?: string;
 
-	/** Checkbox flag and alternative caption */
+	/** Checkbox flag */
 	checkbox?: boolean;
+
+	/** Checkbox alternative caption */
 	checkedText?: string;
 
 	/** Property in Editor which affects checkbox state */
 	checkboxProperty?: string;
 }
 
-export const SelectToolItems: SelectToolItem[] = [{
-	id: 'TBST_SELECTALL',
-	icon: 'fullscreen',
-	title: 'select all',
-	hotkey: 'mod+A',
-	enabled: true,
-	action: () => actionSelectAll()
-}, {
-	id: 'TBST_DESELECT',
-	icon: 'disable',
-	title: 'deselect',
-	hotkey: 'mod+D',
-	action: () => actionSelectNone()
-}, {
-	id: 'TBST_CUT',
-	icon: 'cut',
-	title: 'cut',
-	hotkey: 'mod+X',
-	action: () => actionSelectCopy(true)
-}, {
-	id: 'TBST_CLONE',
-	icon: 'duplicate',
-	title: 'clone',
-	hotkey: 'mod+C',
-	action: () => actionSelectCopy(false)
-}, {
-	id: 'TBST_CLEAR',
-	icon: 'eraser',
-	title: 'clear',
-	hotkey: 'del',
-	action: () => actionSelectClear()
-}];
-
-export const SelectToolSubMenu: SelectToolSubMenuItem[] = [{
+export const SelectToolSubMenuItems: SelectToolSubMenuItem[] = [{
 	id: 'TBSM_INVERT',
 	icon: 'right-join',
 	text: 'Invert',

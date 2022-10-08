@@ -11,7 +11,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../constants';
 import { OVERLAY_WRAPPER } from '../elements';
-import { DrawModeItems } from '../params/DrawMode';
+import { DrawModeItems } from '../params/DrawModeItems';
 import { actionDrawModeChanged } from '../actions/base';
 import { EditorTool } from '../editor/Editor';
 import { useEditor } from './EditorProvider';

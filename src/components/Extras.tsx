@@ -12,9 +12,9 @@ import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 import { actionColorModeChanged, actionToggleGuides, actionUndo } from '../actions/base';
 import { actionImportScreen } from '../actions/importScreen';
 import constants from '../constants';
-import database from '../params/screen.db';
+import { DemoScreenItems } from '../params/DemoScreenItems';
 import { OVERLAY_WRAPPER } from '../elements';
-import { ColorModeItems } from '../params/ColorMode';
+import { ColorModeItems } from '../params/ColorModeItems';
 import { useEditor } from './EditorProvider';
 
 
@@ -116,7 +116,7 @@ const Extras: React.VFC = () => {
 						portalContainer={portalContainer}
 						content={
 							<Menu>
-								{database.map((item, key) => (
+								{DemoScreenItems.map((item, key) => (
 									<MenuItem
 										key={`MNXI_${key}`}
 										text={item.name}

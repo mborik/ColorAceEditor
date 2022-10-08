@@ -12,7 +12,8 @@ import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../constants';
 import { OVERLAY_WRAPPER } from '../elements';
-import { SelectToolItems, SelectToolSubMenu } from '../params/SelectTool';
+import { SelectToolItems } from '../params/SelectToolItems';
+import { SelectToolSubMenuItems } from '../params/SelectToolSubMenuItems';
 import { actionSelectFnCheckboxChanged } from '../actions/base';
 import { EditorTool } from '../editor/Editor';
 import { useEditor } from './EditorProvider';
@@ -85,7 +86,7 @@ const SelectTools: React.VFC = () => {
 					portalContainer={portalContainer}
 					content={
 						<Menu>
-							{SelectToolSubMenu.map((item: any, idx: number) => {
+							{SelectToolSubMenuItems.map((item: any, idx: number) => {
 								if (item.divider) {
 									return <MenuDivider key={`TBSD_${idx}`} {...item} />;
 								}

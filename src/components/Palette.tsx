@@ -11,7 +11,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../constants';
 import { OVERLAY_WRAPPER } from '../elements';
-import { PaletteItems } from '../params/Palette';
+import { PaletteItems } from '../params/PaletteItems';
 import { actionColorChanged } from '../actions/base';
 import { useEditor } from './EditorProvider';
 

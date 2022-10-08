@@ -1,9 +1,20 @@
 /*
  * PMD 85 ColorAce picture editor
- * Copyright (c) 2019 Martin Bórik
+ * Copyright (c) 2019-2022 Martin Bórik
  */
 
-export default [
+export interface DemoScreenItem {
+	/** Screen name */
+	name: string;
+
+	/** Author(s) */
+	author: string;
+
+	/** PMD 85 Screen dump file path relative to `/public` */
+	filename: string;
+}
+
+export const DemoScreenItems: DemoScreenItem[] = [
 	{
 		name: 'Magicland Dizzy',
 		author: 'Chris Graham, Zdeněk Šesták',
