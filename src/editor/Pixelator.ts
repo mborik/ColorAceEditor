@@ -105,6 +105,10 @@ export class Pixelator {
 
 		editor.editColorMode = colorMode;
 		editor.canvas.className = colorMode === EditorColorMode.Mono ? 'monochrome' : '';
+
+		if (!this.isColorAceMode && editor.editColor > 4) {
+			editor.editColor = this.pal[editor.editColor][7];
+		}
 	}
 
 	/**
@@ -323,7 +327,7 @@ export class Pixelator {
 			for (let ix = x, k = ((iy * 288) + ix); ix < (x + w); ix++, k++) {
 				let attr = this.surface[k];
 				if (refreshAttributes && attr) {
-					const ulineAddress = (iy * 48) + ~~(ix / 6);
+					const ulineAddress = (iy * 48) + Math.floor(ix / 6);
 					attr = this.attrs[ulineAddress];
 
 					if (this.isColorAceMode) {
