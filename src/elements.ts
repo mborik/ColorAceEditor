@@ -3,10 +3,8 @@
  * Copyright (c) 2022 Martin Bórik
  */
 
-const cache = {};
-const queryElement = <T>(selector: string): T =>
-	(cache[selector]) ??
-	(cache[selector] = document.querySelector(selector) as T);
+import { queryElement } from './utils/queryElement';
+
 
 export const APP_WRAPPER = () => queryElement<HTMLDivElement>('#wrapper');
 export const OVERLAY_WRAPPER = () => queryElement<HTMLDivElement>('#overlays');
