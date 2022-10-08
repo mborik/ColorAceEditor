@@ -41,6 +41,7 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 					editor[opt] = configuration[opt];
 				}
 
+				editor.pixel.changeColorMode(configuration.editColorMode);
 				return actionRefresh();
 			};
 		}

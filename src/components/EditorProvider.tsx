@@ -63,7 +63,7 @@ const EditorProvider = ({ children }) => {
 				break;
 
 			case EditorAction.ColorModeChanged:
-				editor.editColorMode = payload.editColorMode;
+				editor.pixel.refreshAttrs(payload.editColorMode);
 				editor.refresh();
 				return withRender();
 

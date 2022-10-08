@@ -5,7 +5,7 @@
  * Copyright (c) 2012-2022 Martin Bórik
  */
 
-import { editor, EditorDrawMode } from './Editor';
+import { editor, EditorColorMode, EditorDrawMode } from './Editor';
 
 
 const FULL_ALPHA = 0xFFFFFFFF;
@@ -26,6 +26,7 @@ export class EditorSnippet {
 }
 
 export class Pixelator {
+	private isColorAceMode: boolean = true;
 	private currentZoom: number = 0;
 	private scrollerX: number = 0;
 	private scrollerY: number = 0;
@@ -95,6 +96,31 @@ export class Pixelator {
 	}
 
 	/**
+	 * Actions related to changing color mode.
+	 *
+	 * @param colorMode Target color mode
+	 */
+	changeColorMode(colorMode: EditorColorMode) {
+		this.isColorAceMode = colorMode === EditorColorMode.Full;
+
+		editor.editColorMode = colorMode;
+		editor.canvas.className = colorMode === EditorColorMode.Mono ? 'monochrome' : '';
+	}
+
+	/**
+	 * Refresh viewport attributes according to changing color mode.
+	 *
+	 * @param colorMode Target color mode
+	 */
+	refreshAttrs(colorMode?: EditorColorMode) {
+		const vram = this.preparePMD85vram();
+		if (colorMode) {
+			this.changeColorMode(colorMode);
+		}
+		this.readPMD85vram(vram);
+	}
+
+	/**
 	 * Binary decoding of PMD 85 screen.
 	 *
 	 * @param videoRam With dump of PMD 85 VRAM (0xC000-0xFFFF)
@@ -107,32 +133,59 @@ export class Pixelator {
 		let vramptr = 0;
 		let ptr = 0, atptr = 0;
 		let h: number = 256;
-		let i: number, c: number;
-		let bt: number, bt2: number;
-		let at: number, at2: number;
+		let i: number, attr: number;
+		let byte: number, siblingByte: number, siblingAttr = 0;
 
 		while (h--) {
 			for (i = 0; i < 48; i++, vramptr++) {
-				bt = videoRam[vramptr];
-				at = (bt & 0xC0) >> 6;
+				byte = videoRam[vramptr];
+				attr = (byte & 0xC0) >> 6;
 
-				bt2 = videoRam[vramptr + ((h & 1) ? 64 : -64)];
-				at2 = (bt2 & 0xC0) >> 6;
+				if (this.isColorAceMode) {
+					siblingByte = videoRam[vramptr + ((h & 1) ? 64 : -64)];
+					siblingAttr = (siblingByte & 0xC0) >> 6;
+					attr = attr | siblingAttr | ((attr & siblingAttr) ? 0 : 4);
+				}
+				else {
+					attr = attr || 4;
+				}
 
-				c = at | at2 | ((at & at2) ? 0 : 4);
+				this.surface[ptr++] = (byte & 0x01) ? attr : 0;
+				this.surface[ptr++] = (byte & 0x02) ? attr : 0;
+				this.surface[ptr++] = (byte & 0x04) ? attr : 0;
+				this.surface[ptr++] = (byte & 0x08) ? attr : 0;
+				this.surface[ptr++] = (byte & 0x10) ? attr : 0;
+				this.surface[ptr++] = (byte & 0x20) ? attr : 0;
 
-				this.surface[ptr++] = (bt & 0x01) ? c : 0;
-				this.surface[ptr++] = (bt & 0x02) ? c : 0;
-				this.surface[ptr++] = (bt & 0x04) ? c : 0;
-				this.surface[ptr++] = (bt & 0x08) ? c : 0;
-				this.surface[ptr++] = (bt & 0x10) ? c : 0;
-				this.surface[ptr++] = (bt & 0x20) ? c : 0;
-
-				this.attrs[atptr++] = at;
+				this.attrs[atptr++] = this.pal[attr][(h & 1) + 7];
 			}
 
 			vramptr += 16;
 		}
+	}
+
+	/**
+	 * Binary encoding of PMD 85 screen memory.
+	 */
+	preparePMD85vram(): Uint8Array {
+		const vram = new Uint8Array(16384);
+
+		for (let ptr = 0, attrPtr = 0, src = 0; ptr < 16384;) {
+			for (let x = 0; x < 48; x++, ptr++) {
+				vram[ptr] =
+					(this.surface[src++] ? 0x01 : 0) |
+					(this.surface[src++] ? 0x02 : 0) |
+					(this.surface[src++] ? 0x04 : 0) |
+					(this.surface[src++] ? 0x08 : 0) |
+					(this.surface[src++] ? 0x10 : 0) |
+					(this.surface[src++] ? 0x20 : 0) |
+					(this.attrs[attrPtr++] << 6);
+			}
+
+			ptr += 16;
+		}
+
+		return vram;
 	}
 
 	/**
@@ -151,13 +204,11 @@ export class Pixelator {
 	 */
 	render(left: number, top: number, zoom: number) {
 		const { canvas, ctx, contentWidth, contentHeight, selection } = editor;
-		const l = Math.max(Math.floor(left / zoom), 0);
-		const t = Math.max(Math.floor(top / zoom), 0);
+		const offsetX = Math.max(Math.floor(left / zoom), 0);
+		const offsetY = Math.max(Math.floor(top / zoom), 0);
 
-		let x = 0, y = 0, z = 0, s: number;
-
-		this.scrollerX = l * zoom;
-		this.scrollerY = t * zoom;
+		this.scrollerX = offsetX * zoom;
+		this.scrollerY = offsetY * zoom;
 
 		if (zoom !== this.currentZoom) {
 			editor.zoomFactor = this.currentZoom = zoom;
@@ -171,28 +222,43 @@ export class Pixelator {
 			this.bmpDWORD = new Uint32Array(bmpBuffer);
 		}
 
-		const w = this.bmpW - zoom;
-		for (let i = t; i < 256; i++) {
+		let x = 0, y = 0, ptr = 0;
+		const width = this.bmpW - zoom;
+
+		for (let iy = offsetY; iy < 256; iy++) {
 			x = 0;
 
-			for (let j = l, k = ((i * 288) + j); j < 288; j++, k++) {
-				this.scalers[zoom]?.(z + x, this.pal[this.surface[k]], this.isGuide(j));
+			for (let ix = offsetX, k = ((iy * 288) + ix); ix < 288; ix++, k++) {
+				this.scalers[zoom]?.(
+					ptr + x,
+					this.pal[this.surface[k]],
+					this.isGuide(ix)
+				);
 
-				if ((s = selection.testBoundsX(j, i))) {
-					this.marqueeX(z + x + (--s * (zoom - 1)), zoom, y);
+				let bound: number;
+				if ((bound = selection.testBoundsX(ix, iy))) {
+					this.marqueeX(
+						ptr + x + (--bound * (zoom - 1)),
+						zoom,
+						y
+					);
 				}
-				if ((s = selection.testBoundsY(j, i))) {
-					this.marqueeY(z + x + (--s * (zoom - 1) * this.bmpW), zoom, x);
+				if ((bound = selection.testBoundsY(ix, iy))) {
+					this.marqueeY(
+						ptr + x + (--bound * (zoom - 1) * this.bmpW),
+						zoom,
+						x
+					);
 				}
 
 				x += zoom;
-				if (x > w) {
+				if (x > width) {
 					break;
 				}
 			}
 
 			y += zoom;
-			z += zoom * this.bmpW;
+			ptr += zoom * this.bmpW;
 			if (y >= this.bmpH) {
 				break;
 			}
@@ -202,7 +268,7 @@ export class Pixelator {
 		ctx.fillStyle = this.bmpBgColor;
 
 		// clear overlapped areas if needed...
-		if (x < w) {
+		if (x < width) {
 			ctx.fillRect(x, 0, this.bmpW - x, this.bmpH);
 		}
 		if (y < (this.bmpH - zoom)) {
@@ -242,38 +308,58 @@ export class Pixelator {
 	 * @param refreshAttributes Refresh color from attributes.
 	 */
 	redrawRect(x: number, y: number, w: number, h: number, refreshAttributes?: boolean) {
-		const zoom = this.currentZoom;
+		const { ctx, selection } = editor;
 
-		let c: number, d: number, bound: number;
+		const zoom = this.currentZoom;
+		const surfaceWidth = this.bmpW - zoom;
+
 		let sx: Optional<number>, sy: Optional<number>;
 		let bx: Optional<number>, by: Optional<number>;
-		const sw = this.bmpW - zoom;
-		let sz = (sy = (y * zoom) - this.scrollerY) * this.bmpW;
+		let zoomedSurfacePtr = (sy = (y * zoom) - this.scrollerY) * this.bmpW;
 
-		for (let i = y; i < (y + h); i++) {
+		for (let iy = y; iy < (y + h); iy++) {
 			sx = (x * zoom) - this.scrollerX;
 
-			for (let j = x, k = ((i * 288) + j); j < (x + w); j++, k++) {
-				c = this.surface[k];
-				if (refreshAttributes && c) {
-					d = (Math.floor((i * 48) + Math.floor(j / 6)));
-					c = d + ((i & 1) ? -48 : 48);
+			for (let ix = x, k = ((iy * 288) + ix); ix < (x + w); ix++, k++) {
+				let attr = this.surface[k];
+				if (refreshAttributes && attr) {
+					const ulineAddress = (iy * 48) + ~~(ix / 6);
+					attr = this.attrs[ulineAddress];
 
-					d = this.attrs[d];
-					c = this.attrs[c];
-					c = (d | c | ((d * c) ? 0 : 4));
+					if (this.isColorAceMode) {
+						const siblingUlineAddress = ulineAddress + ((iy & 1) ? -48 : 48);
+						const siblingAttr = this.attrs[siblingUlineAddress];
 
-					this.surface[k] = c;
+						attr = (attr | siblingAttr | ((attr & siblingAttr) ? 0 : 4));
+					}
+					else {
+						attr = attr || 4;
+					}
+
+					this.surface[k] = attr;
 				}
 
 				if (sx >= 0 && sy >= 0) {
-					this.scalers[zoom]?.(sz + sx, this.pal[c], this.isGuide(j));
+					this.scalers[zoom]?.(
+						zoomedSurfacePtr + sx,
+						this.pal[attr],
+						this.isGuide(ix)
+					);
 
-					if ((bound = editor.selection.testBoundsX(j, i))) {
-						this.marqueeX(sz + sx + (--bound * (zoom - 1)), zoom, sy);
+					let bound: number;
+					if ((bound = selection.testBoundsX(ix, iy))) {
+						this.marqueeX(
+							zoomedSurfacePtr + sx + (--bound * (zoom - 1)),
+							zoom,
+							sy
+						);
 					}
-					if ((bound = editor.selection.testBoundsY(j, i))) {
-						this.marqueeY(sz + sx + (--bound * (zoom - 1) * this.bmpW), zoom, sx);
+					if ((bound = selection.testBoundsY(ix, iy))) {
+						this.marqueeY(
+							zoomedSurfacePtr + sx + (--bound * (zoom - 1) * this.bmpW),
+							zoom,
+							sx
+						);
 					}
 
 					if (bx === undefined) {
@@ -283,13 +369,13 @@ export class Pixelator {
 				}
 
 				sx += zoom;
-				if (sx > sw) {
+				if (sx > surfaceWidth) {
 					break;
 				}
 			}
 
 			sy += zoom;
-			sz += zoom * this.bmpW;
+			zoomedSurfacePtr += zoom * this.bmpW;
 			if (sy >= this.bmpH) {
 				break;
 			}
@@ -299,7 +385,7 @@ export class Pixelator {
 		if (sx !== undefined && sy !== undefined && bx !== undefined && by !== undefined) {
 			sx -= bx;
 			sy -= by;
-			editor.ctx.putImageData(this.bmp, 0, 0, bx, by, sx, sy);
+			ctx.putImageData(this.bmp, 0, 0, bx, by, sx, sy);
 		}
 	}
 
@@ -321,39 +407,48 @@ export class Pixelator {
 		}
 
 		const column = Math.floor(x / 6);
-		let a1 = Math.floor((y * 48) + column);
-		let a2 = a1 + ((y & 1) ? -48 : 48);
+		let baseAddress = Math.floor((y * 48) + column);
+		let attr = 0;
 
-		if (a1 > a2) {
-			const flip = a2;
-			a2 = a1;
-			a1 = flip;
-		}
+		if (this.isColorAceMode) {
+			let siblingAddress = baseAddress + ((y & 1) ? -48 : 48);
+			if (baseAddress > siblingAddress) {
+				const flip = siblingAddress;
+				siblingAddress = baseAddress;
+				baseAddress = flip;
+			}
 
-		let c = 0;
-		if (color) {
-			c = color;
-			this.attrs[a1] = this.pal[c][7];
-			this.attrs[a2] = this.pal[c][8];
+			if (color) {
+				attr = color;
+				this.attrs[baseAddress] = this.pal[attr][7];
+				this.attrs[siblingAddress] = this.pal[attr][8];
+			}
+			else {
+				const baseAttr = this.attrs[baseAddress];
+				const siblingAttr = this.attrs[siblingAddress];
+				attr = (baseAttr | siblingAttr | ((baseAttr & siblingAttr) ? 0 : 4));
+			}
 		}
 		else {
-			const d = this.attrs[a1];
-			c = this.attrs[a2];
-			c = (d | c | ((d * c) ? 0 : 4));
+			if (color) {
+				this.attrs[baseAddress] = this.pal[color][7];
+			}
+
+			attr = this.attrs[baseAddress] || 4;
 		}
 
 		const ptr = ((y * 288) + x);
 		switch (mode) {
 			case EditorDrawMode.Reset:
-				c = this.surface[ptr] = 0;
+				attr = this.surface[ptr] = 0;
 				break;
 
 			case EditorDrawMode.Set:
-				this.surface[ptr] = c;
+				this.surface[ptr] = attr;
 				break;
 
 			case EditorDrawMode.Over:
-				c = this.surface[ptr] = (this.surface[ptr] ? 0 : c);
+				attr = this.surface[ptr] = (this.surface[ptr] ? 0 : attr);
 				break;
 		}
 
@@ -362,7 +457,7 @@ export class Pixelator {
 		}
 
 		if (color) {
-			this.redrawRect((column * 6), ((a1 - column) / 48), 6, 2, true);
+			this.redrawRect((column * 6), ((baseAddress - column) / 48), 6, 2, true);
 		}
 		else if (mode !== EditorDrawMode.Color) {
 			const zoom = this.currentZoom;
@@ -370,7 +465,7 @@ export class Pixelator {
 			y = (y * zoom) - this.scrollerY;
 			x = (x * zoom) - this.scrollerX;
 
-			this.scalers[zoom]?.((y * this.bmpW) + x, this.pal[c], this.isGuide(x));
+			this.scalers[zoom]?.((y * this.bmpW) + x, this.pal[attr], this.isGuide(x));
 
 			this.bmp.data.set(this.bmpClamp);
 			editor.ctx.putImageData(this.bmp, 0, 0, x, y, zoom, zoom);
@@ -389,21 +484,20 @@ export class Pixelator {
 			return -1;
 		}
 
-		let a1 = Math.floor((y * 48) + Math.floor(x / 6));
-		let a2 = a1 + ((y & 1) ? -48 : 48);
+		const baseAddress = Math.floor((y * 48) + Math.floor(x / 6));
+		let attr = this.attrs[baseAddress];
 
-		if (a1 > a2) {
-			const flip = a2;
-			a2 = a1;
-			a1 = flip;
+		if (this.isColorAceMode) {
+			const siblingAddress = baseAddress + ((y & 1) ? -48 : 48);
+			const siblingAttr = this.attrs[siblingAddress];
+			attr = (attr | siblingAttr | ((attr & siblingAttr) ? 0 : 4));
+		}
+		else {
+			attr = attr || 4;
 		}
 
-		const c = this.attrs[a2];
-		const d = this.attrs[a1];
-		const color = (d | c | ((d * c) ? 0 : 4));
-
 		const ptr = ((y * 288) + x);
-		return this.surface[ptr] ? color : 0;
+		return this.surface[ptr] ? attr : 0;
 	}
 
 	/**
