@@ -5,11 +5,9 @@
  * Copyright (c) 2012-2022 Martin Bórik
  */
 
+import constants from '../constants';
 import { editor, EditorColorMode, EditorDrawMode } from './Editor';
 
-
-const FULL_ALPHA = 0xFFFFFFFF;
-const MARQUEE_COLOR = 0x302010;
 
 export interface EditorSnapshot {
 	surface: Uint8ClampedArray;
@@ -564,7 +562,7 @@ export class Pixelator {
 	 */
 	marqueeX(p: number, z: number, y: number) {
 		for (let i = 0; i < z; i++, y++) {
-			this.bmpDWORD[p] = (y & 4) ? FULL_ALPHA : (this.bmpDWORD[p] ^ MARQUEE_COLOR);
+			this.bmpDWORD[p] = (y & 4) ? constants.FULL_ALPHA : (this.bmpDWORD[p] ^ constants.MARQUEE_COLOR);
 			p += this.bmpW;
 		}
 	}
@@ -578,7 +576,7 @@ export class Pixelator {
 	 */
 	marqueeY(p: number, z: number, x: number) {
 		for (let i = 0; i < z; i++, x++, p++) {
-			this.bmpDWORD[p] = (x & 4) ? FULL_ALPHA : (this.bmpDWORD[p] ^ MARQUEE_COLOR);
+			this.bmpDWORD[p] = (x & 4) ? constants.FULL_ALPHA : (this.bmpDWORD[p] ^ constants.MARQUEE_COLOR);
 		}
 	}
 

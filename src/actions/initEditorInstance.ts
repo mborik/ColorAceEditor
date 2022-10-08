@@ -6,10 +6,9 @@
 import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from './base';
 import { Editor, getInstance } from '../editor/Editor';
 import devLog from '../utils/logger';
+import constants from '../constants';
 import { CANVAS, STATUS_BAR, UPLOAD } from '../elements';
 
-
-const COLORACE_EDITOR_CONFIGURATION = 'colorace-editor-configuration';
 
 type EditorConfig = Pick<Editor,
 	'undoLevels' | 'zoomFactor' | 'showGuides' | 'editColorMode' |
@@ -31,7 +30,7 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 
 	try {
 		const configuration: EditorConfig = JSON.parse(
-			localStorage.getItem(COLORACE_EDITOR_CONFIGURATION) as string
+			localStorage.getItem(constants.EDITOR_CONFIGURATION_KEY) as string
 		);
 
 		if (configuration) {
@@ -69,7 +68,7 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 			editSelectFnShiftWrap, editSelectFnShiftAttr, editSelectFnBlockAttr
 		} = editor;
 
-		localStorage.setItem(COLORACE_EDITOR_CONFIGURATION, JSON.stringify({
+		localStorage.setItem(constants.EDITOR_CONFIGURATION_KEY, JSON.stringify({
 			undoLevels, zoomFactor, showGuides, editColorMode,
 			editColor, editTool, editMode, editFilled, editBrushShape,
 			editSelectFnShiftWrap, editSelectFnShiftAttr, editSelectFnBlockAttr

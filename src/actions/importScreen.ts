@@ -6,7 +6,7 @@
 import { actionRefresh, Dispatch } from './base';
 import { actionToast } from './toast';
 import { Editor } from '../editor/Editor';
-import constants from '../params/constants';
+import constants from '../constants';
 
 
 export const actionImportScreen = ({

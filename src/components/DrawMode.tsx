@@ -9,7 +9,7 @@ import * as React from 'react';
 import { Button, ButtonGroup, Navbar, Position, KeyCombo } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
-import constants from '../params/constants';
+import constants from '../constants';
 import { OVERLAY_WRAPPER } from '../elements';
 import { DrawModeItems } from '../params/DrawMode';
 import { actionDrawModeChanged } from '../actions/base';

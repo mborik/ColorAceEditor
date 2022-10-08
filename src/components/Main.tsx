@@ -15,7 +15,7 @@ import { Dispatch } from '../actions/base';
 import { actionInitEditorInstance } from '../actions/initEditorInstance';
 import { actionUploadFile } from '../actions/uploadFile';
 import { HotkeyItems } from '../params/Hotkeys';
-import constants from '../params/constants';
+import constants from '../constants';
 import devLog from '../utils/logger';
 
 

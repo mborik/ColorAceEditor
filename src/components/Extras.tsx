@@ -11,7 +11,7 @@ import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
 import { actionColorModeChanged, actionToggleGuides, actionUndo } from '../actions/base';
 import { actionImportScreen } from '../actions/importScreen';
-import constants from '../params/constants';
+import constants from '../constants';
 import database from '../params/screen.db';
 import { OVERLAY_WRAPPER } from '../elements';
 import { ColorModeItems } from '../params/ColorMode';

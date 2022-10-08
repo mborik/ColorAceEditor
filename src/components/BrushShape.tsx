@@ -9,7 +9,7 @@ import * as React from 'react';
 import { Button, Classes, Dialog, Navbar, Position } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
-import constants from '../params/constants';
+import constants from '../constants';
 import { OVERLAY_WRAPPER } from '../elements';
 import { EditorTool } from '../editor/Editor';
 import { useEditor } from './EditorProvider';

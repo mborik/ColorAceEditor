@@ -10,7 +10,7 @@ import debounce from 'lodash/debounce';
 import { Button, ButtonGroup, Navbar, Position, Menu, MenuItem, MenuDivider, Icon, KeyCombo } from '@blueprintjs/core';
 import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
-import constants from '../params/constants';
+import constants from '../constants';
 import { OVERLAY_WRAPPER } from '../elements';
 import { SelectToolItems, SelectToolSubMenu } from '../params/SelectTool';
 import { actionSelectFnCheckboxChanged } from '../actions/base';
