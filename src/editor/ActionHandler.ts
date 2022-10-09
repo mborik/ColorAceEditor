@@ -10,6 +10,7 @@ import { debounce } from 'typescript-debounce-decorator';
 import { ActionShiftFlip } from './ActionShiftFlip';
 import { editor, EditorColorMode, EditorDrawMode, EditorTool } from './Editor';
 import { EditorSnapshot, EditorSnippet } from './Pixelator';
+import { RedrawStatusBarParams } from './StatusBar';
 
 
 export class ActionHandler extends ActionShiftFlip {
@@ -92,9 +93,11 @@ export class ActionHandler extends ActionShiftFlip {
 	 * Handler of `mousemove` event.
 	 */
 	mouseMove(e: React.MouseEvent) {
-		const { x, y, column } = editor.translateCoords(e.pageX, e.pageY);
-
-		editor.redrawStatusBar(x, y, column);
+		const { x, y } = editor.translateCoords(e.pageX, e.pageY);
+		let statusBarParams: RedrawStatusBarParams = {
+			viewportX: e.pageX,
+			viewportY: e.pageY
+		};
 
 		if (this.activeSnippet != null) {
 			this._placeSnippetTo(x, y);
@@ -106,16 +109,28 @@ export class ActionHandler extends ActionShiftFlip {
 				pageX: e.pageX,
 				pageY: e.pageY
 			}], e.timeStamp);
+
+			statusBarParams = {};
 		}
-		else if (this.mouseBtnFlag !== 0) {
+		else if (this.mouseBtnFlag === 0) {
+			if (editor.editTool === EditorTool.Selection ||
+					editor.editTool === EditorTool.AttrSelect) {
+
+				const { x1, y1, x2, y2 } = editor.selection;
+				statusBarParams = x1 < x2 && y1 < y2 ? { x1, y1, x2, y2 } : {};
+			}
+		}
+		else {
 			this.mouseNotMoved = false;
 
 			switch (editor.editTool) {
 				case EditorTool.Selection: {
 					if (!this.mouseNotMoved) {
 						const { x0, y0 } = editor.selection;
-						editor.selection.set(x0, y0, x - 1, y - 1);
+						const { x1, y1, x2, y2 } =
+							editor.selection.set(x0, y0, x - 1, y - 1);
 
+						statusBarParams = x1 < x2 && y1 < y2 ? { x1, y1, x2, y2 } : {};
 						this._redrawMouseActionRect(x, y, false);
 					}
 					break;
@@ -124,8 +139,10 @@ export class ActionHandler extends ActionShiftFlip {
 					if (!this.mouseNotMoved) {
 						const attrFit = editor.editColorMode === EditorColorMode.Full ? 1 : 0;
 						const { x0, y0 } = editor.selection;
-						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y | attrFit);
+						const { x1, y1, x2, y2 } =
+							editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y | attrFit);
 
+						statusBarParams = x1 < x2 && y1 < y2 ? { x1, y1, x2, y2 } : {};
 						this._redrawMouseActionRect(x, y, false);
 					}
 					break;
@@ -155,7 +172,7 @@ export class ActionHandler extends ActionShiftFlip {
 						x, y, true, false
 					);
 
-					this._redrawMouseActionRect(x, y);
+					statusBarParams = this._redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Ellipse: {
@@ -166,7 +183,7 @@ export class ActionHandler extends ActionShiftFlip {
 						x, y, editor.editFilled
 					);
 
-					this._redrawMouseActionRect(x, y);
+					statusBarParams = this._redrawMouseActionRect(x, y);
 					break;
 				}
 				case EditorTool.Rectangle: {
@@ -177,11 +194,13 @@ export class ActionHandler extends ActionShiftFlip {
 						x, y, editor.editFilled
 					);
 
-					this._redrawMouseActionRect(x, y);
+					statusBarParams = this._redrawMouseActionRect(x, y);
 					break;
 				}
 			}
 		}
+
+		editor.redrawStatusBar(statusBarParams);
 
 		this.lastPixelX = x;
 		this.lastPixelY = y;
@@ -333,7 +352,20 @@ export class ActionHandler extends ActionShiftFlip {
 				y - editor.scroller.__clientTop
 			);
 
-			editor.redrawStatusBar(x, y);
+			let statusBarParams: RedrawStatusBarParams = {
+				viewportX: x,
+				viewportY: y,
+				zoom
+			};
+
+			if (editor.editTool === EditorTool.Selection ||
+					editor.editTool === EditorTool.AttrSelect) {
+
+				const { x1, y1, x2, y2 } = editor.selection;
+				statusBarParams = x1 < x2 && y1 < y2 ? { x1, y1, x2, y2 } : {};
+			}
+
+			editor.redrawStatusBar(statusBarParams);
 		}
 	}
 
@@ -542,5 +574,6 @@ export class ActionHandler extends ActionShiftFlip {
 		}
 
 		editor.pixel.redrawOuterRect(x1, y1, x2, y2, attrs);
+		return { x1, y1, x2, y2 };
 	}
 }

@@ -51,6 +51,7 @@ const EditorProvider = ({ children }) => {
 			case EditorAction.ToolChanged:
 				if (!action.isActionInProgress()) {
 					editor.editTool = payload.editTool;
+					editor.redrawStatusBarAfterToolChanged();
 					return withRender();
 				}
 				break;
