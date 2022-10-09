@@ -9,13 +9,13 @@ import { EditorColorMode, EditorCoordinates, EditorDrawMode, EditorTool } from '
 
 export const enum EditorAction {
 	InitEditorInstance = 'INIT_EDITOR_INSTANCE',
-	SelectionChanged = 'SELECTION_CHANGED',
 	ToolChanged = 'TOOL_CHANGED',
 	ColorChanged = 'COLOR_CHANGED',
 	ColorModeChanged = 'COLOR_MODE_CHANGED',
 	DrawModeChanged = 'DRAW_MODE_CHANGED',
 	FillShapeChanged = 'FILL_SHAPE_CHANGED',
 	SelectFnCheckboxChanged = 'SELECT_FN_CHECKBOX_CHANGED',
+	SelectionChanged = 'SELECTION_CHANGED',
 	SelectAll = 'SELECT_ALL',
 	SelectNone = 'SELECT_NONE',
 	SelectClear = 'SELECT_CLEAR',
@@ -44,11 +44,6 @@ export interface DispatchAction {
 export type Dispatch = (action: DispatchAction) => void;
 
 //---------------------------------------------------------------------------------------
-export const actionSelectionChanged = (nonEmpty: boolean): DispatchAction => ({
-	type: EditorAction.SelectionChanged,
-	payload: { nonEmpty }
-});
-
 export const actionToolChanged = (editTool: EditorTool): DispatchAction => ({
 	type: EditorAction.ToolChanged,
 	payload: { editTool }
@@ -77,6 +72,10 @@ export const actionFillShapeChanged = (editFilled: boolean): DispatchAction => (
 export const actionSelectFnCheckboxChanged = (checkboxProperty: string): DispatchAction => ({
 	type: EditorAction.SelectFnCheckboxChanged,
 	payload: { checkboxProperty }
+});
+
+export const actionSelectionChanged = (): DispatchAction => ({
+	type: EditorAction.SelectionChanged,
 });
 
 export const actionSelectAll = (): DispatchAction => ({

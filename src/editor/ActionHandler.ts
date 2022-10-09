@@ -212,7 +212,7 @@ export class ActionHandler extends ActionShiftFlip {
 						this._redrawMouseActionRect(x, y, false);
 					}
 
-					editor.selectionActionCallback(editor.selection.nonEmpty());
+					editor.selectionActionCallback();
 					break;
 				}
 				case EditorTool.AttrSelect: {
@@ -224,7 +224,7 @@ export class ActionHandler extends ActionShiftFlip {
 						this._redrawMouseActionRect(x, y, false);
 					}
 
-					editor.selectionActionCallback(editor.selection.nonEmpty());
+					editor.selectionActionCallback();
 					break;
 				}
 				case EditorTool.Pencil: {

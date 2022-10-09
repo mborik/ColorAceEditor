@@ -10,7 +10,6 @@ import devLog from '../utils/logger';
 import {
 	actionAbout,
 	actionRefresh,
-	actionSelectionChanged,
 	Dispatch,
 	DispatchAction,
 	EditorAction
@@ -27,7 +26,6 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 	devLog('initializing ColorAceEditor instance...');
 
 	const editor = getInstance({
-		selectCB: (nonEmpty: boolean) => dispatch(actionSelectionChanged(nonEmpty)),
 		canvas: CANVAS(),
 		status: STATUS_BAR(),
 		upload: UPLOAD.CANVAS(),

@@ -10,20 +10,20 @@ import { HotkeyConfig, useHotkeys } from '@blueprintjs/core';
 import { ResizeSensor2, ResizeSensor2Props } from '@blueprintjs/popover2';
 import useEventListener from '@use-it/event-listener';
 
-import { Dispatch } from '../actions';
+import { actionSelectionChanged, Dispatch } from '../actions';
 import { actionInitEditorInstance } from '../actions/initEditorInstance';
 import { actionUploadFile } from '../actions/uploadFile';
 import constants from '../constants';
-import { useEditor } from '../editor';
+import { Editor, useEditor } from '../editor';
 import { HotkeyItems } from '../params/HotkeyItems';
 import devLog from '../utils/logger';
 
 
-type InitCallbackFn = (currentDispatch: Dispatch) => void
+type InitCallbackFn = (currentDispatch: Dispatch, currentInstance: Editor) => void
 
 const Main: React.VFC = () => {
 	const { dispatch, editor } = useEditor();
-	const [initCallback, setCallBackQueue] = React.useState<InitCallbackFn>();
+	const [initCallback, setInitCallback] = React.useState<InitCallbackFn>();
 
 	const hotkeyItems = React.useMemo(() => {
 		if (editor) {
@@ -89,15 +89,20 @@ const Main: React.VFC = () => {
 		const doActionAfterInit = actionInitEditorInstance(dispatch);
 		setTimeout(() => {
 			const action = doActionAfterInit();
-			setCallBackQueue((): InitCallbackFn => (currentDispatch) => currentDispatch(action));
+			setInitCallback((): InitCallbackFn =>
+				(currentDispatch, currentInstance) => {
+					currentInstance.selectionActionCallback = () => currentDispatch(actionSelectionChanged());
+					currentDispatch(action);
+				}
+			);
 		},
 		constants.DEBOUNCE_TIMEOUT);
 	}, []);
 
 	React.useEffect(() => {
-		if (typeof initCallback === 'function') {
-			initCallback(dispatch);
-			setCallBackQueue(undefined);
+		if (typeof initCallback === 'function' && editor) {
+			initCallback(dispatch, editor);
+			setInitCallback(undefined);
 		}
 	},
 	[ initCallback, dispatch ]);

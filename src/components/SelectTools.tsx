@@ -8,7 +8,6 @@
 import * as React from 'react';
 import { Button, ButtonGroup, Icon, KeyCombo, Menu, MenuDivider, MenuItem, Navbar, Position } from '@blueprintjs/core';
 import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
-import debounce from 'lodash/debounce';
 
 import { actionSelectFnCheckboxChanged } from '../actions';
 import constants from '../constants';
@@ -20,31 +19,13 @@ import { SelectToolSubMenuItems } from '../params/SelectToolSubMenuItems';
 
 const SelectTools: React.VFC = () => {
 	const { dispatch, editor } = useEditor();
-	const [isSelectionNonEmpty, setIsSelectionNonEmpty] = React.useState(false);
-
-	const debouncedObservedSelection = debounce(
-		(selection) => setIsSelectionNonEmpty(selection.nonEmpty()),
-		constants.DEBOUNCE_TIMEOUT
-	);
-
-	React.useEffect(() => {
-		if (!editor) {
-			return;
-		}
-		editor.selection = new Proxy(editor.selection, {
-			set(...args) {
-				debouncedObservedSelection(args[0]);
-				return Reflect.set(...args);
-			}
-		});
-	},
-	[ editor ]);
-
 	if (!editor) {
 		return null;
 	}
 
 	const portalContainer = OVERLAY_WRAPPER();
+
+	const isSelectionNonEmpty = editor.selection.nonEmpty();
 	const isSelectionMode =
 		editor.editTool === EditorTool.Selection ||
 		editor.editTool === EditorTool.AttrSelect;

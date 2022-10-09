@@ -81,6 +81,9 @@ const EditorProvider = ({ children }) => {
 				editor[prop] = !editor[prop];
 				return withRender();
 
+			case EditorAction.SelectionChanged:
+				return withRender();
+
 			case EditorAction.SelectAll:
 				if (!action.isActionInProgress()) {
 					editor.selection.set(0, 0, 287, 255);

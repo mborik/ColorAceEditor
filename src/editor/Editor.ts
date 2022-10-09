@@ -54,9 +54,7 @@ export const enum EditorDirection {
 	FV = 'FLIP_V'
 }
 
-type EditorSelectionActionFn = (nonEmpty: boolean) => void;
 export interface EditorOptions {
-	selectCB: EditorSelectionActionFn;
 	canvas: HTMLCanvasElement;
 	upload: HTMLCanvasElement;
 	status?: HTMLDivElement;
@@ -92,7 +90,7 @@ export class Editor extends FileOps {
 	editSelectFnShiftAttr: boolean = false;
 	editSelectFnBlockAttr: boolean = false;
 
-	selectionActionCallback: EditorSelectionActionFn;
+	selectionActionCallback: () => void;
 
 	coordsRecorder: { x: number, y: number }[] = [];
 
@@ -129,7 +127,6 @@ export class Editor extends FileOps {
 		this.ctx = canvasContext;
 		this.canvas = opt.canvas;
 		this.statusBar = opt.status || null;
-		this.selectionActionCallback = opt.selectCB;
 	}
 
 	/**
