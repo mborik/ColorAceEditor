@@ -6,6 +6,7 @@
  */
 
 import { UPLOAD } from '../elements';
+import { countMostFrequent } from '../utils/countMostFrequent';
 import { editor } from './Editor';
 
 
@@ -17,35 +18,6 @@ export class FileOps {
 		if (!(this.uploadCanvas instanceof HTMLCanvasElement)) {
 			throw Error('ColorAceEditor: Image render canvas element not defined!');
 		}
-	}
-
-	private getPixelValue(bmpClamp: Uint8ClampedArray, ptr: number) {
-		const pix = bmpClamp.slice(ptr, ptr + 3).map(v => v < 128 ? 0 : 255);
-
-		return editor.pixel.pal.findIndex(base =>
-			pix[0] === base[4] &&
-			pix[1] === base[5] &&
-			pix[2] === base[6]
-		);
-	}
-
-	private countMostFrequent(arr: number[]) {
-		const counts = {};
-		arr.forEach(v => {
-			if (v > 0) {
-				counts[v] = (counts[v] || 0) + 1;
-			}
-		});
-
-		let result = 0, max = 0;
-		for (const c in counts) {
-			if (counts[c] > max) {
-				max = counts[c];
-				result = +c;
-			}
-		}
-
-		return result;
 	}
 
 	/**
@@ -61,6 +33,7 @@ export class FileOps {
 			}
 
 			try {
+				const { pixel } = editor;
 				const fr = new FileReader();
 
 				if (typeof file.type === 'string' && file.type.indexOf('image/') === 0) {
@@ -72,8 +45,8 @@ export class FileOps {
 								return reject('invalid image dimensions (supported up to 288x256)');
 							}
 
-							editor.pixel.doSnapshot();
-							editor.pixel.clearViewport();
+							pixel.doSnapshot();
+							pixel.clearViewport();
 
 							const cols = Math.ceil(img.width / 6);
 							const rows = Math.ceil(img.height / 2) * 2;
@@ -95,6 +68,13 @@ export class FileOps {
 							const bmp = ctx.getImageData(0, 0, width, rows);
 							const bmpClamp = new Uint8ClampedArray(bmp.data);
 
+							const getPixelValue = (bmpClamp: Uint8ClampedArray, ptr: number) => {
+								const [R, G, B] = bmpClamp.slice(ptr, ptr + 3).map(v => v < 128 ? 0 : 255);
+								return pixel.pal.findIndex(
+									([,,,, palR, palG, palB]) => R === palR && G === palG && B === palB
+								);
+							};
+
 							let y = 0;
 							const loopY = () => {
 								const attr: number[] = new Array(12);
@@ -102,20 +82,20 @@ export class FileOps {
 
 								for (let cx = 0; cx < cols; cx++) {
 									for (ptr = (cx * 6 * 4) + (y * rowlen), i = 0; i < 12; ptr += 4) {
-										attr[i++] = this.getPixelValue(bmpClamp, ptr);
-										attr[i++] = this.getPixelValue(bmpClamp, ptr + rowlen);
+										attr[i++] = getPixelValue(bmpClamp, ptr);
+										attr[i++] = getPixelValue(bmpClamp, ptr + rowlen);
 									}
 
 									i = (y * 48) + cx;
-									c = this.countMostFrequent(attr);
+									c = countMostFrequent(attr);
 
-									editor.pixel.attrs[i] = editor.pixel.pal[c][7];
-									editor.pixel.attrs[i + 48] = editor.pixel.pal[c][8];
+									pixel.attrs[i] = pixel.pal[c][7];
+									pixel.attrs[i + 48] = pixel.pal[c][8];
 
 									x = (y * 288) + (cx * 6);
 									for (i = 0; i < 12; x++) {
-										editor.pixel.surface[x] = attr[i++] ? c : 0;
-										editor.pixel.surface[x + 288] = attr[i++] ? c : 0;
+										pixel.surface[x] = attr[i++] ? c : 0;
+										pixel.surface[x + 288] = attr[i++] ? c : 0;
 									}
 								}
 
@@ -150,8 +130,8 @@ export class FileOps {
 					fr.onload = () => {
 						const b = new Uint8Array(fr.result as ArrayBuffer);
 
-						editor.pixel.doSnapshot();
-						editor.pixel.readPMD85vram(b);
+						pixel.doSnapshot();
+						pixel.readPMD85vram(b);
 						editor.refresh();
 
 						resolve();
