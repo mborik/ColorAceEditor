@@ -459,7 +459,12 @@ export class Pixelator {
 		}
 
 		if (color) {
-			this.redrawRect((column * 6), ((baseAddress - column) / 48), 6, 2, true);
+			this.redrawRect(
+				(column * 6), ((baseAddress - column) / 48),
+				6,
+				this.isColorAceMode ? 2 : 1,
+				true
+			);
 		}
 		else if (mode !== EditorDrawMode.Color) {
 			const zoom = this.currentZoom;
