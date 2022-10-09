@@ -6,7 +6,7 @@
  */
 
 import { UPLOAD } from '../elements';
-import { countMostFrequent } from '../utils/countMostFrequent';
+import { countMostFrequent } from '../utils';
 import { editor } from './Editor';
 
 

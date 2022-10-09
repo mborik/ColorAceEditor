@@ -3,7 +3,7 @@
  * Copyright (c) 2022 Martin Bórik
  */
 
-import { queryElement } from './utils/queryElement';
+import { queryElement } from './utils';
 
 
 export const APP_WRAPPER = () => queryElement<HTMLDivElement>('#wrapper');

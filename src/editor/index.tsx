@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Dispatch, DispatchAction, EditorAction } from '../actions';
 import { showToast } from '../actions/toast';
 import { UPLOAD } from '../elements';
-import devLog from '../utils/logger';
+import { devLog } from '../utils';
 import type { Editor } from './Editor';
 
 

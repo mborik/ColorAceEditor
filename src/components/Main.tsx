@@ -16,7 +16,7 @@ import { actionUploadFile } from '../actions/uploadFile';
 import constants from '../constants';
 import { Editor, useEditor } from '../editor';
 import { HotkeyItems } from '../params/HotkeyItems';
-import devLog from '../utils/logger';
+import { devLog } from '../utils';
 
 
 type InitCallbackFn = (currentDispatch: Dispatch, currentInstance: Editor) => void

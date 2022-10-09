@@ -5,7 +5,7 @@
 
 import constants from '../constants';
 import { Editor, getInstance } from '../editor';
-import devLog from '../utils/logger';
+import { devLog } from '../utils';
 import {
 	actionAbout,
 	actionRefresh,

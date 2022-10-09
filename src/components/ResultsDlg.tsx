@@ -9,7 +9,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Classes, Dialog, NonIdealState, Switch, TextArea } from '@blueprintjs/core';
 import { actionResults } from '../actions';
 import { useEditor } from '../editor';
-import toHex from '../utils/toHex';
+import { toHex } from '../utils';
 
 
 const ResultsDlg: React.VFC = () => {

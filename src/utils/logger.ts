@@ -3,7 +3,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-const devLog = (...args) => {
+export const devLog = (...args) => {
 	if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development' ||
 		window.location.href.startsWith('#dev')) {
 
@@ -11,5 +11,3 @@ const devLog = (...args) => {
 		console.log(...args);
 	}
 };
-
-export default devLog;
