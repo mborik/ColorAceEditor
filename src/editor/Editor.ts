@@ -8,6 +8,7 @@
 /// <reference path="../global.d.ts" />
 
 import { Scroller } from 'scroller';
+import { CANVAS, STATUS_BAR } from '../elements';
 import { ActionHandler } from './ActionHandler';
 import { Drawing } from './Drawing';
 import { FileOps } from './FileOps';
@@ -112,21 +113,21 @@ export class Editor extends FileOps {
 		}
 	);
 
-	constructor(opt: EditorOptions) {
-		super(opt.upload);
+	constructor() {
+		super();
 
-		if (!(opt.canvas instanceof HTMLCanvasElement)) {
+		this.canvas = CANVAS();
+		if (!(this.canvas instanceof HTMLCanvasElement)) {
 			throw Error('ColorAceEditor: Canvas element not defined!');
 		}
 
-		const canvasContext = opt.canvas.getContext('2d');
+		const canvasContext = this.canvas.getContext('2d');
 		if (!(canvasContext instanceof CanvasRenderingContext2D)) {
 			throw Error('ColorAceEditor: Canvas rendering context not defined!');
 		}
 
 		this.ctx = canvasContext;
-		this.canvas = opt.canvas;
-		this.statusBar = opt.status || null;
+		this.statusBar = STATUS_BAR();
 	}
 
 	/**
@@ -220,5 +221,5 @@ export class Editor extends FileOps {
 /**
  * @return singleton instance
  */
-export const getInstance = (opt: EditorOptions): Editor =>
-	(editor instanceof Editor) ? editor : (editor = new Editor(opt));
+export const getInstance = (): Editor =>
+	(editor instanceof Editor) ? editor : (editor = new Editor());

@@ -5,7 +5,6 @@
 
 import constants from '../constants';
 import { Editor, getInstance } from '../editor';
-import { CANVAS, STATUS_BAR, UPLOAD } from '../elements';
 import devLog from '../utils/logger';
 import {
 	actionAbout,
@@ -25,12 +24,7 @@ type EditorConfig = Pick<Editor,
 export const actionInitEditorInstance = (dispatch: Dispatch) => {
 	devLog('initializing ColorAceEditor instance...');
 
-	const editor = getInstance({
-		canvas: CANVAS(),
-		status: STATUS_BAR(),
-		upload: UPLOAD.CANVAS(),
-	});
-
+	const editor = getInstance();
 	let doActionAfterInit = (): DispatchAction => actionAbout(true);
 
 	try {

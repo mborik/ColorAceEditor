@@ -5,12 +5,16 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
+import { UPLOAD } from '../elements';
 import { editor } from './Editor';
 
 
 export class FileOps {
-	constructor(public uploadCanvas: HTMLCanvasElement) {
-		if (!(uploadCanvas instanceof HTMLCanvasElement)) {
+	public uploadCanvas: HTMLCanvasElement;
+
+	constructor() {
+		this.uploadCanvas = UPLOAD.CANVAS();
+		if (!(this.uploadCanvas instanceof HTMLCanvasElement)) {
 			throw Error('ColorAceEditor: Image render canvas element not defined!');
 		}
 	}
