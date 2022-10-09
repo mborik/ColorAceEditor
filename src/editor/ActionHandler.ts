@@ -8,7 +8,7 @@
 import React from 'react';
 import { debounce } from 'typescript-debounce-decorator';
 import { ActionShiftFlip } from './ActionShiftFlip';
-import { editor, EditorDrawMode, EditorTool } from './Editor';
+import { editor, EditorColorMode, EditorDrawMode, EditorTool } from './Editor';
 import { EditorSnapshot, EditorSnippet } from './Pixelator';
 
 
@@ -46,7 +46,8 @@ export class ActionHandler extends ActionShiftFlip {
 					break;
 				}
 				case EditorTool.AttrSelect: {
-					editor.selection.reset(Math.floor(x / 6) * 6, y & ~1);
+					const mask = editor.editColorMode === EditorColorMode.Full ? ~1 : -1;
+					editor.selection.reset(Math.floor(x / 6) * 6, y & mask);
 					editor.refresh();
 					break;
 				}
@@ -121,8 +122,9 @@ export class ActionHandler extends ActionShiftFlip {
 				}
 				case EditorTool.AttrSelect: {
 					if (!this.mouseNotMoved) {
+						const attrFit = editor.editColorMode === EditorColorMode.Full ? 1 : 0;
 						const { x0, y0 } = editor.selection;
-						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y | 1);
+						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y | attrFit);
 
 						this._redrawMouseActionRect(x, y, false);
 					}
@@ -215,8 +217,9 @@ export class ActionHandler extends ActionShiftFlip {
 				}
 				case EditorTool.AttrSelect: {
 					if (!this.mouseNotMoved) {
+						const attrFit = editor.editColorMode === EditorColorMode.Full ? 1 : 0;
 						const { x0, y0 } = editor.selection;
-						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y | 1);
+						editor.selection.set(x0, y0, (Math.ceil(x / 6) * 6) - 1, y | attrFit);
 
 						this._redrawMouseActionRect(x, y, false);
 					}
