@@ -163,13 +163,14 @@ body {
 
 		footer#statusBar {
 			position: absolute;
-			bottom: 2rem;
+			bottom: 1rem;
+			height: 4rem;
 			width: calc(100% - 2rem);
 			text-align: center;
-			font-size: 11px;
+			font-size: 13px;
 			font-family: monospace;
-			letter-spacing: 1px;
-			color: $gray2;
+			letter-spacing: 2px;
+			color: $gray4;
 		}
 	}
 

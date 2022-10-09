@@ -8,12 +8,12 @@
 /// <reference path="../global.d.ts" />
 
 import { Scroller } from 'scroller';
-import { CANVAS, STATUS_BAR } from '../elements';
+import { CANVAS } from '../elements';
 import { ActionHandler } from './ActionHandler';
 import { Drawing } from './Drawing';
-import { FileOps } from './FileOps';
 import { Pixelator } from './Pixelator';
 import { Selection } from './Selection';
+import { StatusBar } from './StatusBar';
 
 
 export const enum EditorColorMode {
@@ -71,10 +71,9 @@ interface CanvasCoordinates extends EditorCoordinates {
 }
 
 export let editor: Editor;
-export class Editor extends FileOps {
+export class Editor extends StatusBar {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
-	statusBar: Nullable<HTMLDivElement>;
 
 	contentWidth: number = 0;
 	contentHeight: number = 0;
@@ -93,7 +92,7 @@ export class Editor extends FileOps {
 
 	selectionActionCallback: () => void;
 
-	coordsRecorder: { x: number, y: number }[] = [];
+	coordsRecorder: EditorCoordinates[] = [];
 
 	action: ActionHandler = new ActionHandler();
 	draw: Drawing = new Drawing();
@@ -127,7 +126,6 @@ export class Editor extends FileOps {
 		}
 
 		this.ctx = canvasContext;
-		this.statusBar = STATUS_BAR();
 	}
 
 	/**
@@ -184,31 +182,6 @@ export class Editor extends FileOps {
 		const y = Math.floor(((sy - o.top) + s.top) / s.zoom);
 
 		return { x, y, column: Math.floor(x / 6) };
-	}
-
-	/**
-	 * Generate new status bar message string with coordinates.
-	 *
-	 * @param vx Viewport cursor X position
-	 * @param vy Viewport cursor X position
-	 * @param column Viewport cursor attribute column by X
-	 */
-	redrawStatusBar(vx: number, vy: number, column: number = Math.floor(vx / 6)) {
-		if (!this.statusBar) {
-			return;
-		}
-
-		const x = Math.max(0, Math.min(vx, 287));
-		const y = Math.max(0, Math.min(vy, 255));
-		const c = Math.max(0, Math.min(column, 47));
-		const a = `${(49152 + (y * 64) + c).toString(16).toUpperCase()}h`;
-		const z = this.zoomFactor * 100;
-
-		const pad = (num: string | number, len: number) => num.toString().padStart(len);
-
-		this.statusBar.textContent =
-			`${pad(z, 4)}%   X:${pad(x, 3)} Y:${pad(y, 3)}  C:${pad(c, 2)}   ${a}`
-				.replace(/\s/g, '\u00A0');
 	}
 
 	/**
