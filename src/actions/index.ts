@@ -5,7 +5,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { EditorCoordinates, EditorTool, EditorDrawMode, EditorColorMode } from '../editor/Editor';
+import { EditorColorMode, EditorCoordinates, EditorDrawMode, EditorTool } from '../editor';
 
 export const enum EditorAction {
 	InitEditorInstance = 'INIT_EDITOR_INSTANCE',

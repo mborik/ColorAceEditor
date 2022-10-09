@@ -6,29 +6,29 @@
  */
 
 import { HotkeyConfig } from '@blueprintjs/core';
-import { Editor, EditorTool, EditorDrawMode, EditorDirection } from '../editor/Editor';
 import {
-	DispatchAction,
-	actionToolChanged,
-	actionDrawModeChanged,
-	actionColorChanged,
-	actionFillShapeChanged,
-	actionSelectAll,
-	actionSelectNone,
-	actionSelectClear,
-	actionSelectInvert,
-	actionSelectCopy,
-	actionViewportZoom,
-	actionViewportPan,
-	actionToggleGuides,
-	actionCancel,
-	actionUndo,
 	actionAbout,
-	actionResults,
+	actionCancel,
+	actionColorChanged,
+	actionDrawModeChanged,
+	actionFillShapeChanged,
 	actionLoadFile,
-	actionSaveFile
+	actionResults,
+	actionSaveFile,
+	actionSelectAll,
+	actionSelectClear,
+	actionSelectCopy,
+	actionSelectInvert,
+	actionSelectNone,
+	actionToggleGuides,
+	actionToolChanged,
+	actionUndo,
+	actionViewportPan,
+	actionViewportZoom,
+	DispatchAction
 } from '../actions';
 import { actionSelectShift } from '../actions/selectShift';
+import { Editor, EditorDirection, EditorDrawMode, EditorTool } from '../editor';
 
 
 export type HotkeyItemAction = (editor: Editor, e: KeyboardEvent) => Nullable<DispatchAction>;

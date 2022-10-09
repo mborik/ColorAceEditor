@@ -6,15 +6,14 @@
  */
 
 import * as React from 'react';
-import { Button, ButtonGroup, Navbar, Position, KeyCombo } from '@blueprintjs/core';
+import { Button, ButtonGroup, KeyCombo, Navbar, Position } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
+import { actionToolChanged } from '../actions';
 import constants from '../constants';
+import { EditorTool,useEditor } from '../editor';
 import { OVERLAY_WRAPPER } from '../elements';
 import { ToolbarItems } from '../params/ToolbarItems';
-import { actionToolChanged } from '../actions';
-import { EditorTool } from '../editor/Editor';
-import { useEditor } from './EditorProvider';
 
 
 const Toolbar: React.VFC = () => {

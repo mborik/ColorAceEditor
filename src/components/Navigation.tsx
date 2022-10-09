@@ -6,18 +6,18 @@
  */
 
 import * as React from 'react';
-import { Navbar, Icon } from '@blueprintjs/core';
-import { useEditor } from './EditorProvider';
+import { Icon, Navbar } from '@blueprintjs/core';
 import { actionAbout } from '../actions';
 
-import Toolbar from './Toolbar';
-import DrawMode from './DrawMode';
-import FillShape from './FillShape';
+import { useEditor } from '../editor';
 import BrushShape from './BrushShape';
-import SelectTools from './SelectTools';
-import Palette from './Palette';
-import FileMenu from './FileMenu';
+import DrawMode from './DrawMode';
 import Extras from './Extras';
+import FileMenu from './FileMenu';
+import FillShape from './FillShape';
+import Palette from './Palette';
+import SelectTools from './SelectTools';
+import Toolbar from './Toolbar';
 
 
 const Navigation: React.VFC = () => {

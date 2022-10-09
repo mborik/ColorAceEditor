@@ -7,12 +7,12 @@
 
 /// <reference path="../global.d.ts" />
 
+import { Scroller } from 'scroller';
 import { ActionHandler } from './ActionHandler';
 import { Drawing } from './Drawing';
 import { FileOps } from './FileOps';
 import { Pixelator } from './Pixelator';
 import { Selection } from './Selection';
-import { Scroller } from 'scroller';
 
 
 export const enum EditorColorMode {

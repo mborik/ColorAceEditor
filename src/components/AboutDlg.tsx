@@ -8,7 +8,7 @@
 import React from 'react';
 import { Button, Classes, Dialog } from '@blueprintjs/core';
 import { actionAbout } from '../actions';
-import { useEditor } from './EditorProvider';
+import { useEditor } from '../editor';
 
 /**
  * Helper React element which generates external anchor link.

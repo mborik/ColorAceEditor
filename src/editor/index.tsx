@@ -4,11 +4,11 @@
  */
 
 import * as React from 'react';
-import { Editor } from '../editor/Editor';
-import { EditorAction, DispatchAction, Dispatch } from '../actions';
+import { Dispatch, DispatchAction, EditorAction } from '../actions';
 import { showToast } from '../actions/toast';
 import { UPLOAD } from '../elements';
 import devLog from '../utils/logger';
+import type { Editor } from './Editor';
 
 
 export interface EditorContextState {
@@ -180,4 +180,5 @@ const EditorProvider = ({ children }) => {
 
 export const useEditor = () => React.useContext(Context);
 
+export * from './Editor';
 export default EditorProvider;

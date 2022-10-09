@@ -10,9 +10,8 @@ import { Button, Classes, Dialog, Navbar, Position } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import constants from '../constants';
+import { EditorTool, useEditor } from '../editor';
 import { OVERLAY_WRAPPER } from '../elements';
-import { EditorTool } from '../editor/Editor';
-import { useEditor } from './EditorProvider';
 
 
 interface HTMLCanvasExtended extends HTMLCanvasElement {

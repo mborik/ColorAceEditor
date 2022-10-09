@@ -6,7 +6,7 @@
  */
 
 import { IconName } from '@blueprintjs/core';
-import { EditorTool } from '../editor/Editor';
+import { EditorTool } from '../editor';
 
 
 export interface ToolbarItem {

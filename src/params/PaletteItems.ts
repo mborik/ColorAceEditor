@@ -6,7 +6,7 @@
  */
 
 import { IconName } from '@blueprintjs/core';
-import { Editor, EditorColorMode } from '../editor/Editor';
+import { Editor, EditorColorMode } from '../editor';
 
 
 export interface PaletteItem {

@@ -12,10 +12,10 @@ import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 import { actionColorModeChanged, actionToggleGuides, actionUndo } from '../actions';
 import { actionImportScreen } from '../actions/importScreen';
 import constants from '../constants';
-import { DemoScreenItems } from '../params/DemoScreenItems';
+import { useEditor } from '../editor';
 import { OVERLAY_WRAPPER } from '../elements';
 import { ColorModeItems } from '../params/ColorModeItems';
-import { useEditor } from './EditorProvider';
+import { DemoScreenItems } from '../params/DemoScreenItems';
 
 
 const Extras: React.VFC = () => {

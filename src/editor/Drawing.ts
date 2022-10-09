@@ -5,7 +5,7 @@
  * Copyright (c) 2012-2022 Martin Bórik
  */
 
-import { editor, EditorDrawMode, EditorCoordinates } from './Editor';
+import { editor, EditorCoordinates, EditorDrawMode } from './Editor';
 
 
 export class Drawing {

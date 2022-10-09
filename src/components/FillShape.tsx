@@ -6,14 +6,13 @@
  */
 
 import * as React from 'react';
-import { Button, Navbar, Position, KeyCombo } from '@blueprintjs/core';
+import { Button, KeyCombo, Navbar, Position } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
-import constants from '../constants';
-import { OVERLAY_WRAPPER } from '../elements';
 import { actionFillShapeChanged } from '../actions';
-import { EditorTool } from '../editor/Editor';
-import { useEditor } from './EditorProvider';
+import constants from '../constants';
+import { EditorTool,useEditor } from '../editor';
+import { OVERLAY_WRAPPER } from '../elements';
 
 
 const FillShape: React.VFC = () => {

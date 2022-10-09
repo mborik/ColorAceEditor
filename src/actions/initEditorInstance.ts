@@ -3,11 +3,18 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { actionAbout, actionRefresh, actionSelectionChanged, Dispatch, DispatchAction, EditorAction } from '.';
-import { Editor, getInstance } from '../editor/Editor';
-import devLog from '../utils/logger';
 import constants from '../constants';
+import { Editor, getInstance } from '../editor';
 import { CANVAS, STATUS_BAR, UPLOAD } from '../elements';
+import devLog from '../utils/logger';
+import {
+	actionAbout,
+	actionRefresh,
+	actionSelectionChanged,
+	Dispatch,
+	DispatchAction,
+	EditorAction
+} from '.';
 
 
 type EditorConfig = Pick<Editor,

@@ -6,14 +6,14 @@
  */
 
 import { IconName } from '@blueprintjs/core';
-import { Editor } from '../editor/Editor';
 import {
 	actionSelectAll,
-	actionSelectNone,
 	actionSelectClear,
 	actionSelectCopy,
+	actionSelectNone,
 	DispatchAction
 } from '../actions';
+import type { Editor } from '../editor';
 
 
 export type SelectToolItemAction = (editor: Editor) => DispatchAction;

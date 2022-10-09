@@ -10,12 +10,12 @@ import { HotkeyConfig, useHotkeys } from '@blueprintjs/core';
 import { ResizeSensor2, ResizeSensor2Props } from '@blueprintjs/popover2';
 import useEventListener from '@use-it/event-listener';
 
-import { useEditor } from './EditorProvider';
 import { Dispatch } from '../actions';
 import { actionInitEditorInstance } from '../actions/initEditorInstance';
 import { actionUploadFile } from '../actions/uploadFile';
-import { HotkeyItems } from '../params/HotkeyItems';
 import constants from '../constants';
+import { useEditor } from '../editor';
+import { HotkeyItems } from '../params/HotkeyItems';
 import devLog from '../utils/logger';
 
 

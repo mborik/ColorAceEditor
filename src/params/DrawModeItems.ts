@@ -5,7 +5,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
-import { EditorDrawMode } from '../editor/Editor';
+import { EditorDrawMode } from '../editor';
 
 
 export interface DrawModeItem {

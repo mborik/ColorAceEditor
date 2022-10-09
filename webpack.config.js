@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerNotifierPlugin = require('fork-ts-checker-notifier-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PackageJsonPlugin = require('pkg.json-webpack-plugin');
-const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const WebpackNotifierPlugin = require('webpack-notifier');
 const optimizeConstEnum = require('ts-transformer-optimize-const-enum').default;
+const WebpackNotifierPlugin = require('webpack-notifier');
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const DEV_PORT = process.env.PORT || 3000;

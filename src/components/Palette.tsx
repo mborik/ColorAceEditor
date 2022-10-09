@@ -6,14 +6,14 @@
  */
 
 import * as React from 'react';
-import { Button, ButtonGroup, Navbar, Position, Icon, KeyCombo, IconSize } from '@blueprintjs/core';
+import { Button, ButtonGroup, Icon, IconSize, KeyCombo, Navbar, Position } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
+import { actionColorChanged } from '../actions';
 import constants from '../constants';
+import { useEditor } from '../editor';
 import { OVERLAY_WRAPPER } from '../elements';
 import { PaletteItems } from '../params/PaletteItems';
-import { actionColorChanged } from '../actions';
-import { useEditor } from './EditorProvider';
 
 
 const attrsToTooltip = (attrs?: string[]) => {

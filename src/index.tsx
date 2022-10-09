@@ -9,7 +9,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { HotkeysProvider } from '@blueprintjs/core';
 import App from './components/App';
-import EditorProvider from './components/EditorProvider';
+import EditorProvider from './editor';
 import { APP_WRAPPER } from './elements';
 
 (async () => {

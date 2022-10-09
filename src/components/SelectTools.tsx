@@ -6,17 +6,16 @@
  */
 
 import * as React from 'react';
-import debounce from 'lodash/debounce';
-import { Button, ButtonGroup, Navbar, Position, Menu, MenuItem, MenuDivider, Icon, KeyCombo } from '@blueprintjs/core';
+import { Button, ButtonGroup, Icon, KeyCombo, Menu, MenuDivider, MenuItem, Navbar, Position } from '@blueprintjs/core';
 import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
+import debounce from 'lodash/debounce';
 
+import { actionSelectFnCheckboxChanged } from '../actions';
 import constants from '../constants';
+import { EditorTool,useEditor } from '../editor';
 import { OVERLAY_WRAPPER } from '../elements';
 import { SelectToolItems } from '../params/SelectToolItems';
 import { SelectToolSubMenuItems } from '../params/SelectToolSubMenuItems';
-import { actionSelectFnCheckboxChanged } from '../actions';
-import { EditorTool } from '../editor/Editor';
-import { useEditor } from './EditorProvider';
 
 
 const SelectTools: React.VFC = () => {

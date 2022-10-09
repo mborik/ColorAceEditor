@@ -6,12 +6,12 @@
  */
 
 import * as React from 'react';
-import { Button, Navbar, ButtonGroup, Classes } from '@blueprintjs/core';
+import { Button, ButtonGroup, Classes, Navbar } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 
-import { actionLoadFile, actionSaveFile, actionCleanup } from '../actions';
+import { actionCleanup, actionLoadFile, actionSaveFile } from '../actions';
+import { useEditor } from '../editor';
 import { OVERLAY_WRAPPER } from '../elements';
-import { useEditor } from './EditorProvider';
 
 const FileMenu: React.VFC = () => {
 	const { dispatch } = useEditor();

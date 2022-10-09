@@ -8,7 +8,7 @@
 import React from 'react';
 import { debounce } from 'typescript-debounce-decorator';
 import { ActionShiftFlip } from './ActionShiftFlip';
-import { editor, EditorTool, EditorDrawMode } from './Editor';
+import { editor, EditorDrawMode, EditorTool } from './Editor';
 import { EditorSnapshot, EditorSnippet } from './Pixelator';
 
 

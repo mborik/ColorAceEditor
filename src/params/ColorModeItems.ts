@@ -5,7 +5,7 @@
  * Copyright (c) 2022 Martin Bórik
  */
 
-import { EditorColorMode } from '../editor/Editor';
+import { EditorColorMode } from '../editor';
 
 
 export interface ColorModeItem {
