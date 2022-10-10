@@ -71,7 +71,7 @@ export class StatusBar extends FileOps {
 				y1 = undefined;
 			}
 
-			coords = `\nX:${pad(x1, 3)}  Y:${pad(y1, 3)}  W:${pad(w, 3)}  H:${pad(h, 3)}`;
+			coords = `\n X:${pad(x1, 3)}  Y:${pad(y1, 3)}  W:${pad(w, 3)}  H:${pad(h, 3)} `;
 		}
 
 		this.statusBar.textContent =

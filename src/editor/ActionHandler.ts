@@ -305,6 +305,18 @@ export class ActionHandler extends ActionShiftFlip {
 			}
 		}
 
+		let statusBarParams: RedrawStatusBarParams = {
+			viewportX: e.pageX,
+			viewportY: e.pageY
+		};
+		if (editor.editTool === EditorTool.Selection ||
+				editor.editTool === EditorTool.AttrSelect) {
+
+			const { x1, y1, x2, y2 } = editor.selection;
+			statusBarParams = x1 < x2 && y1 < y2 ? { x1, y1, x2, y2 } : {};
+		}
+
+		editor.redrawStatusBar(statusBarParams);
 		this.actionSnapshot = undefined;
 		this.mouseNotMoved = true;
 		this.mouseBtnFlag = 0;
