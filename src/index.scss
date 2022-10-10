@@ -51,6 +51,13 @@ body {
 			border-left: 1px solid $gray5;
 			padding-left: .75rem;
 		}
+
+		.#{$ns}-tag.variant {
+			top: -3px;
+			padding: 0 4px;
+			font-size: 10px;
+			margin-left: .5rem;
+		}
 	}
 }
 

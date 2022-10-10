@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { Button, ButtonGroup, KeyCombo, Menu, MenuDivider, MenuItem, Navbar, Position } from '@blueprintjs/core';
+import { Button, ButtonGroup, KeyCombo, Menu, MenuDivider, MenuItem, Navbar, Position, Tag } from '@blueprintjs/core';
 import { Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
 import { actionColorModeChanged, actionToggleGuides, actionUndo } from '../actions';
@@ -119,7 +119,9 @@ const Extras: React.VFC = () => {
 								{DemoScreenItems.map((item, key) => (
 									<MenuItem
 										key={`MNXI_${key}`}
-										text={item.name}
+										text={<>{item.name}{
+											item.variant && <Tag minimal className="variant">{item.variant}</Tag>
+										}</>}
 										label={`[ ${item.author} ]`}
 										onClick={() => {
 											actionImportScreen({ dispatch, editor, fileName: item.filename });
