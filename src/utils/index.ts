@@ -1,5 +1,5 @@
 export * from './countMostFrequent';
-export * from './logger';
+export * from './devLog';
 export * from './pad';
 export * from './queryElement';
 export * from './toHex';

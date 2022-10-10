@@ -5,7 +5,7 @@
 
 export const devLog = (...args) => {
 	if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development' ||
-		window.location.href.startsWith('#dev')) {
+		window.location.hash.startsWith('#dev')) {
 
 		// eslint-disable-next-line no-console
 		console.log(...args);
