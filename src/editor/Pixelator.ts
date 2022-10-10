@@ -33,7 +33,6 @@ export class Pixelator {
 	private bmpH: number;
 	private bmpClamp: Uint8ClampedArray;
 	private bmpDWORD: Uint32Array;
-	private bmpBgColor: string;
 
 	snapshots: EditorSnapshot[] = [];
 	pal = [
@@ -81,8 +80,6 @@ export class Pixelator {
 		}
 
 		this.resetBrushShape();
-		this.bmpBgColor = getComputedStyle(document.body)
-			.getPropertyValue('background-color');
 	}
 
 	/**
@@ -266,19 +263,8 @@ export class Pixelator {
 			}
 		}
 
-		ctx.save();
-		ctx.fillStyle = this.bmpBgColor;
-
-		// clear overlapped areas if needed...
-		if (x < width) {
-			ctx.fillRect(x, 0, this.bmpW - x, this.bmpH);
-		}
-		if (y < (this.bmpH - zoom)) {
-			ctx.fillRect(0, y, x, this.bmpH - y);
-		}
-
-		ctx.restore();
 		this.bmp.data.set(this.bmpClamp);
+		ctx.clearRect(0, 0, this.bmpW, this.bmpW);
 		ctx.putImageData(this.bmp, 0, 0, 0, 0, x, y);
 	}
 
