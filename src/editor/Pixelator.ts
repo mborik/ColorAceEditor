@@ -9,6 +9,13 @@ import constants from '../constants';
 import { editor, EditorColorMode, EditorDrawMode } from './Editor';
 
 
+export interface EditorSpriteDimensions {
+	x: number;
+	y: number;
+	w: number;
+	h: number;
+}
+
 export interface EditorSnapshot {
 	surface: Uint8ClampedArray;
 	attrs: Uint8ClampedArray;
@@ -185,6 +192,30 @@ export class Pixelator {
 		}
 
 		return vram;
+	}
+
+	/**
+	 * Binary encoding of PMD 85 sprite from viewport.
+	 */
+	prepareSprite({ x, y, w, h }: EditorSpriteDimensions): Uint8Array {
+		const width = Math.floor(w / 6);
+		const sprite = new Uint8Array(width * h);
+
+		for (let ptr = 0, iy = 0; iy < h; iy++, y++) {
+			let attrSrc = (y * 48) + x, src = (y * 288) + x;
+			for (let ix = 0; ix < width; ix++) {
+				sprite[ptr++] =
+					(this.surface[src++] ? 0x01 : 0) |
+					(this.surface[src++] ? 0x02 : 0) |
+					(this.surface[src++] ? 0x04 : 0) |
+					(this.surface[src++] ? 0x08 : 0) |
+					(this.surface[src++] ? 0x10 : 0) |
+					(this.surface[src++] ? 0x20 : 0) |
+					(this.attrs[attrSrc++] << 6);
+			}
+		}
+
+		return sprite;
 	}
 
 	/**

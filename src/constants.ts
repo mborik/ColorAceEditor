@@ -5,6 +5,8 @@
 
 export default {
 	EDITOR_CONFIGURATION_KEY: 'colorace-editor-configuration',
+	FILE_NAME_SCREEN: 'screen.bin',
+	FILE_NAME_SPRITE: 'sprite.bin',
 
 	FULL_ALPHA: 0xFFFFFFFF,
 	MARQUEE_COLOR: 0x302010,

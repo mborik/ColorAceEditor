@@ -117,6 +117,11 @@ const EditorProvider = ({ children }) => {
 				}
 				break;
 
+			case EditorAction.SelectExport:
+				const { fileName, ...dimensions } = payload;
+				editor.download(fileName, dimensions);
+				break;
+
 			case EditorAction.ViewportRefresh:
 				editor.refresh();
 				return withRender();

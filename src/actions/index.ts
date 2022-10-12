@@ -5,6 +5,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
+import constants from '../constants';
 import { EditorColorMode, EditorCoordinates, EditorDrawMode, EditorTool } from '../editor';
 
 export const enum EditorAction {
@@ -145,7 +146,9 @@ export const actionLoadFile = (): DispatchAction => ({
 	type: EditorAction.LoadFile
 });
 
-export const actionSaveFile = (fileName?: string): DispatchAction => ({
+export const actionSaveFile = (
+	fileName: string = constants.FILE_NAME_SCREEN
+): DispatchAction => ({
 	type: EditorAction.SaveFile,
 	payload: { fileName }
 });

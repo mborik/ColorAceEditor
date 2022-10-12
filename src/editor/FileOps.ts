@@ -8,6 +8,7 @@
 import { UPLOAD } from '../elements';
 import { countMostFrequent } from '../utils';
 import { editor } from './Editor';
+import { EditorSpriteDimensions } from './Pixelator';
 
 
 export class FileOps {
@@ -152,11 +153,13 @@ export class FileOps {
 	/**
 	 * Create VRAM dump in PMD 85 format and provide download of the binary file.
 	 */
-	download(filename: string = 'screen.bin'): void {
+	download(filename: string, dimensions?: EditorSpriteDimensions): void {
 		const type = 'application/octet-stream';
-		const bin = editor.pixel.preparePMD85vram();
-		let blob: Nullable<Blob> = null;
+		const bin = dimensions ?
+			editor.pixel.prepareSprite(dimensions) :
+			editor.pixel.preparePMD85vram();
 
+		let blob: Nullable<Blob> = null;
 		try {
 			blob = new Blob([ bin ], { type });
 		}
