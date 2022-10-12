@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { debounce } from 'typescript-debounce-decorator';
+import constants from '../constants';
 import { ActionShiftFlip } from './ActionShiftFlip';
 import { editor, EditorColorMode, EditorDrawMode, EditorTool } from './Editor';
 import { EditorSnapshot, EditorSnippet } from './Pixelator';
@@ -325,8 +326,7 @@ export class ActionHandler extends ActionShiftFlip {
 	/**
 	 * Debounced handler of `mousewheel` event.
 	 */
-	@debounce(16, { leading: true })
-	// @ts-ignore
+	@debounce(constants.DEBOUNCE_TIMEOUT, { leading: true })
 	mouseWheel(e: React.WheelEvent) {
 		let delta = 0;
 		if (e.deltaY > 0) {
