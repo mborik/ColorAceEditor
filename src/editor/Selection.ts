@@ -5,6 +5,8 @@
  * Copyright (c) 2014-2022 Martin Bórik
  */
 
+import { editor, EditorColorMode } from './Editor';
+
 export interface SelectionObject {
 	x1: number;
 	y1: number;
@@ -130,7 +132,8 @@ export class Selection implements SelectionObject {
 		return (
 			(Math.floor(this.x1 / 6) * 6) === this.x1 &&
 			(Math.ceil(this.x2 / 6) * 6) === (this.x2 + 1) &&
-			(this.y1 & 1) === 0 && (this.y2 & 1) === 1
+			(editor.editColorMode === EditorColorMode.Full ?
+				((this.y1 & 1) === 0 && (this.y2 & 1) === 1) : true)
 		);
 	}
 }

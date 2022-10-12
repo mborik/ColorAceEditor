@@ -6,10 +6,13 @@
 import constants from '../constants';
 import { Editor } from '../editor';
 import { actionToast } from './toast';
-import { DispatchAction, EditorAction } from '.';
+import { actionCancel, DispatchAction, EditorAction } from '.';
 
 
 export const actionSelectExport = (editor: Editor): DispatchAction => {
+	if (!editor.selection.nonEmpty()) {
+		return actionCancel();
+	}
 	if (!editor.selection.testAttrBounds()) {
 		return actionToast({
 			icon: 'new-grid-item',
