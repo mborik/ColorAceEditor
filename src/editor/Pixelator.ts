@@ -202,7 +202,7 @@ export class Pixelator {
 		const sprite = new Uint8Array(width * h);
 
 		for (let ptr = 0, iy = 0; iy < h; iy++, y++) {
-			let attrSrc = (y * 48) + x, src = (y * 288) + x;
+			let attrSrc = (y * 48) + Math.floor(x / 6), src = (y * 288) + x;
 			for (let ix = 0; ix < width; ix++) {
 				sprite[ptr++] =
 					(this.surface[src++] ? 0x01 : 0) |
