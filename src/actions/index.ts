@@ -22,6 +22,7 @@ export const enum EditorAction {
 	SelectInvert = 'SELECT_INVERT',
 	SelectCopy = 'SELECT_COPY',
 	SelectShiftFlip = 'SELECT_SHIFTFLIP',
+	SelectExport = 'SELECT_EXPORT',
 	ViewportRefresh = 'VIEWPORT_REFRESH',
 	ViewportCleanup = 'VIEWPORT_CLEANUP',
 	ViewportZoom = 'VIEWPORT_ZOOM',

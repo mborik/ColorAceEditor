@@ -7,6 +7,7 @@
 
 import { IconName } from '@blueprintjs/core';
 import { actionSelectInvert } from '../actions';
+import { actionSelectExport } from '../actions/selectExport';
 import { actionSelectShift } from '../actions/selectShift';
 import { EditorDirection } from '../editor';
 import { SelectToolItemAction } from './SelectToolItems';
@@ -109,4 +110,12 @@ export const SelectToolSubMenuItems: SelectToolSubMenuItem[] = [{
 	text: 'Cut or clone with attributes',
 	checkbox: true,
 	checkboxProperty: 'editSelectFnBlockAttr'
+}, {
+	divider: true
+}, {
+	id: 'TBSM_EXPORT_SPRITE',
+	icon: 'share',
+	text: 'Export selection to file',
+	hotkey: 'cmd+E',
+	action: editor => actionSelectExport(editor)
 }];

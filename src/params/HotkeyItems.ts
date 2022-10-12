@@ -27,6 +27,7 @@ import {
 	actionViewportZoom,
 	DispatchAction
 } from '../actions';
+import { actionSelectExport } from '../actions/selectExport';
 import { actionSelectShift } from '../actions/selectShift';
 import { Editor, EditorDirection, EditorDrawMode, EditorTool } from '../editor';
 
@@ -286,6 +287,12 @@ export const HotkeyItems: HotkeyItem[] = [
 		'Shift Down',
 		'mod+down',
 		editor => actionSelectShift(editor, EditorDirection.DN)
+	),
+	new HotkeyItem(
+		'5. Selection',
+		'Export',
+		'mod+E',
+		editor => actionSelectExport(editor)
 	),
 	new HotkeyItem(
 		'6. Operations',
