@@ -9,14 +9,14 @@ import { DispatchAction, EditorAction } from '.';
 
 
 export const actionSelectShift = (editor: Editor, direction: EditorDirection): DispatchAction => {
-	if (editor.editSelectFnShiftAttr && !editor.selection.testAttrBounds()) {
-		return actionToast({
-			icon: 'new-grid-item',
-			message: 'Selection not fit to attributes!'
-		});
-	}
-	return {
-		type: EditorAction.SelectShiftFlip,
-		payload: { direction }
-	};
+  if (editor.editSelectFnShiftAttr && !editor.selection.testAttrBounds()) {
+    return actionToast({
+      icon: 'new-grid-item',
+      message: 'Selection not fit to attributes!'
+    });
+  }
+  return {
+    type: EditorAction.SelectShiftFlip,
+    payload: { direction }
+  };
 };

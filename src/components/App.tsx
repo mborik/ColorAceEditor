@@ -13,13 +13,13 @@ import ResultsDlg from './ResultsDlg';
 
 
 const App: React.VFC = () => (
-	<>
-		<hr hidden id="progress" />
-		<AboutDlg />
-		<ResultsDlg />
-		<Navigation />
-		<Main />
-	</>
+  <>
+    <hr hidden id="progress" />
+    <AboutDlg />
+    <ResultsDlg />
+    <Navigation />
+    <Main />
+  </>
 );
 
 

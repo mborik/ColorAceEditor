@@ -5,5 +5,5 @@
 
 const cache: { [key: string]: any } = {};
 export const queryElement = <T>(selector: string): T =>
-	(cache[selector]) ??
-	(cache[selector] = document.querySelector(selector) as T);
+  (cache[selector]) ??
+  (cache[selector] = document.querySelector(selector) as T);

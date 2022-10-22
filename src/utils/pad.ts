@@ -4,5 +4,5 @@
  */
 
 export const pad =
-	(num: string | number | undefined, len: number, fillString?: string) =>
-		(num != null) ? num.toString().padStart(len, fillString) : ''.padEnd(len, '\u2011');
+  (num: string | number | undefined, len: number, fillString?: string) =>
+    (num != null) ? num.toString().padStart(len, fillString) : ''.padEnd(len, '\u2011');

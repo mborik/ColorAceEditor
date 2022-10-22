@@ -9,20 +9,20 @@ import { EditorColorMode } from '../editor';
 
 
 export interface ColorModeItem {
-	/** Unique identifier - Color mode of Editor */
-	id: EditorColorMode;
+  /** Unique identifier - Color mode of Editor */
+  id: EditorColorMode;
 
-	/** Label */
-	label: string;
+  /** Label */
+  label: string;
 }
 
 export const ColorModeItems: ColorModeItem[] = [{
-	id: EditorColorMode.Full,
-	label: 'ColorACE'
+  id: EditorColorMode.Full,
+  label: 'ColorACE'
 }, {
-	id: EditorColorMode.RGB,
-	label: 'RGB'
+  id: EditorColorMode.RGB,
+  label: 'RGB'
 }, {
-	id: EditorColorMode.Mono,
-	label: 'Monochromatic'
+  id: EditorColorMode.Mono,
+  label: 'Monochromatic'
 }];
