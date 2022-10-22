@@ -8,6 +8,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PackageJsonPlugin = require('pkg.json-webpack-plugin');
 const optimizeConstEnum = require('ts-transformer-optimize-const-enum').default;
 const WebpackNotifierPlugin = require('webpack-notifier');
+const { InjectManifest } = require('workbox-webpack-plugin');
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const DEV_PORT = process.env.PORT || 3000;
@@ -47,7 +48,16 @@ const plugins = [
   }),
 ];
 
-if (!IS_PRODUCTION) {
+if (IS_PRODUCTION) {
+  plugins.push(
+    new InjectManifest({
+      exclude: [/LICENSE\.txt$/],
+      swSrc: path.resolve(__dirname, './src/serviceWorker.ts'),
+      swDest: 'sw.js',
+    })
+  );
+}
+else {
   plugins.push(
     new ReactRefreshPlugin(),
     new ForkTsCheckerNotifierPlugin({

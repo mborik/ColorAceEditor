@@ -11,6 +11,7 @@ import { HotkeysProvider } from '@blueprintjs/core';
 import App from './components/App';
 import EditorProvider from './editor';
 import { APP_WRAPPER } from './elements';
+import { register } from './serviceWorkerRegistration';
 
 (async () => {
   await import('./index.scss');
@@ -22,3 +23,5 @@ import { APP_WRAPPER } from './elements';
     </HotkeysProvider>
   ), APP_WRAPPER());
 })();
+
+register();
