@@ -10,6 +10,7 @@ import {
   actionAbout,
   actionCancel,
   actionColorChanged,
+  actionCopyToClipboard,
   actionDrawModeChanged,
   actionFillShapeChanged,
   actionLoadFile,
@@ -293,6 +294,12 @@ export const HotkeyItems: HotkeyItem[] = [
     'Export',
     'mod+E',
     editor => actionSelectExport(editor)
+  ),
+  new HotkeyItem(
+    '6. Operations',
+    'Copy image into clipboard',
+    'mod+shift+C',
+    () => actionCopyToClipboard()
   ),
   new HotkeyItem(
     '6. Operations',

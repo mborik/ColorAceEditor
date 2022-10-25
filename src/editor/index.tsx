@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import { Dispatch, DispatchAction, EditorAction } from '../actions';
-import { showToast } from '../actions/toast';
+import { actionToast, showToast } from '../actions/toast';
 import { UPLOAD } from '../elements';
 import { devLog } from '../utils';
 import type { Editor } from './Editor';
@@ -179,6 +179,23 @@ const EditorProvider = ({ children }) => {
 
       case EditorAction.SaveFile:
         editor.download(payload.fileName);
+        break;
+
+      case EditorAction.CopyToClipboard:
+        editor.copyToClipboard()
+          .then(() => {
+            dispatch(actionToast({
+              icon: 'tick-circle',
+              intent: 'success',
+              message: 'copied into clipboard'
+            }));
+          })
+          .catch((error: string) => {
+            dispatch(actionToast({
+              intent: 'danger',
+              message: error
+            }));
+          });
         break;
     }
   },

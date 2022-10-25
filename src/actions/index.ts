@@ -35,7 +35,8 @@ export const enum EditorAction {
   Results = 'RESULTS_DIALOG',
   Toast = 'SHOW_TOAST',
   LoadFile = 'LOAD_FILE',
-  SaveFile = 'SAVE_FILE'
+  SaveFile = 'SAVE_FILE',
+  CopyToClipboard = 'COPY_TO_CLIPBOARD'
 }
 
 export interface DispatchAction {
@@ -151,4 +152,8 @@ export const actionSaveFile = (
 ): DispatchAction => ({
   type: EditorAction.SaveFile,
   payload: { fileName }
+});
+
+export const actionCopyToClipboard = (): DispatchAction => ({
+  type: EditorAction.CopyToClipboard
 });

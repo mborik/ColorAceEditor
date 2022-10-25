@@ -7,7 +7,7 @@
 
 import { UPLOAD } from '../elements';
 import { countMostFrequent } from '../utils';
-import { editor } from './Editor';
+import { Editor } from './Editor';
 import { EditorSpriteDimensions } from './Pixelator';
 
 
@@ -27,14 +27,14 @@ export class FileOps {
    * 288x256 (or lower) it will be converted by complex algorithm with proper
    * color attribute matching.
    */
-  upload(file: File, updateProgress?: (amount: number) => void): Promise<void> {
+  upload(this: Editor, file: File, updateProgress?: (amount: number) => void): Promise<void> {
     return new Promise((resolve, reject) => {
       if (file == null) {
         return reject('not a file');
       }
 
       try {
-        const { pixel } = editor;
+        const { pixel } = this;
         const fr = new FileReader();
 
         if (typeof file.type === 'string' && file.type.indexOf('image/') === 0) {
@@ -109,7 +109,7 @@ export class FileOps {
                   requestAnimationFrame(loopY);
                 }
                 else {
-                  editor.refresh();
+                  this.refresh();
 
                   if (typeof updateProgress === 'function') {
                     updateProgress(1);
@@ -133,7 +133,7 @@ export class FileOps {
 
             pixel.doSnapshot();
             pixel.readPMD85vram(b);
-            editor.refresh();
+            this.refresh();
 
             resolve();
           };
@@ -153,11 +153,11 @@ export class FileOps {
   /**
    * Create VRAM dump in PMD 85 format and provide download of the binary file.
    */
-  download(filename: string, dimensions?: EditorSpriteDimensions): void {
+  download(this: Editor, filename: string, dimensions?: EditorSpriteDimensions): void {
     const type = 'application/octet-stream';
     const bin = dimensions ?
-      editor.pixel.prepareSprite(dimensions) :
-      editor.pixel.preparePMD85vram();
+      this.pixel.prepareSprite(dimensions) :
+      this.pixel.preparePMD85vram();
 
     let blob: Nullable<Blob> = null;
     try {
@@ -201,5 +201,40 @@ export class FileOps {
         console.error(ex);
       }
     }
+  }
+
+  /**
+   * Render current screen into clipboard as image.
+   */
+  copyToClipboard(this: Editor, type = 'image/png'): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!(navigator?.clipboard instanceof Clipboard)) {
+        return reject('clipboard not available');
+      }
+
+      const lastZoomFactor = this.zoomFactor;
+      this.pixel.render(0, 0, 1);
+
+      try {
+        this.canvas.toBlob((blob) => {
+          if (!(blob instanceof Blob)) {
+            return reject('unexpected error!');
+          }
+
+          navigator.clipboard.write([
+            new ClipboardItem({ [type]: blob })
+          ]).then(() => {
+            this.zoomFactor = lastZoomFactor;
+            this.refresh();
+            resolve();
+          }).catch((e) => {
+            reject(`unexpected error: ${e}`);
+          });
+        }, type, /* quality */ 1);
+      }
+      catch (e) {
+        reject(`fatal error: ${e}`);
+      }
+    });
   }
 }
