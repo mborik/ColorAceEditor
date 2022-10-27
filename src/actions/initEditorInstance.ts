@@ -3,6 +3,7 @@
  * Copyright (c) 2019-2022 Martin Bórik
  */
 
+import pako from 'pako';
 import constants from '../constants';
 import { Editor, getInstance } from '../editor';
 import { devLog } from '../utils';
@@ -32,6 +33,18 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
       localStorage.getItem(constants.EDITOR_CONFIGURATION_KEY) as string
     );
 
+    let imageData: Optional<Uint8Array>;
+    const storedBase64 = localStorage.getItem(constants.EDITOR_IMAGE_KEY);
+    if (storedBase64) {
+      imageData = pako.inflate(
+        Uint8Array.from(
+          atob(storedBase64)
+            .split('')
+            .map(c => c.charCodeAt(0))
+        )
+      );
+    }
+
     if (configuration) {
       devLog('ColorAceEditor configuration:', configuration);
       doActionAfterInit = () => {
@@ -44,6 +57,9 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
             editor[opt] = value;
           }
         }
+        if (imageData instanceof Uint8Array) {
+          editor.pixel.readPMD85vram(imageData);
+        }
         return actionRefresh();
       };
     }
@@ -54,12 +70,7 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
 
   window.addEventListener('beforeunload', event => {
     event.preventDefault();
-    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-      delete event['returnValue'];
-    }
-    else {
-      event.returnValue = 'Unsaved changes will be lost. Are you sure?';
-    }
+    delete event['returnValue'];
 
     const {
       undoLevels, zoomFactor, showGuides, editColorMode,
@@ -72,6 +83,10 @@ export const actionInitEditorInstance = (dispatch: Dispatch) => {
       editColor, editTool, editMode, editFilled, editBrushShape,
       editSelectFnShiftWrap, editSelectFnShiftAttr, editSelectFnBlockAttr
     }));
+
+    const imageData = editor.pixel.preparePMD85vram();
+    const base64 = btoa(String.fromCharCode.apply(null, pako.deflate(imageData)));
+    localStorage.setItem(constants.EDITOR_IMAGE_KEY, base64);
   });
 
   dispatch({

@@ -5,6 +5,7 @@
 
 export default {
   EDITOR_CONFIGURATION_KEY: 'colorace-editor-configuration',
+  EDITOR_IMAGE_KEY: 'colorace-editor-image',
   FILE_NAME_SCREEN: 'screen.bin',
   FILE_NAME_SPRITE: 'sprite.bin',
 
