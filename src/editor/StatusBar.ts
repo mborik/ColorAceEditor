@@ -58,10 +58,10 @@ export class StatusBar extends FileOps {
       let w: Optional<number> = (x2 + 1) - x1;
       let h: Optional<number> = (y2 + 1) - y1;
 
-      if (w >= 288) {
+      if (w > 288) {
         w = undefined;
       }
-      if (h >= 256) {
+      if (h > 256) {
         h = undefined;
       }
       if (x1 < 0 || x1 >= 288) {
