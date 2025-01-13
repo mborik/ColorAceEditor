@@ -46,7 +46,7 @@
     "workbox-sw": "^6.5.4"
   },
   "devDependencies": {
-    "@blueprintjs/node-build-scripts": "^5.2.0",
+    "@blueprintjs/node-build-scripts": "^9.2.4",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@types/node": "^12.7.2",
     "@types/pako": "^2.0.0",
@@ -64,7 +64,7 @@
     "fork-ts-checker-webpack-plugin": "^7.2.13",
     "mini-css-extract-plugin": "^2.6.1",
     "pkg.json-webpack-plugin": "^2.0.2",
-    "postcss": "^8.4.17",
+    "postcss": "^8.4.49",
     "postcss-discard-comments": "^5.1.2",
     "postcss-loader": "^7.0.1",
     "sass-loader": "^13.0.2",
